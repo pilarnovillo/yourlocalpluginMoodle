@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="index, follow, all" />
+    <title>EasyRdf\Serialiser\Turtle | EasyRdf API Documentation</title>
+
+            <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/doctum.css">
+        <link rel="stylesheet" type="text/css" href="../../fonts/doctum-font.css">
+        <script src="../../js/jquery-3.5.1.slim.min.js"></script>
+        <script async defer src="../../js/bootstrap.min.js"></script>
+        <script src="../../js/typeahead.min.js"></script>
+        <script src="../../doctum.js"></script>
+        <meta name="MobileOptimized" content="width">
+        <meta name="HandheldFriendly" content="true">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    </head>
+
+    <body id="class" data-name="class:EasyRdf_Serialiser_Turtle" data-root-path="../../">
+            <div id="content">
+        <div id="left-column">
+                <div id="control-panel">
+                <form id="search-form" action="../../search.html">
+            <span class="icon icon-search"></span>
+            <input name="search"
+                   class="typeahead form-control"
+                   type="search"
+                   placeholder="Search">
+        </form>
+    </div>
+
+                <div id="api-tree"></div>
+
+        </div>
+        <div id="right-column">
+                <nav id="site-nav" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-elements">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="../../index.html">EasyRdf API Documentation</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-elements">
+                <ul class="nav navbar-nav">
+                    <li><a href="../../classes.html">Classes</a></li>
+                    <li><a href="../../namespaces.html">Namespaces</a></li>
+                    <li><a href="../../interfaces.html">Interfaces</a></li>
+                    <li><a href="../../traits.html">Traits</a></li>
+                    <li><a href="../../doc-index.html">Index</a></li>
+                    <li><a href="../../search.html">Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+                        <div class="namespace-breadcrumbs">
+            <ol class="breadcrumb">
+                <li><span class="label label-default">class</span></li>
+                        <li><a href="../../EasyRdf.html">EasyRdf</a></li><li class="backslash">\</li><li><a href="../../EasyRdf/Serialiser.html">Serialiser</a></li><li class="backslash">\</li><li>Turtle</li>
+            </ol>
+        </div>
+                <div id="page-content">
+                
+    <div class="page-header">
+        <h1>
+            Turtle
+                
+        </h1>
+    </div>
+
+    <p>    class
+    <strong>Turtle</strong>        extends <a href="../../EasyRdf/Serialiser.html"><abbr title="EasyRdf\Serialiser">Serialiser</abbr></a>
+</p>
+
+        
+    
+
+            <div class="description">
+            <p>Class to serialise an EasyRdf\Graph to Turtle
+with no external dependencies.</p>            <p>http://www.w3.org/TR/turtle/</p>                    </div>
+    
+    
+    
+            <h2>Properties</h2>
+
+            <table class="table table-condensed">
+                    <tr>
+                <td class="type" id="property_prefixes">
+                                        protected                                        
+                </td>
+                <td>$prefixes</td>
+                <td class="last"></td>
+                <td><small>from&nbsp;<a href="../../EasyRdf/Serialiser.html#property_prefixes">
+<abbr title="EasyRdf\Serialiser">Serialiser</abbr></a></small></td>
+            </tr>
+            </table>
+
+    
+            <h2>Methods</h2>
+
+            <div class="container-fluid underlined">
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_addPrefix">addPrefix</a>($qname)
+        
+                                            <p>Keep track of the prefixes used while serialising</p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../EasyRdf/Serialiser.html#method_addPrefix">
+<abbr title="EasyRdf\Serialiser">Serialiser</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_checkSerialiseParams">checkSerialiseParams</a>($format)
+        
+                                            <p>Check and cleanup parameters passed to serialise() method</p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../EasyRdf/Serialiser.html#method_checkSerialiseParams">
+<abbr title="EasyRdf\Serialiser">Serialiser</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_reversePropertyCount">reversePropertyCount</a>($resource)
+        
+                                            <p>Protected method to get the number of reverse properties for a resource
+If a resource only has a single property, the number of values for that
+property is returned instead.</p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../EasyRdf/Serialiser.html#method_reversePropertyCount">
+<abbr title="EasyRdf\Serialiser">Serialiser</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_serialise">serialise</a>(<a href="../../EasyRdf/Graph.html"><abbr title="EasyRdf\Graph">Graph</abbr></a> $graph, Format|string $format, array $options = array())
+        
+                                            <p>Serialise an EasyRdf\Graph to Turtle.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    static&nbsp;string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_escapeIri">escapeIri</a>(string $resourceIri)
+        
+                                            <p>Given a IRI string, escape and enclose in angle brackets.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    static&nbsp;string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_quotedString">quotedString</a>(string $value)
+        
+                                            <p>Given a string, enclose in quotes and escape any quotes in the string.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_serialiseResource">serialiseResource</a>(resource|string $resource, bool $createNamespace = false)
+        
+                                            <p>Given a an EasyRdf\Resource or URI, convert it into a string, suitable to
+be written to a Turtle document. URIs will be shortened into CURIES
+where possible.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_serialiseLiteral">serialiseLiteral</a>(Literal $literal)
+        
+                                            <p>Given an EasyRdf\Literal object, convert it into a string, suitable to
+be written to a Turtle document. Supports multiline literals and literals with
+datatypes or languages.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_serialiseObject">serialiseObject</a>(resource|Literal $object)
+        
+                                            <p>Convert an EasyRdf object into a string suitable to
+be written to a Turtle document.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_serialiseCollection">serialiseCollection</a>($node, $indent)
+        
+                                            <p>Protected method to serialise a RDF collection</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_serialiseProperties">serialiseProperties</a>($res, $depth = 1)
+        
+                                            <p>Protected method to serialise the properties of a resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_serialisePrefixes">serialisePrefixes</a>()
+        
+                                            <p class="no-description">No description</p>
+                                    </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_serialiseSubjects">serialiseSubjects</a>(<a href="../../EasyRdf/Graph.html"><abbr title="EasyRdf\Graph">Graph</abbr></a> $graph, $filterType)
+        
+                                            <p class="no-description">No description</p>
+                                    </div>
+                <div class="col-md-2"></div>
+            </div>
+            </div>
+
+
+        <h2>Details</h2>
+
+            <div id="method-details">
+                    <div class="method-item">
+                    <h3 id="method_addPrefix">
+        <div class="location">in <a href="../../EasyRdf/Serialiser.html#method_addPrefix">
+<abbr title="EasyRdf\Serialiser">Serialiser</abbr></a> at line 54</div>
+        <code>            protected        
+    <strong>addPrefix</strong>($qname)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Keep track of the prefixes used while serialising</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$qname</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_checkSerialiseParams">
+        <div class="location">in <a href="../../EasyRdf/Serialiser.html#method_checkSerialiseParams">
+<abbr title="EasyRdf\Serialiser">Serialiser</abbr></a> at line 64</div>
+        <code>            protected        
+    <strong>checkSerialiseParams</strong>($format)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Check and cleanup parameters passed to serialise() method</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$format</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_reversePropertyCount">
+        <div class="location">in <a href="../../EasyRdf/Serialiser.html#method_reversePropertyCount">
+<abbr title="EasyRdf\Serialiser">Serialiser</abbr></a> at line 85</div>
+        <code>            protected        
+    <strong>reversePropertyCount</strong>($resource)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Protected method to get the number of reverse properties for a resource
+If a resource only has a single property, the number of values for that
+property is returned instead.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$resource</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_serialise">
+        <div class="location">at line 366</div>
+        <code>                    string
+    <strong>serialise</strong>(<a href="../../EasyRdf/Graph.html"><abbr title="EasyRdf\Graph">Graph</abbr></a> $graph, Format|string $format, array $options = array())
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Serialise an EasyRdf\Graph to Turtle.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><a href="../../EasyRdf/Graph.html"><abbr title="EasyRdf\Graph">Graph</abbr></a></td>
+                <td>$graph</td>
+                <td>An EasyRdf\Graph object.</td>
+            </tr>
+                    <tr>
+                <td>Format|string</td>
+                <td>$format</td>
+                <td>The name of the format to convert to.</td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$options</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+                            <h4>Exceptions</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><a target="_blank" rel="noopener" href="https://www.php.net/Exception">Exception</a></td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_escapeIri">
+        <div class="location">at line 67</div>
+        <code>        static            string
+    <strong>escapeIri</strong>(string $resourceIri)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Given a IRI string, escape and enclose in angle brackets.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$resourceIri</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_quotedString">
+        <div class="location">at line 82</div>
+        <code>        static            string
+    <strong>quotedString</strong>(string $value)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Given a string, enclose in quotes and escape any quotes in the string.</p>                    <p>Strings containing tabs, linefeeds or carriage returns will be
+enclosed in three double quotes (""").</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$value</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_serialiseResource">
+        <div class="location">at line 113</div>
+        <code>                    string
+    <strong>serialiseResource</strong>(resource|string $resource, bool $createNamespace = false)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Given a an EasyRdf\Resource or URI, convert it into a string, suitable to
+be written to a Turtle document. URIs will be shortened into CURIES
+where possible.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>resource|string</td>
+                <td>$resource</td>
+                <td>The resource to convert to a Turtle string</td>
+            </tr>
+                    <tr>
+                <td>bool</td>
+                <td>$createNamespace</td>
+                <td>If true, a new namespace may be created</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_serialiseLiteral">
+        <div class="location">at line 142</div>
+        <code>                    string
+    <strong>serialiseLiteral</strong>(Literal $literal)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Given an EasyRdf\Literal object, convert it into a string, suitable to
+be written to a Turtle document. Supports multiline literals and literals with
+datatypes or languages.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>Literal</td>
+                <td>$literal</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_serialiseObject">
+        <div class="location">at line 176</div>
+        <code>                    string
+    <strong>serialiseObject</strong>(resource|Literal $object)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Convert an EasyRdf object into a string suitable to
+be written to a Turtle document.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>resource|Literal</td>
+                <td>$object</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+                            <h4>Exceptions</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><a target="_blank" rel="noopener" href="https://www.php.net/InvalidArgumentException">InvalidArgumentException</a></td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_serialiseCollection">
+        <div class="location">at line 195</div>
+        <code>            protected        
+    <strong>serialiseCollection</strong>($node, $indent)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Protected method to serialise a RDF collection</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$node</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$indent</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_serialiseProperties">
+        <div class="location">at line 231</div>
+        <code>            protected        
+    <strong>serialiseProperties</strong>($res, $depth = 1)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Protected method to serialise the properties of a resource</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$res</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$depth</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_serialisePrefixes">
+        <div class="location">at line 299</div>
+        <code>            protected        
+    <strong>serialisePrefixes</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_serialiseSubjects">
+        <div class="location">at line 312</div>
+        <code>            protected        
+    <strong>serialiseSubjects</strong>(<a href="../../EasyRdf/Graph.html"><abbr title="EasyRdf\Graph">Graph</abbr></a> $graph, $filterType)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><a href="../../EasyRdf/Graph.html"><abbr title="EasyRdf\Graph">Graph</abbr></a></td>
+                <td>$graph</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$filterType</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+            </div>
+
+    
+            </div><div id="footer">
+        Generated by <a href="https://github.com/code-lts/doctum">Doctum, a API Documentation generator and fork of Sami</a>.
+    </div></div>
+    </div>
+    </body>
+
+</html>

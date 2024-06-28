@@ -1,0 +1,3567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="index, follow, all" />
+    <title>EasyRdf\Graph | EasyRdf API Documentation</title>
+
+            <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="../css/doctum.css">
+        <link rel="stylesheet" type="text/css" href="../fonts/doctum-font.css">
+        <script src="../js/jquery-3.5.1.slim.min.js"></script>
+        <script async defer src="../js/bootstrap.min.js"></script>
+        <script src="../js/typeahead.min.js"></script>
+        <script src="../doctum.js"></script>
+        <meta name="MobileOptimized" content="width">
+        <meta name="HandheldFriendly" content="true">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    </head>
+
+    <body id="class" data-name="class:EasyRdf_Graph" data-root-path="../">
+            <div id="content">
+        <div id="left-column">
+                <div id="control-panel">
+                <form id="search-form" action="../search.html">
+            <span class="icon icon-search"></span>
+            <input name="search"
+                   class="typeahead form-control"
+                   type="search"
+                   placeholder="Search">
+        </form>
+    </div>
+
+                <div id="api-tree"></div>
+
+        </div>
+        <div id="right-column">
+                <nav id="site-nav" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-elements">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="../index.html">EasyRdf API Documentation</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-elements">
+                <ul class="nav navbar-nav">
+                    <li><a href="../classes.html">Classes</a></li>
+                    <li><a href="../namespaces.html">Namespaces</a></li>
+                    <li><a href="../interfaces.html">Interfaces</a></li>
+                    <li><a href="../traits.html">Traits</a></li>
+                    <li><a href="../doc-index.html">Index</a></li>
+                    <li><a href="../search.html">Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+                        <div class="namespace-breadcrumbs">
+            <ol class="breadcrumb">
+                <li><span class="label label-default">class</span></li>
+                        <li><a href="../EasyRdf.html">EasyRdf</a></li><li class="backslash">\</li><li>Graph</li>
+            </ol>
+        </div>
+                <div id="page-content">
+                
+    <div class="page-header">
+        <h1>
+            Graph
+                
+        </h1>
+    </div>
+
+    <p>    class
+    <strong>Graph</strong>
+</p>
+
+        
+    
+
+            <div class="description">
+            <p>Container for collection of EasyRdf\Resource objects.</p>                                </div>
+    
+    
+    
+    
+            <h2>Methods</h2>
+
+            <div class="container-fluid underlined">
+                    <div class="row">
+                <div class="col-md-2 type">
+                    Graph
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method___construct">__construct</a>(string $uri = null, string $data = null, string $format = null)
+        
+                                            <p>Constructor</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    static&nbsp;Graph
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_newAndLoad">newAndLoad</a>(string $uri, string|null $format = null)
+        
+                                            <p>Create a new graph and load RDF data from a URI into it</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a>
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_resource">resource</a>(string $uri = null, mixed $types = array())
+        
+                                            <p>Get or create a resource stored in a graph</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_classForResource">classForResource</a>($uri)
+        
+                                            <p>Work out the class to instantiate a resource as</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a>
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_newBNode">newBNode</a>(mixed $types = array())
+        
+                                            <p>Create a new blank node in the graph and return it.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_newBNodeId">newBNodeId</a>()
+        
+                                            <p>Create a new unique blank node identifier and return it.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parse">parse</a>(string $data, string $format = null, string $uri = null)
+        
+                                            <p>Parse some RDF data into the graph object.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseFile">parseFile</a>(string $filename, string $format = null, string $uri = null)
+        
+                                            <p>Parse a file containing RDF data into the graph object.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_load">load</a>(string $uri = null, string $format = null)
+        
+                                            <p>Load RDF data into the graph from a URI.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a>[]
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_resources">resources</a>()
+        
+                                            <p>Get an associative array of all the resources stored in the graph.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a>[]
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_resourcesMatching">resourcesMatching</a>(string $property, mixed $value = null)
+        
+                                            <p>Get an arry of resources matching a certain property and optional value.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_getUri">getUri</a>()
+        
+                                            <p>Get the URI of the graph</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_checkResourceParam">checkResourceParam</a>($resource, $allowNull = false)
+        
+                                            <p>Check that a URI/resource parameter is valid, and convert it to a string</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_checkSinglePropertyParam">checkSinglePropertyParam</a>($property, $inverse)
+        
+                                            <p>Check that a single URI/property parameter (not a property path)
+ is valid, and expand it if required</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_checkValueParam">checkValueParam</a>($value)
+        
+                                            <p>Check that a value parameter is valid, and convert it to an associative array if needed</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    mixed
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_get">get</a>(string $resource, string|array $propertyPath, string $type = null, string $lang = null)
+        
+                                            <p>Get a single value for a property of a resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    mixed
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_getSingleProperty">getSingleProperty</a>(string $resource, string $property, string $type = null, string $lang = null)
+        
+                                            <p>Get a single value for a property of a resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <a href="../EasyRdf/Literal.html"><abbr title="EasyRdf\Literal">Literal</abbr></a>
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_getLiteral">getLiteral</a>(string $resource, string|array $property, string $lang = null)
+        
+                                            <p>Get a single literal value for a property of a resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a>
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_getResource">getResource</a>(string $resource, string|array $property)
+        
+                                            <p>Get a single resource value for a property of a resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_propertyValuesArray">propertyValuesArray</a>($resource, $property, $inverse = false)
+        
+                                            <p>Return all the values for a particular property of a resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_arrayToObject">arrayToObject</a>($data)
+        
+                                            <p>Get an EasyRdf\Resource or EasyRdf\Literal object from an associative array.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_all">all</a>(string $resource, string $propertyPath, string $type = null, string $lang = null)
+        
+                                            <p>Get all values for a property path</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_allForSingleProperty">allForSingleProperty</a>(string $resource, string $property, string $type = null, string $lang = null)
+        
+                                            <p>Get all values for a single property of a resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_allLiterals">allLiterals</a>(string $resource, string $property, string $lang = null)
+        
+                                            <p>Get all literal values for a property of a resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_allResources">allResources</a>(string $resource, string $property)
+        
+                                            <p>Get all resources for a property of a resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_allOfType">allOfType</a>(string $type)
+        
+                                            <p>Get all the resources in the graph of a certain type</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_countValues">countValues</a>(string $resource, string $property, string $type = null, string $lang = null)
+        
+                                            <p>Count the number of values for a property of a resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_join">join</a>(mixed $resource, string $property, string $glue = &#039; &#039;, string $lang = null)
+        
+                                            <p>Concatenate all values for a property of a resource into a string.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_add">add</a>(mixed $resource, mixed $property, mixed $value)
+        
+                                            <p>Add data to the graph</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_addLiteral">addLiteral</a>(mixed $resource, mixed $property, mixed $value, string $lang = null)
+        
+                                            <p>Add a literal value as a property of a resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_addResource">addResource</a>(mixed $resource, mixed $property, mixed $resource2)
+        
+                                            <p>Add a resource as a property of another resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_set">set</a>(string $resource, string $property, mixed $value)
+        
+                                            <p>Set a value for a property</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_delete">delete</a>(mixed $resource, string $property, mixed $value = null)
+        
+                                            <p>Delete a property (or optionally just a specific value)</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_deleteSingleProperty">deleteSingleProperty</a>(mixed $resource, string $property, mixed $value = null)
+        
+                                            <p>Delete a property (or optionally just a specific value)</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_deleteResource">deleteResource</a>(mixed $resource, mixed $property, mixed $resource2)
+        
+                                            <p>Delete a resource from a property of another resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_deleteLiteral">deleteLiteral</a>(mixed $resource, mixed $property, mixed $value, string $lang = null)
+        
+                                            <p>Delete a literal value from a property of a resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_deleteInverse">deleteInverse</a>($resource, $property, $value)
+        
+                                            <p>This function is for internal use only.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_isEmpty">isEmpty</a>()
+        
+                                            <p>Check if the graph contains any statements</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_properties">properties</a>(string $resource)
+        
+                                            <p>Get a list of all the shortened property names (qnames) for a resource.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_propertyUris">propertyUris</a>(string $resource)
+        
+                                            <p>Get a list of the full URIs for the properties of a resource.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_reversePropertyUris">reversePropertyUris</a>(string $resource)
+        
+                                            <p>Get a list of the full URIs for the properties that point to a resource.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_hasProperty">hasProperty</a>(mixed $resource, string $property, mixed $value = null)
+        
+                                            <p>Check to see if a property exists for a resource.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    mixed
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_serialise">serialise</a>(mixed $format, array $options = array())
+        
+                                            <p>Serialise the graph into RDF</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_dump">dump</a>(string $format = &#039;html&#039;)
+        
+                                            <p>Return a human readable view of all the resources in the graph</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_dumpResource">dumpResource</a>(mixed $resource, string $format = &#039;html&#039;)
+        
+                                            <p>Return a human readable view of a resource and its properties</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_type">type</a>(string|null $resource = null)
+        
+                                            <p>Get the resource type of the graph</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a>
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_typeAsResource">typeAsResource</a>(mixed $resource = null)
+        
+                                            <p>Get the resource type of the graph as a EasyRdf\Resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_types">types</a>(string|null $resource = null)
+        
+                                            <p>Get a list of types for a resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a>[]
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_typesAsResources">typesAsResources</a>(string|null $resource = null)
+        
+                                            <p>Get the resource types of the graph as a EasyRdf\Resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_isA">isA</a>(string $resource, string $type)
+        
+                                            <p>Check if a resource is of the specified type</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_addType">addType</a>(string $resource, string $types)
+        
+                                            <p>Add one or more rdf:type properties to a resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_setType">setType</a>(string $resource, string $type)
+        
+                                            <p>Change the rdf:type property for a resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <a href="../EasyRdf/Literal.html"><abbr title="EasyRdf\Literal">Literal</abbr></a>|null
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_label">label</a>(string|null $resource = null, string|null $lang = null)
+        
+                                            <p>Get a human readable label for a resource</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    <a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a>
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_primaryTopic">primaryTopic</a>(mixed $resource = null)
+        
+                                            <p>Get the primary topic of the graph</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    array
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_toRdfPhp">toRdfPhp</a>()
+        
+                                            <p>Returns the graph as a RDF/PHP associative array</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_countTriples">countTriples</a>()
+        
+                                            <p>Calculates the number of triples in the graph</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method___toString">__toString</a>()
+        
+                                            <p>Magic method to return URI of resource when casted to string</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method___get">__get</a>(string $name)
+        
+                                            <p>Magic method to get a property of the graph</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method___set">__set</a>(string $name, string $value)
+        
+                                            <p>Magic method to set the value for a property of the graph</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    bool
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method___isset">__isset</a>(string $name)
+        
+                                            <p>Magic method to check if a property exists</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    int
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method___unset">__unset</a>(string $name)
+        
+                                            <p>Magic method to delete a property of the graph</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+            </div>
+
+
+        <h2>Details</h2>
+
+            <div id="method-details">
+                    <div class="method-item">
+                    <h3 id="method___construct">
+        <div class="location">at line 84</div>
+        <code>                    Graph
+    <strong>__construct</strong>(string $uri = null, string $data = null, string $format = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Constructor</p>                    <p>If no URI is given then an unnamed graph is created.</p>
+
+<p>The $data parameter is optional and will be parsed into
+the graph if given.</p>
+
+<p>The data format is optional and should be specified if it
+can't be guessed by EasyRdf.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$uri</td>
+                <td>The URI of the graph</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$data</td>
+                <td>Data for the graph</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$format</td>
+                <td>The document type of the data (e.g. rdfxml)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>Graph</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_newAndLoad">
+        <div class="location">at line 115</div>
+        <code>        static            Graph
+    <strong>newAndLoad</strong>(string $uri, string|null $format = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Create a new graph and load RDF data from a URI into it</p>                    <p>This static function is shorthand for:
+    $graph = new \EasyRdf\Graph($uri);
+    $graph->load($uri, $format);</p>
+
+<p>The document format is optional but should be specified if it
+can't be guessed or got from the HTTP headers.</p>
+
+<p>If the document format is given, then the HTTP Accept header is
+set to the MIME type of the requested format.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$uri</td>
+                <td>The URI of the data to load</td>
+            </tr>
+                    <tr>
+                <td>string|null</td>
+                <td>$format</td>
+                <td>Optional format of the data (eg. rdfxml or text/turtle)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>Graph</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_resource">
+        <div class="location">at line 137</div>
+        <code>                    <a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a>
+    <strong>resource</strong>(string $uri = null, mixed $types = array())
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get or create a resource stored in a graph</p>                    <p>If the resource did not previously exist, then a new resource will
+be created. If you provide an RDF type and that type is registered
+with the EasyRdf\TypeMapper, then the resource will be an instance
+of the class registered.</p>
+
+<p>If URI is null, then the URI of the graph is used.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$uri</td>
+                <td>The URI of the resource</td>
+            </tr>
+                    <tr>
+                <td>mixed</td>
+                <td>$types</td>
+                <td>RDF type of a new resource (e.g. foaf:Person)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a></td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+                            <h4>Exceptions</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><a target="_blank" rel="noopener" href="https://www.php.net/InvalidArgumentException">InvalidArgumentException</a></td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_classForResource">
+        <div class="location">at line 166</div>
+        <code>            protected        
+    <strong>classForResource</strong>($uri)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Work out the class to instantiate a resource as</p>                    <p>@ignore</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$uri</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_newBNode">
+        <div class="location">at line 202</div>
+        <code>                    <a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a>
+    <strong>newBNode</strong>(mixed $types = array())
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Create a new blank node in the graph and return it.</p>                    <p>If you provide an RDF type and that type is registered
+with the EasyRdf\TypeMapper, then the resource will be an instance
+of the class registered.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>mixed</td>
+                <td>$types</td>
+                <td>RDF type of a new blank node (e.g. foaf:Person)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a></td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_newBNodeId">
+        <div class="location">at line 212</div>
+        <code>                    string
+    <strong>newBNodeId</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Create a new unique blank node identifier and return it.</p>                                                </div>
+                <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parse">
+        <div class="location">at line 227</div>
+        <code>                    int
+    <strong>parse</strong>(string $data, string $format = null, string $uri = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parse some RDF data into the graph object.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$data</td>
+                <td>Data to parse for the graph</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$format</td>
+                <td>Optional format of the data</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$uri</td>
+                <td>The URI of the data to load</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+                            <h4>Exceptions</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><a target="_blank" rel="noopener" href="https://www.php.net/Exception">Exception</a></td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseFile">
+        <div class="location">at line 257</div>
+        <code>                    int
+    <strong>parseFile</strong>(string $filename, string $format = null, string $uri = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parse a file containing RDF data into the graph object.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$filename</td>
+                <td>The path of the file to load</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$format</td>
+                <td>Optional format of the file</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$uri</td>
+                <td>The URI of the file to load</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_load">
+        <div class="location">at line 288</div>
+        <code>                    int
+    <strong>load</strong>(string $uri = null, string $format = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Load RDF data into the graph from a URI.</p>                    <p>If no URI is given, then the URI of the graph will be used.</p>
+
+<p>The document format is optional but should be specified if it
+can't be guessed or got from the HTTP headers.</p>
+
+<p>If the document format is given, then the HTTP Accept header is
+set to the MIME type of the requested format.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$uri</td>
+                <td>The URI of the data to load</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$format</td>
+                <td>Optional format of the data (eg. rdfxml or text/turtle)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+                            <h4>Exceptions</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><a target="_blank" rel="noopener" href="https://www.php.net/Exception">Exception</a></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td><abbr title="Http\Exception">Exception</abbr></td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_resources">
+        <div class="location">at line 378</div>
+        <code>                    <a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a>[]
+    <strong>resources</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get an associative array of all the resources stored in the graph.</p>                    <p>The keys of the array is the URI of the EasyRdf\Resource.</p>                            </div>
+                <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a>[]</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_resourcesMatching">
+        <div class="location">at line 412</div>
+        <code>                    <a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a>[]
+    <strong>resourcesMatching</strong>(string $property, mixed $value = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get an arry of resources matching a certain property and optional value.</p>                    <p>For example this routine could be used as a way of getting
+everyone who has name:
+$people = $graph->resourcesMatching('foaf:name')</p>
+
+<p>Or everyone who is male:
+$people = $graph->resourcesMatching('foaf:gender', 'male');</p>
+
+<p>Or all homepages:
+$people = $graph->resourcesMatching('^foaf:homepage');</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$property</td>
+                <td>The property to check.</td>
+            </tr>
+                    <tr>
+                <td>mixed</td>
+                <td>$value</td>
+                <td>Optional, the value of the propery to check for.</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a>[]</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getUri">
+        <div class="location">at line 447</div>
+        <code>                    string
+    <strong>getUri</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get the URI of the graph</p>                                                </div>
+                <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_checkResourceParam">
+        <div class="location">at line 455</div>
+        <code>            protected        
+    <strong>checkResourceParam</strong>($resource, $allowNull = false)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Check that a URI/resource parameter is valid, and convert it to a string</p>                    <p>@ignore</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$resource</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$allowNull</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_checkSinglePropertyParam">
+        <div class="location">at line 496</div>
+        <code>            protected        
+    <strong>checkSinglePropertyParam</strong>($property, $inverse)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Check that a single URI/property parameter (not a property path)
+ is valid, and expand it if required</p>                    <p>@ignore</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$property</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$inverse</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_checkValueParam">
+        <div class="location">at line 530</div>
+        <code>            protected        
+    <strong>checkValueParam</strong>($value)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Check that a value parameter is valid, and convert it to an associative array if needed</p>                    <p>@ignore</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$value</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_get">
+        <div class="location">at line 603</div>
+        <code>                    mixed
+    <strong>get</strong>(string $resource, string|array $propertyPath, string $type = null, string $lang = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get a single value for a property of a resource</p>                    <p>If multiple values are set for a property then the value returned
+may be arbitrary.</p>
+
+<p>If $property is an array, then the first item in the array that matches
+a property that exists is returned.</p>
+
+<p>This method will return null if the property does not exist.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$resource</td>
+                <td>The URI of the resource (e.g. http://example.com/joe#me)</td>
+            </tr>
+                    <tr>
+                <td>string|array</td>
+                <td>$propertyPath</td>
+                <td>A valid property path</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$type</td>
+                <td>The type of value to filter by (e.g. literal or resource)</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$lang</td>
+                <td>The language to filter by (e.g. en)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>mixed</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+                            <h4>Exceptions</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><a target="_blank" rel="noopener" href="https://www.php.net/InvalidArgumentException">InvalidArgumentException</a></td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getSingleProperty">
+        <div class="location">at line 659</div>
+        <code>            protected        mixed
+    <strong>getSingleProperty</strong>(string $resource, string $property, string $type = null, string $lang = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get a single value for a property of a resource</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$resource</td>
+                <td>The URI of the resource (e.g. http://example.com/joe#me)</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$property</td>
+                <td>The name of the property (e.g. foaf:name)</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$type</td>
+                <td>The type of value to filter by (e.g. literal or resource)</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$lang</td>
+                <td>The language to filter by (e.g. en)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>mixed</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getLiteral">
+        <div class="location">at line 708</div>
+        <code>                    <a href="../EasyRdf/Literal.html"><abbr title="EasyRdf\Literal">Literal</abbr></a>
+    <strong>getLiteral</strong>(string $resource, string|array $property, string $lang = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get a single literal value for a property of a resource</p>                    <p>If multiple values are set for a property then the value returned
+may be arbitrary.</p>
+
+<p>This method will return null if there is not literal value for the
+property.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$resource</td>
+                <td>The URI of the resource (e.g. http://example.com/joe#me)</td>
+            </tr>
+                    <tr>
+                <td>string|array</td>
+                <td>$property</td>
+                <td>The name of the property (e.g. foaf:name)</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$lang</td>
+                <td>The language to filter by (e.g. en)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><a href="../EasyRdf/Literal.html"><abbr title="EasyRdf\Literal">Literal</abbr></a></td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_getResource">
+        <div class="location">at line 726</div>
+        <code>                    <a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a>
+    <strong>getResource</strong>(string $resource, string|array $property)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get a single resource value for a property of a resource</p>                    <p>If multiple values are set for a property then the value returned
+may be arbitrary.</p>
+
+<p>This method will return null if there is not resource for the
+property.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$resource</td>
+                <td>The URI of the resource (e.g. http://example.com/joe#me)</td>
+            </tr>
+                    <tr>
+                <td>string|array</td>
+                <td>$property</td>
+                <td>The name of the property (e.g. foaf:name)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a></td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_propertyValuesArray">
+        <div class="location">at line 734</div>
+        <code>            protected        
+    <strong>propertyValuesArray</strong>($resource, $property, $inverse = false)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Return all the values for a particular property of a resource</p>                    <p>@ignore</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$resource</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$property</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$inverse</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_arrayToObject">
+        <div class="location">at line 757</div>
+        <code>            protected        
+    <strong>arrayToObject</strong>($data)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get an EasyRdf\Resource or EasyRdf\Literal object from an associative array.</p>                    <p>@ignore</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$data</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_all">
+        <div class="location">at line 782</div>
+        <code>                    array
+    <strong>all</strong>(string $resource, string $propertyPath, string $type = null, string $lang = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get all values for a property path</p>                    <p>This method will return an empty array if the property does not exist.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$resource</td>
+                <td>The URI of the resource (e.g. http://example.com/joe#me)</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$propertyPath</td>
+                <td>A valid property path</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$type</td>
+                <td>The type of value to filter by (e.g. literal)</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$lang</td>
+                <td>The language to filter by (e.g. en)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+                            <h4>Exceptions</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><a target="_blank" rel="noopener" href="https://www.php.net/InvalidArgumentException">InvalidArgumentException</a></td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_allForSingleProperty">
+        <div class="location">at line 842</div>
+        <code>            protected        array
+    <strong>allForSingleProperty</strong>(string $resource, string $property, string $type = null, string $lang = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get all values for a single property of a resource</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$resource</td>
+                <td>The URI of the resource (e.g. http://example.com/joe#me)</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$property</td>
+                <td>The name of the property (e.g. foaf:name)</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$type</td>
+                <td>The type of value to filter by (e.g. literal)</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$lang</td>
+                <td>The language to filter by (e.g. en)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_allLiterals">
+        <div class="location">at line 885</div>
+        <code>                    array
+    <strong>allLiterals</strong>(string $resource, string $property, string $lang = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get all literal values for a property of a resource</p>                    <p>This method will return an empty array if the resource does not
+has any literal values for that property.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$resource</td>
+                <td>The URI of the resource (e.g. http://example.com/joe#me)</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$property</td>
+                <td>The name of the property (e.g. foaf:name)</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$lang</td>
+                <td>The language to filter by (e.g. en)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_allResources">
+        <div class="location">at line 900</div>
+        <code>                    array
+    <strong>allResources</strong>(string $resource, string $property)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get all resources for a property of a resource</p>                    <p>This method will return an empty array if the resource does not
+has any resources for that property.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$resource</td>
+                <td>The URI of the resource (e.g. http://example.com/joe#me)</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$property</td>
+                <td>The name of the property (e.g. foaf:name)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_allOfType">
+        <div class="location">at line 914</div>
+        <code>                    array
+    <strong>allOfType</strong>(string $type)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get all the resources in the graph of a certain type</p>                    <p>If no resources of the type are available and empty
+array is returned.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$type</td>
+                <td>The type of the resource (e.g. foaf:Person)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_countValues">
+        <div class="location">at line 928</div>
+        <code>                    int
+    <strong>countValues</strong>(string $resource, string $property, string $type = null, string $lang = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Count the number of values for a property of a resource</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$resource</td>
+                <td>The URI of the resource (e.g. http://example.com/joe#me)</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$property</td>
+                <td>The name of the property (e.g. foaf:name)</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$type</td>
+                <td>The type of value to filter by (e.g. literal)</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$lang</td>
+                <td>The language to filter by (e.g. en)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_join">
+        <div class="location">at line 945</div>
+        <code>                    string
+    <strong>join</strong>(mixed $resource, string $property, string $glue = &#039; &#039;, string $lang = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Concatenate all values for a property of a resource into a string.</p>                    <p>The default is to join the values together with a space character.
+This method will return an empty string if the property does not exist.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>mixed</td>
+                <td>$resource</td>
+                <td>The resource to get the property on</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$property</td>
+                <td>The name of the property (e.g. foaf:name)</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$glue</td>
+                <td>The string to glue the values together with.</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$lang</td>
+                <td>The language to filter by (e.g. en)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_add">
+        <div class="location">at line 963</div>
+        <code>                    int
+    <strong>add</strong>(mixed $resource, mixed $property, mixed $value)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Add data to the graph</p>                    <p>The resource can either be a resource or the URI of a resource.</p>
+
+<p>Example:
+  $graph->add("http://www.example.com", 'dc:title', 'Title of Page');</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>mixed</td>
+                <td>$resource</td>
+                <td>The resource to add data to</td>
+            </tr>
+                    <tr>
+                <td>mixed</td>
+                <td>$property</td>
+                <td>The property name</td>
+            </tr>
+                    <tr>
+                <td>mixed</td>
+                <td>$value</td>
+                <td>The new value for the property</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_addLiteral">
+        <div class="location">at line 1012</div>
+        <code>                    int
+    <strong>addLiteral</strong>(mixed $resource, mixed $property, mixed $value, string $lang = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Add a literal value as a property of a resource</p>                    <p>The resource can either be a resource or the URI of a resource.
+The value can either be a single value or an array of values.</p>
+
+<p>Example:
+  $graph->add("http://www.example.com", 'dc:title', 'Title of Page');</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>mixed</td>
+                <td>$resource</td>
+                <td>The resource to add data to</td>
+            </tr>
+                    <tr>
+                <td>mixed</td>
+                <td>$property</td>
+                <td>The property name</td>
+            </tr>
+                    <tr>
+                <td>mixed</td>
+                <td>$value</td>
+                <td>The value or values for the property</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$lang</td>
+                <td>The language of the literal</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_addResource">
+        <div class="location">at line 1042</div>
+        <code>                    int
+    <strong>addResource</strong>(mixed $resource, mixed $property, mixed $resource2)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Add a resource as a property of another resource</p>                    <p>The resource can either be a resource or the URI of a resource.</p>
+
+<p>Example:
+  $graph->add("http://example.com/bob", 'foaf:knows', 'http://example.com/alice');</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>mixed</td>
+                <td>$resource</td>
+                <td>The resource to add data to</td>
+            </tr>
+                    <tr>
+                <td>mixed</td>
+                <td>$property</td>
+                <td>The property name</td>
+            </tr>
+                    <tr>
+                <td>mixed</td>
+                <td>$resource2</td>
+                <td>The resource to be value of the property</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_set">
+        <div class="location">at line 1068</div>
+        <code>                    int
+    <strong>set</strong>(string $resource, string $property, mixed $value)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Set a value for a property</p>                    <p>The new value will replace the existing values for the property.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$resource</td>
+                <td>The resource to set the property on</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$property</td>
+                <td>The name of the property (e.g. foaf:name)</td>
+            </tr>
+                    <tr>
+                <td>mixed</td>
+                <td>$value</td>
+                <td>The value for the property</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_delete">
+        <div class="location">at line 1090</div>
+        <code>                    int
+    <strong>delete</strong>(mixed $resource, string $property, mixed $value = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Delete a property (or optionally just a specific value)</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>mixed</td>
+                <td>$resource</td>
+                <td>The resource to delete the property from</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$property</td>
+                <td>The name of the property (e.g. foaf:name)</td>
+            </tr>
+                    <tr>
+                <td>mixed</td>
+                <td>$value</td>
+                <td>The value to delete (null to delete all values)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+                            <h4>Exceptions</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><a target="_blank" rel="noopener" href="https://www.php.net/InvalidArgumentException">InvalidArgumentException</a></td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_deleteSingleProperty">
+        <div class="location">at line 1123</div>
+        <code>                    int
+    <strong>deleteSingleProperty</strong>(mixed $resource, string $property, mixed $value = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Delete a property (or optionally just a specific value)</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>mixed</td>
+                <td>$resource</td>
+                <td>The resource to delete the property from</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$property</td>
+                <td>The name of the property (e.g. foaf:name)</td>
+            </tr>
+                    <tr>
+                <td>mixed</td>
+                <td>$value</td>
+                <td>The value to delete (null to delete all values)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_deleteResource">
+        <div class="location">at line 1172</div>
+        <code>                    int
+    <strong>deleteResource</strong>(mixed $resource, mixed $property, mixed $resource2)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Delete a resource from a property of another resource</p>                    <p>The resource can either be a resource or the URI of a resource.</p>
+
+<p>Example:
+  $graph->delete("http://example.com/bob", 'foaf:knows', 'http://example.com/alice');</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>mixed</td>
+                <td>$resource</td>
+                <td>The resource to delete data from</td>
+            </tr>
+                    <tr>
+                <td>mixed</td>
+                <td>$property</td>
+                <td>The property name</td>
+            </tr>
+                    <tr>
+                <td>mixed</td>
+                <td>$resource2</td>
+                <td>The resource value of the property to be deleted</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_deleteLiteral">
+        <div class="location">at line 1200</div>
+        <code>                    int
+    <strong>deleteLiteral</strong>(mixed $resource, mixed $property, mixed $value, string $lang = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Delete a literal value from a property of a resource</p>                    <p>Example:
+$graph->delete("http://www.example.com", 'dc:title', 'Title of Page');</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>mixed</td>
+                <td>$resource</td>
+                <td>The resource to add data to</td>
+            </tr>
+                    <tr>
+                <td>mixed</td>
+                <td>$property</td>
+                <td>The property name</td>
+            </tr>
+                    <tr>
+                <td>mixed</td>
+                <td>$value</td>
+                <td>The value of the property</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$lang</td>
+                <td>The language of the literal</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_deleteInverse">
+        <div class="location">at line 1219</div>
+        <code>            protected        
+    <strong>deleteInverse</strong>($resource, $property, $value)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>This function is for internal use only.</p>                    <p>Deletes an inverse property from a resource.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$resource</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$property</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$value</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_isEmpty">
+        <div class="location">at line 1240</div>
+        <code>                    bool
+    <strong>isEmpty</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Check if the graph contains any statements</p>                                                </div>
+                <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_properties">
+        <div class="location">at line 1253</div>
+        <code>                    array
+    <strong>properties</strong>(string $resource)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get a list of all the shortened property names (qnames) for a resource.</p>                    <p>This method will return an empty array if the resource has no properties.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$resource</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_propertyUris">
+        <div class="location">at line 1277</div>
+        <code>                    array
+    <strong>propertyUris</strong>(string $resource)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get a list of the full URIs for the properties of a resource.</p>                    <p>This method will return an empty array if the resource has no properties.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$resource</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_reversePropertyUris">
+        <div class="location">at line 1294</div>
+        <code>                    array
+    <strong>reversePropertyUris</strong>(string $resource)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get a list of the full URIs for the properties that point to a resource.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$resource</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_hasProperty">
+        <div class="location">at line 1320</div>
+        <code>                    bool
+    <strong>hasProperty</strong>(mixed $resource, string $property, mixed $value = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Check to see if a property exists for a resource.</p>                    <p>This method will return true if the property exists.
+If the value parameter is given, then it will only return true
+if the value also exists for that property.</p>
+
+<p>By providing a value parameter you can use this function to check
+to see if a triple exists in the graph.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>mixed</td>
+                <td>$resource</td>
+                <td>The resource to check</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$property</td>
+                <td>The name of the property (e.g. foaf:name)</td>
+            </tr>
+                    <tr>
+                <td>mixed</td>
+                <td>$value</td>
+                <td>An optional value of the property</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_serialise">
+        <div class="location">at line 1361</div>
+        <code>                    mixed
+    <strong>serialise</strong>(mixed $format, array $options = array())
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Serialise the graph into RDF</p>                    <p>The $format parameter can be an EasyRdf\Format object, a
+format name, a mime type or a file extension.</p>
+
+<p>Example:
+  $turtle = $graph->serialise('turtle');</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>mixed</td>
+                <td>$format</td>
+                <td>The format to serialise to</td>
+            </tr>
+                    <tr>
+                <td>array</td>
+                <td>$options</td>
+                <td>Serialiser-specific options, for fine-tuning the output</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>mixed</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_dump">
+        <div class="location">at line 1380</div>
+        <code>                    string
+    <strong>dump</strong>(string $format = &#039;html&#039;)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Return a human readable view of all the resources in the graph</p>                    <p>This method is intended to be a debugging aid and will
+return a pretty-print view of all the resources and their
+properties.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$format</td>
+                <td>Either 'html' or 'text'</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_dumpResource">
+        <div class="location">at line 1407</div>
+        <code>                    string
+    <strong>dumpResource</strong>(mixed $resource, string $format = &#039;html&#039;)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Return a human readable view of a resource and its properties</p>                    <p>This method is intended to be a debugging aid and will
+print a resource and its properties.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>mixed</td>
+                <td>$resource</td>
+                <td>The resource to dump</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$format</td>
+                <td>Either 'html' or 'text'</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_type">
+        <div class="location">at line 1470</div>
+        <code>                    string
+    <strong>type</strong>(string|null $resource = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get the resource type of the graph</p>                    <p>The type will be a shortened URI as a string.
+If the graph has multiple types then the type returned
+may be arbitrary.
+This method will return null if the resource has no type.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string|null</td>
+                <td>$resource</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_typeAsResource">
+        <div class="location">at line 1491</div>
+        <code>                    <a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a>
+    <strong>typeAsResource</strong>(mixed $resource = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get the resource type of the graph as a EasyRdf\Resource</p>                    <p>If the graph has multiple types then the type returned
+may be arbitrary.
+This method will return null if the resource has no type.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>mixed</td>
+                <td>$resource</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a></td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_types">
+        <div class="location">at line 1513</div>
+        <code>                    array
+    <strong>types</strong>(string|null $resource = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get a list of types for a resource</p>                    <p>The types will each be a shortened URI as a string.
+This method will return an empty array if the resource has no types.</p>
+
+<p>If $resource is null, then it will get the types for the URI of the graph.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string|null</td>
+                <td>$resource</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_typesAsResources">
+        <div class="location">at line 1532</div>
+        <code>                    <a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a>[]
+    <strong>typesAsResources</strong>(string|null $resource = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get the resource types of the graph as a EasyRdf\Resource</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string|null</td>
+                <td>$resource</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a>[]</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_isA">
+        <div class="location">at line 1550</div>
+        <code>                    bool
+    <strong>isA</strong>(string $resource, string $type)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Check if a resource is of the specified type</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$resource</td>
+                <td>The resource to check the type of</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$type</td>
+                <td>The type to check (e.g. foaf:Person)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_addType">
+        <div class="location">at line 1570</div>
+        <code>                    int
+    <strong>addType</strong>(string $resource, string $types)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Add one or more rdf:type properties to a resource</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$resource</td>
+                <td>The resource to add the type to</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$types</td>
+                <td>One or more types to add (e.g. foaf:Person)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_setType">
+        <div class="location">at line 1597</div>
+        <code>                    int
+    <strong>setType</strong>(string $resource, string $type)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Change the rdf:type property for a resource</p>                    <p>Note that if the resource object has already previously
+been created, then the PHP class of the resource will not change.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$resource</td>
+                <td>The resource to change the type of</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$type</td>
+                <td>The new type (e.g. foaf:Person)</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_label">
+        <div class="location">at line 1617</div>
+        <code>                    <a href="../EasyRdf/Literal.html"><abbr title="EasyRdf\Literal">Literal</abbr></a>|null
+    <strong>label</strong>(string|null $resource = null, string|null $lang = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get a human readable label for a resource</p>                    <p>This method will check a number of properties for a resource
+(in the order: skos:prefLabel, rdfs:label, foaf:name, dc:title)
+and return an approriate first that is available. If no label
+is available then it will return null.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string|null</td>
+                <td>$resource</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td>string|null</td>
+                <td>$lang</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><a href="../EasyRdf/Literal.html"><abbr title="EasyRdf\Literal">Literal</abbr></a>|null</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_primaryTopic">
+        <div class="location">at line 1639</div>
+        <code>                    <a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a>
+    <strong>primaryTopic</strong>(mixed $resource = null)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Get the primary topic of the graph</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>mixed</td>
+                <td>$resource</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td><a href="../EasyRdf/Resource.html"><abbr title="EasyRdf\Resource">Resource</abbr></a></td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_toRdfPhp">
+        <div class="location">at line 1658</div>
+        <code>                    array
+    <strong>toRdfPhp</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Returns the graph as a RDF/PHP associative array</p>                                                </div>
+                <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>array</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_countTriples">
+        <div class="location">at line 1667</div>
+        <code>                    int
+    <strong>countTriples</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Calculates the number of triples in the graph</p>                                                </div>
+                <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method___toString">
+        <div class="location">at line 1682</div>
+        <code>                    string
+    <strong>__toString</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Magic method to return URI of resource when casted to string</p>                                                </div>
+                <div class="tags">
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method___get">
+        <div class="location">at line 1699</div>
+        <code>                    string
+    <strong>__get</strong>(string $name)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Magic method to get a property of the graph</p>                    <p>Note that only properties in the default namespace can be accessed in this way.</p>
+
+<p>Example:
+  $value = $graph->title;</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$name</td>
+                <td>The name of the property</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                            <h4>See also</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>
+                                            \RdfNamespace::setDefault()
+                                    </td>
+                <td></td>
+            </tr>
+            </table>
+
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method___set">
+        <div class="location">at line 1717</div>
+        <code>                    int
+    <strong>__set</strong>(string $name, string $value)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Magic method to set the value for a property of the graph</p>                    <p>Note that only properties in the default namespace can be accessed in this way.</p>
+
+<p>Example:
+  $graph->title = 'Title';</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$name</td>
+                <td>The name of the property</td>
+            </tr>
+                    <tr>
+                <td>string</td>
+                <td>$value</td>
+                <td>The value for the property</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                            <h4>See also</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>
+                                            \RdfNamespace::setDefault()
+                                    </td>
+                <td></td>
+            </tr>
+            </table>
+
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method___isset">
+        <div class="location">at line 1734</div>
+        <code>                    bool
+    <strong>__isset</strong>(string $name)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Magic method to check if a property exists</p>                    <p>Note that only properties in the default namespace can be accessed in this way.</p>
+
+<p>Example:
+  if (isset($graph->title)) { blah(); }</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$name</td>
+                <td>The name of the property</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>bool</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                            <h4>See also</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>
+                                            \RdfNamespace::setDefault()
+                                    </td>
+                <td></td>
+            </tr>
+            </table>
+
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method___unset">
+        <div class="location">at line 1751</div>
+        <code>                    int
+    <strong>__unset</strong>(string $name)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Magic method to delete a property of the graph</p>                    <p>Note that only properties in the default namespace can be accessed in this way.</p>
+
+<p>Example:
+  unset($graph->title);</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$name</td>
+                <td>The name of the property</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>int</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                            <h4>See also</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>
+                                            \RdfNamespace::setDefault()
+                                    </td>
+                <td></td>
+            </tr>
+            </table>
+
+                    </div>
+    </div>
+
+            </div>
+            </div>
+
+    
+            </div><div id="footer">
+        Generated by <a href="https://github.com/code-lts/doctum">Doctum, a API Documentation generator and fork of Sami</a>.
+    </div></div>
+    </div>
+    </body>
+
+</html>

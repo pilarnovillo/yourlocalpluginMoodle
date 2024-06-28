@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<libraries>
+    <library>
+        <location>lib</location>
+        <name>EasyRDF</name>
+        <version>1.1.1</version>
+        <license>Copyright (c) 2009-2020 Nicholas J Humfrey</license>
+    </library>
+</libraries>

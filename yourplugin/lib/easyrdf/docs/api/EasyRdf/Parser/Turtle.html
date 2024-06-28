@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="index, follow, all" />
+    <title>EasyRdf\Parser\Turtle | EasyRdf API Documentation</title>
+
+            <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="../../css/doctum.css">
+        <link rel="stylesheet" type="text/css" href="../../fonts/doctum-font.css">
+        <script src="../../js/jquery-3.5.1.slim.min.js"></script>
+        <script async defer src="../../js/bootstrap.min.js"></script>
+        <script src="../../js/typeahead.min.js"></script>
+        <script src="../../doctum.js"></script>
+        <meta name="MobileOptimized" content="width">
+        <meta name="HandheldFriendly" content="true">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    </head>
+
+    <body id="class" data-name="class:EasyRdf_Parser_Turtle" data-root-path="../../">
+            <div id="content">
+        <div id="left-column">
+                <div id="control-panel">
+                <form id="search-form" action="../../search.html">
+            <span class="icon icon-search"></span>
+            <input name="search"
+                   class="typeahead form-control"
+                   type="search"
+                   placeholder="Search">
+        </form>
+    </div>
+
+                <div id="api-tree"></div>
+
+        </div>
+        <div id="right-column">
+                <nav id="site-nav" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-elements">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="../../index.html">EasyRdf API Documentation</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-elements">
+                <ul class="nav navbar-nav">
+                    <li><a href="../../classes.html">Classes</a></li>
+                    <li><a href="../../namespaces.html">Namespaces</a></li>
+                    <li><a href="../../interfaces.html">Interfaces</a></li>
+                    <li><a href="../../traits.html">Traits</a></li>
+                    <li><a href="../../doc-index.html">Index</a></li>
+                    <li><a href="../../search.html">Search</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+                        <div class="namespace-breadcrumbs">
+            <ol class="breadcrumb">
+                <li><span class="label label-default">class</span></li>
+                        <li><a href="../../EasyRdf.html">EasyRdf</a></li><li class="backslash">\</li><li><a href="../../EasyRdf/Parser.html">Parser</a></li><li class="backslash">\</li><li>Turtle</li>
+            </ol>
+        </div>
+                <div id="page-content">
+                
+    <div class="page-header">
+        <h1>
+            Turtle
+                
+        </h1>
+    </div>
+
+    <p>    class
+    <strong>Turtle</strong>        extends <a href="../../EasyRdf/Parser/Ntriples.html"><abbr title="EasyRdf\Parser\Ntriples">Ntriples</abbr></a>
+</p>
+
+        
+    
+
+            <div class="description">
+            <p>Class to parse Turtle with no external dependencies.</p>            <p>It is a translation from Java to PHP of the Sesame Turtle Parser:
+http://bit.ly/TurtleParser</p>
+
+<p>Lasted updated against version:
+ecda6a15a200a2fc6a062e2e43081257c3ccd4e6   (Mon Jul 29 12:05:58 2013)</p>                    </div>
+    
+    
+    
+            <h2>Properties</h2>
+
+            <table class="table table-condensed">
+                    <tr>
+                <td class="type" id="property_graph">
+                                        protected                                        Graph
+                </td>
+                <td>$graph</td>
+                <td class="last"></td>
+                <td><small>from&nbsp;<a href="../../EasyRdf/Parser.html#property_graph">
+<abbr title="EasyRdf\Parser">Parser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_format">
+                                        protected                                        
+                </td>
+                <td>$format</td>
+                <td class="last">The format of the document currently being parsed</td>
+                <td><small>from&nbsp;<a href="../../EasyRdf/Parser.html#property_format">
+<abbr title="EasyRdf\Parser">Parser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_baseUri">
+                                        protected                                        
+                </td>
+                <td>$baseUri</td>
+                <td class="last">The base URI for the document currently being parsed</td>
+                <td><small>from&nbsp;<a href="../../EasyRdf/Parser.html#property_baseUri">
+<abbr title="EasyRdf\Parser">Parser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_tripleCount">
+                                        protected                                        
+                </td>
+                <td>$tripleCount</td>
+                <td class="last"></td>
+                <td><small>from&nbsp;<a href="../../EasyRdf/Parser.html#property_tripleCount">
+<abbr title="EasyRdf\Parser">Parser</abbr></a></small></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_data">
+                                        protected                                        
+                </td>
+                <td>$data</td>
+                <td class="last"></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_namespaces">
+                                        protected                                        
+                </td>
+                <td>$namespaces</td>
+                <td class="last"></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_subject">
+                                        protected                                        
+                </td>
+                <td>$subject</td>
+                <td class="last"></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_predicate">
+                                        protected                                        
+                </td>
+                <td>$predicate</td>
+                <td class="last"></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_object">
+                                        protected                                        
+                </td>
+                <td>$object</td>
+                <td class="last"></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_line">
+                                        protected                                        
+                </td>
+                <td>$line</td>
+                <td class="last"></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_column">
+                                        protected                                        
+                </td>
+                <td>$column</td>
+                <td class="last"></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_bytePos">
+                                        protected                                        
+                </td>
+                <td>$bytePos</td>
+                <td class="last"></td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td class="type" id="property_dataLength">
+                                        protected                                        
+                </td>
+                <td>$dataLength</td>
+                <td class="last"></td>
+                <td></td>
+            </tr>
+            </table>
+
+    
+            <h2>Methods</h2>
+
+            <div class="container-fluid underlined">
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_remapBnode">remapBnode</a>($name)
+        
+                                            <p>Create a new, unique bnode identifier from a source identifier.</p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../EasyRdf/Parser.html#method_remapBnode">
+<abbr title="EasyRdf\Parser">Parser</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_resetBnodeMap">resetBnodeMap</a>()
+        
+                                            <p>Delete the bnode mapping - to be called at the start of a new parse</p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../EasyRdf/Parser.html#method_resetBnodeMap">
+<abbr title="EasyRdf\Parser">Parser</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_checkParseParams">checkParseParams</a>($graph, $data, $format, $baseUri)
+        
+                                            <p>Check, cleanup parameters and prepare for parsing</p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../EasyRdf/Parser.html#method_checkParseParams">
+<abbr title="EasyRdf\Parser">Parser</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parse">parse</a>($graph, $data, $format, $baseUri)
+        
+                                            <p>Parse Turtle into an Graph</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_addTriple">addTriple</a>($resource, $property, $value)
+        
+                                            <p>Add a triple to the current graph, and keep count of the number of triples</p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../EasyRdf/Parser.html#method_addTriple">
+<abbr title="EasyRdf\Parser">Parser</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_unescapeString">unescapeString</a>(string $str)
+        
+                                            <p>Decodes an encoded N-Triples string. Any &#45;escape sequences are substituted
+with their decoded value.</p>                </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../EasyRdf/Parser/Ntriples.html#method_unescapeString">
+<abbr title="EasyRdf\Parser\Ntriples">Ntriples</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseNtriplesSubject">parseNtriplesSubject</a>($sub, $lineNum)
+        
+                                            <p class="no-description">No description</p>
+                                    </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../EasyRdf/Parser/Ntriples.html#method_parseNtriplesSubject">
+<abbr title="EasyRdf\Parser\Ntriples">Ntriples</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseNtriplesObject">parseNtriplesObject</a>($obj, $lineNum)
+        
+                                            <p class="no-description">No description</p>
+                                    </div>
+                <div class="col-md-2"><small>from&nbsp;<a href="../../EasyRdf/Parser/Ntriples.html#method_parseNtriplesObject">
+<abbr title="EasyRdf\Parser\Ntriples">Ntriples</abbr></a></small></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method___construct">__construct</a>()
+        
+                                            <p>Constructor</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseStatement">parseStatement</a>()
+        
+                                            <p>Parse a statement [2]</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseDirective">parseDirective</a>($directive)
+        
+                                            <p>Parse a directive [3]</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parsePrefixID">parsePrefixID</a>()
+        
+                                            <p>Parse a prefixID [4]</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseBase">parseBase</a>()
+        
+                                            <p>Parse base [5]</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseTriples">parseTriples</a>()
+        
+                                            <p>Parse triples [6] modified to use a pointer instead of
+manipulating the input buffer directly.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parsePredicateObjectList">parsePredicateObjectList</a>()
+        
+                                            <p>Parse a predicateObjectList [7]</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseObjectList">parseObjectList</a>()
+        
+                                            <p>Parse a objectList [8]</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseSubject">parseSubject</a>()
+        
+                                            <p>Parse a subject [10]</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parsePredicate">parsePredicate</a>()
+        
+                                            <p>Parse a predicate [11]</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseObject">parseObject</a>()
+        
+                                            <p>Parse a object [12]</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseImplicitBlank">parseImplicitBlank</a>()
+        
+                                            <p>Parses a blankNodePropertyList [15]</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseCollection">parseCollection</a>()
+        
+                                            <p>Parses a collection [16], e.g: ( item1 item2 item3 )</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseValue">parseValue</a>()
+        
+                                            <p>Parses an RDF value. This method parses uriref, qname, node ID, quoted
+literal, integer, double and boolean.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseQuotedLiteral">parseQuotedLiteral</a>()
+        
+                                            <p>Parses a quoted string, optionally followed by a language tag or datatype.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseQuotedString">parseQuotedString</a>()
+        
+                                            <p>Parses a quoted string, which is either a "normal string" or a """long string""".</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseString">parseString</a>(string $closingCharacter)
+        
+                                            <p>Parses a "normal string". This method requires that the opening character
+has already been parsed.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    string
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseLongString">parseLongString</a>(string $closingCharacter)
+        
+                                            <p>Parses a """long string""". This method requires that the first three
+characters have already been parsed.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseNumber">parseNumber</a>()
+        
+                                            <p>Parses a numeric value, either of type integer, decimal or double</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseURI">parseURI</a>()
+        
+                                            <p>Parses a URI / IRI</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseQNameOrBoolean">parseQNameOrBoolean</a>()
+        
+                                            <p>Parses qnames and boolean values, which have equivalent starting
+characters.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_readLocalEscapedChar">readLocalEscapedChar</a>()
+        
+                                            <p class="no-description">No description</p>
+                                    </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_parseNodeID">parseNodeID</a>()
+        
+                                            <p>Parses a blank node ID, e.g: _:node1</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_resolve">resolve</a>($uri)
+        
+                                            <p class="no-description">No description</p>
+                                    </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_verifyCharacterOrFail">verifyCharacterOrFail</a>($c, $expected)
+        
+                                            <p>Verifies that the supplied character $c is one of the expected
+characters specified in $expected. This method will throw a
+exception if this is not the case.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_skipWSC">skipWSC</a>()
+        
+                                            <p>Skip through whitespace and comments</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_processComment">processComment</a>()
+        
+                                            <p>Consumes characters from reader until the first EOL has been read.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_read">read</a>()
+        
+                                            <p>Read a single character from the input buffer.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_peek">peek</a>()
+        
+                                            <p>Gets the next character to be returned by read()
+without moving the pointer position. Speeds up the
+mb_substr() call by only giving it the next 4 bytes to parse.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_unread">unread</a>($chars)
+        
+                                            <p>Steps back, restoring the previous character read() to the input buffer</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_unskipWS">unskipWS</a>()
+        
+                                            <p>Reverse skips through whitespace in 4 byte increments.</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_createBNode">createBNode</a>()
+        
+                                            <p class="no-description">No description</p>
+                                    </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    static&nbsp;
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_isWhitespace">isWhitespace</a>($c)
+        
+                                            <p>Returns true if $c is a whitespace character</p>                </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    static&nbsp;
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_isPrefixStartChar">isPrefixStartChar</a>($c)
+        
+                                            <p class="no-description">No description</p>
+                                    </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    static&nbsp;
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_isNameStartChar">isNameStartChar</a>($c)
+        
+                                            <p class="no-description">No description</p>
+                                    </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    static&nbsp;
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_isNameChar">isNameChar</a>($c)
+        
+                                            <p class="no-description">No description</p>
+                                    </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    static&nbsp;
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_isLocalEscapedChar">isLocalEscapedChar</a>($c)
+        
+                                            <p class="no-description">No description</p>
+                                    </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    static&nbsp;
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_isPrefixChar">isPrefixChar</a>($c)
+        
+                                            <p class="no-description">No description</p>
+                                    </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    static&nbsp;
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_isLanguageStartChar">isLanguageStartChar</a>($c)
+        
+                                            <p class="no-description">No description</p>
+                                    </div>
+                <div class="col-md-2"></div>
+            </div>
+                    <div class="row">
+                <div class="col-md-2 type">
+                    static&nbsp;
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_isLanguageChar">isLanguageChar</a>($c)
+        
+                                            <p class="no-description">No description</p>
+                                    </div>
+                <div class="col-md-2"></div>
+            </div>
+            </div>
+
+
+        <h2>Details</h2>
+
+            <div id="method-details">
+                    <div class="method-item">
+                    <h3 id="method_remapBnode">
+        <div class="location">in <a href="../../EasyRdf/Parser.html#method_remapBnode">
+<abbr title="EasyRdf\Parser">Parser</abbr></a> at line 70</div>
+        <code>            protected        
+    <strong>remapBnode</strong>($name)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Create a new, unique bnode identifier from a source identifier.</p>                    <p>If the source identifier has previously been seen, the
+same new bnode identifier is returned.</p>                            </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$name</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_resetBnodeMap">
+        <div class="location">in <a href="../../EasyRdf/Parser.html#method_resetBnodeMap">
+<abbr title="EasyRdf\Parser">Parser</abbr></a> at line 82</div>
+        <code>            protected        
+    <strong>resetBnodeMap</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Delete the bnode mapping - to be called at the start of a new parse</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_checkParseParams">
+        <div class="location">in <a href="../../EasyRdf/Parser.html#method_checkParseParams">
+<abbr title="EasyRdf\Parser">Parser</abbr></a> at line 91</div>
+        <code>            protected        
+    <strong>checkParseParams</strong>($graph, $data, $format, $baseUri)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Check, cleanup parameters and prepare for parsing</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$graph</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$data</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$format</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$baseUri</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parse">
+        <div class="location">at line 91</div>
+        <code>                    
+    <strong>parse</strong>($graph, $data, $format, $baseUri)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parse Turtle into an Graph</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$graph</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$data</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$format</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$baseUri</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+                            <h4>Exceptions</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><a href="../../EasyRdf/Exception.html"><abbr title="EasyRdf\Exception">Exception</abbr></a></td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_addTriple">
+        <div class="location">in <a href="../../EasyRdf/Parser.html#method_addTriple">
+<abbr title="EasyRdf\Parser">Parser</abbr></a> at line 148</div>
+        <code>            protected        
+    <strong>addTriple</strong>($resource, $property, $value)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Add a triple to the current graph, and keep count of the number of triples</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$resource</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$property</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$value</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_unescapeString">
+        <div class="location">in <a href="../../EasyRdf/Parser/Ntriples.html#method_unescapeString">
+<abbr title="EasyRdf\Parser\Ntriples">Ntriples</abbr></a> at line 58</div>
+        <code>            protected        string
+    <strong>unescapeString</strong>(string $str)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Decodes an encoded N-Triples string. Any &#45;escape sequences are substituted
+with their decoded value.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$str</td>
+                <td>An encoded N-Triples string.</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseNtriplesSubject">
+        <div class="location">in <a href="../../EasyRdf/Parser/Ntriples.html#method_parseNtriplesSubject">
+<abbr title="EasyRdf\Parser\Ntriples">Ntriples</abbr></a> at line 110</div>
+        <code>            protected        
+    <strong>parseNtriplesSubject</strong>($sub, $lineNum)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$sub</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$lineNum</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseNtriplesObject">
+        <div class="location">in <a href="../../EasyRdf/Parser/Ntriples.html#method_parseNtriplesObject">
+<abbr title="EasyRdf\Parser\Ntriples">Ntriples</abbr></a> at line 132</div>
+        <code>            protected        
+    <strong>parseNtriplesObject</strong>($obj, $lineNum)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$obj</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$lineNum</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method___construct">
+        <div class="location">at line 76</div>
+        <code>                    
+    <strong>__construct</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Constructor</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseStatement">
+        <div class="location">at line 129</div>
+        <code>            protected        
+    <strong>parseStatement</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parse a statement [2]</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseDirective">
+        <div class="location">at line 161</div>
+        <code>            protected        
+    <strong>parseDirective</strong>($directive)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parse a directive [3]</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$directive</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parsePrefixID">
+        <div class="location">at line 187</div>
+        <code>            protected        
+    <strong>parsePrefixID</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parse a prefixID [4]</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseBase">
+        <div class="location">at line 227</div>
+        <code>            protected        
+    <strong>parseBase</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parse base [5]</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseTriples">
+        <div class="location">at line 240</div>
+        <code>            protected        
+    <strong>parseTriples</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parse triples [6] modified to use a pointer instead of
+manipulating the input buffer directly.</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parsePredicateObjectList">
+        <div class="location">at line 284</div>
+        <code>            protected        
+    <strong>parsePredicateObjectList</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parse a predicateObjectList [7]</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseObjectList">
+        <div class="location">at line 315</div>
+        <code>            protected        
+    <strong>parseObjectList</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parse a objectList [8]</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseSubject">
+        <div class="location">at line 330</div>
+        <code>            protected        
+    <strong>parseSubject</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parse a subject [10]</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parsePredicate">
+        <div class="location">at line 356</div>
+        <code>            protected        
+    <strong>parsePredicate</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parse a predicate [11]</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseObject">
+        <div class="location">at line 394</div>
+        <code>            protected        
+    <strong>parseObject</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parse a object [12]</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseImplicitBlank">
+        <div class="location">at line 421</div>
+        <code>            protected        
+    <strong>parseImplicitBlank</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parses a blankNodePropertyList [15]</p>                    <p>This method parses the token []
+and predicateObjectLists that are surrounded by square brackets.</p>                            </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseCollection">
+        <div class="location">at line 460</div>
+        <code>            protected        
+    <strong>parseCollection</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parses a collection [16], e.g: ( item1 item2 item3 )</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseValue">
+        <div class="location">at line 531</div>
+        <code>            protected        
+    <strong>parseValue</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parses an RDF value. This method parses uriref, qname, node ID, quoted
+literal, integer, double and boolean.</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseQuotedLiteral">
+        <div class="location">at line 569</div>
+        <code>            protected        
+    <strong>parseQuotedLiteral</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parses a quoted string, optionally followed by a language tag or datatype.</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseQuotedString">
+        <div class="location">at line 655</div>
+        <code>            protected        
+    <strong>parseQuotedString</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parses a quoted string, which is either a "normal string" or a """long string""".</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseString">
+        <div class="location">at line 693</div>
+        <code>            protected        string
+    <strong>parseString</strong>(string $closingCharacter)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parses a "normal string". This method requires that the opening character
+has already been parsed.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$closingCharacter</td>
+                <td>The type of quote to use (either ' or ")</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+                            <h4>Exceptions</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><a target="_blank" rel="noopener" href="https://www.php.net/Exception">Exception</a></td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseLongString">
+        <div class="location">at line 739</div>
+        <code>            protected        string
+    <strong>parseLongString</strong>(string $closingCharacter)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parses a """long string""". This method requires that the first three
+characters have already been parsed.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td>string</td>
+                <td>$closingCharacter</td>
+                <td>The type of quote to use (either ' or ")</td>
+            </tr>
+            </table>
+
+            
+                            <h4>Return Value</h4>
+
+                    <table class="table table-condensed">
+        <tr>
+            <td>string</td>
+            <td></td>
+        </tr>
+    </table>
+
+            
+                            <h4>Exceptions</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td><a target="_blank" rel="noopener" href="https://www.php.net/Exception">Exception</a></td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseNumber">
+        <div class="location">at line 782</div>
+        <code>            protected        
+    <strong>parseNumber</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parses a numeric value, either of type integer, decimal or double</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseURI">
+        <div class="location">at line 881</div>
+        <code>            protected        
+    <strong>parseURI</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parses a URI / IRI</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseQNameOrBoolean">
+        <div class="location">at line 932</div>
+        <code>            protected        
+    <strong>parseQNameOrBoolean</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parses qnames and boolean values, which have equivalent starting
+characters.</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_readLocalEscapedChar">
+        <div class="location">at line 1031</div>
+        <code>            protected        
+    <strong>readLocalEscapedChar</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_parseNodeID">
+        <div class="location">at line 1050</div>
+        <code>            protected        
+    <strong>parseNodeID</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Parses a blank node ID, e.g: _:node1</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_resolve">
+        <div class="location">at line 1088</div>
+        <code>            protected        
+    <strong>resolve</strong>($uri)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$uri</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_verifyCharacterOrFail">
+        <div class="location">at line 1103</div>
+        <code>            protected        
+    <strong>verifyCharacterOrFail</strong>($c, $expected)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Verifies that the supplied character $c is one of the expected
+characters specified in $expected. This method will throw a
+exception if this is not the case.</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$c</td>
+                <td></td>
+            </tr>
+                    <tr>
+                <td></td>
+                <td>$expected</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_skipWSC">
+        <div class="location">at line 1133</div>
+        <code>            protected        
+    <strong>skipWSC</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Skip through whitespace and comments</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_processComment">
+        <div class="location">at line 1152</div>
+        <code>            protected        
+    <strong>processComment</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Consumes characters from reader until the first EOL has been read.</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_read">
+        <div class="location">at line 1178</div>
+        <code>            protected        
+    <strong>read</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Read a single character from the input buffer.</p>                    <p>Returns -1 when the end of the file is reached.
+Does not manipulate the data variable. Keeps track of the
+byte position instead.</p>                            </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_peek">
+        <div class="location">at line 1201</div>
+        <code>            protected        
+    <strong>peek</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Gets the next character to be returned by read()
+without moving the pointer position. Speeds up the
+mb_substr() call by only giving it the next 4 bytes to parse.</p>                                                </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_unread">
+        <div class="location">at line 1218</div>
+        <code>            protected        
+    <strong>unread</strong>($chars)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Steps back, restoring the previous character read() to the input buffer</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$chars</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_unskipWS">
+        <div class="location">at line 1235</div>
+        <code>            protected        
+    <strong>unskipWS</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Reverse skips through whitespace in 4 byte increments.</p>                    <p>(Keeps the byte pointer accurate when unreading.)</p>                            </div>
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_createBNode">
+        <div class="location">at line 1253</div>
+        <code>            protected        
+    <strong>createBNode</strong>()
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                <div class="tags">
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_isWhitespace">
+        <div class="location">at line 1265</div>
+        <code>        static            
+    <strong>isWhitespace</strong>($c)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                    <div class="method-description">
+                                    <p>Returns true if $c is a whitespace character</p>                                                </div>
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$c</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_isPrefixStartChar">
+        <div class="location">at line 1272</div>
+        <code>        static            
+    <strong>isPrefixStartChar</strong>($c)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$c</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_isNameStartChar">
+        <div class="location">at line 1293</div>
+        <code>        static            
+    <strong>isNameStartChar</strong>($c)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$c</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_isNameChar">
+        <div class="location">at line 1305</div>
+        <code>        static            
+    <strong>isNameChar</strong>($c)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$c</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_isLocalEscapedChar">
+        <div class="location">at line 1324</div>
+        <code>        static            
+    <strong>isLocalEscapedChar</strong>($c)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$c</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_isPrefixChar">
+        <div class="location">at line 1330</div>
+        <code>        static            
+    <strong>isPrefixChar</strong>($c)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$c</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_isLanguageStartChar">
+        <div class="location">at line 1344</div>
+        <code>        static            
+    <strong>isLanguageStartChar</strong>($c)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$c</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+                    <div class="method-item">
+                    <h3 id="method_isLanguageChar">
+        <div class="location">at line 1353</div>
+        <code>        static            
+    <strong>isLanguageChar</strong>($c)
+        </code>
+    </h3>
+    <div class="details">
+            
+    
+
+                <div class="tags">
+                            <h4>Parameters</h4>
+
+                    <table class="table table-condensed">
+                    <tr>
+                <td></td>
+                <td>$c</td>
+                <td></td>
+            </tr>
+            </table>
+
+            
+            
+            
+                    </div>
+    </div>
+
+            </div>
+            </div>
+
+    
+            </div><div id="footer">
+        Generated by <a href="https://github.com/code-lts/doctum">Doctum, a API Documentation generator and fork of Sami</a>.
+    </div></div>
+    </div>
+    </body>
+
+</html>
