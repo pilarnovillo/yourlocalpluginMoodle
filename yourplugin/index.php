@@ -302,8 +302,14 @@ if ($contentid === null && empty($library)) {
     }
 
     $topics = [];
+    $tipos = array(
+        'contenido' => 'Contenido',
+        'ejemplo' => 'Ejemplo',
+        'actividad' => 'Actividad'
+    );
     echo html_writer::label('Select a content to create for specific topic', 'library');
     echo html_writer::select($topics, 'topic');
+    echo html_writer::select($tipos, 'tipo');
     echo html_writer::select($options2, 'library');
 
     // Button to submit form.
@@ -332,20 +338,98 @@ $sparql = new \EasyRdf\Sparql\Client($endpoint);
 
 $query = '
 PREFIX ex: <http://www.semanticweb.org/valer/ontologies/OntoOA#>
-SELECT ?topico WHERE {
+PREFIX ontoT: <http://www.semanticweb.org/valer/ontologies/OntoT#>
+SELECT * WHERE {
     ?asignatura a ex:Asignatura .
+    FILTER(?asignatura = ex:MatematicaDiscreta)
+    ?asignatura ex:asignaturaTieneRAAsignatura ?raasignatura.
     ?asignatura ex:asignaturaTieneContenidoMinimo ?contenidoMinimo .
     ?contenidoMinimo ex:contenidoMinimoSeOrganizaEnUnidad ?unidad .
     ?unidad ex:unidadCompuestaDeTema ?tema .
-    ?tema ex:temaContieneTopico ?topico .
+	?tema ex:temaContieneTopico ?topico .
+    OPTIONAL {?topico ontoT:topicoTieneTipo ?topicotipo .}
+    OPTIONAL {?topico ontoT:topicoTieneParte ?topicoparte .}
+  	OPTIONAL {?topico ontoT:topicoTieneSoporte ?topicosoporte .}
   }';
 
-$result = $sparql->query($query);
+$results = $sparql->query($query);
 
-// Procesar los resultados
-foreach ($result as $row) {
-    // echo "Topico SPARQL: " . $row->topico . "\n";
+
+// Inicializa arrays para agrupar las instancias
+$asignaturas = [];
+
+// Procesa cada resultado
+foreach ($results as $result) {
+    $asignatura = (string) $result->asignatura;
+    $contenidoMinimo = (string) $result->contenidoMinimo;
+    $raAsignatura = (string) $result->raasignatura;
+    $unidad = (string) $result->unidad;
+    $tema = (string) $result->tema;
+    $topico = (string) $result->topico;
+    $topicotipo = (string) $result->topicotipo;
+    $topicoparte = (string) $result->topicoparte;
+    $topicosoporte = (string) $result->topicosoporte;
+
+    // Construir la estructura deseada
+    if (!isset($asignaturas[$asignatura])) {
+        $asignaturas[$asignatura] = [
+            'asignatura' => $asignatura,
+            'RAsAsignatura' => [],
+            'contenidosMinimo' => []
+        ];
+
+    }
+
+    if (!isset($asignaturas[$asignatura]['RAsAsignatura'][$raAsignatura])) {
+        $asignaturas[$asignatura]['RAsAsignatura'][$raAsignatura] = $raAsignatura;
+    }
+    
+    if (!isset($asignaturas[$asignatura]['contenidosMinimo'][$contenidoMinimo])) {
+        $asignaturas[$asignatura]['contenidosMinimo'][$contenidoMinimo] = [
+            
+            'unidades' => []
+        ];
+    }
+    
+    if (!isset($asignaturas[$asignatura]['contenidosMinimo'][$contenidoMinimo]['unidades'][$unidad])) {
+        $asignaturas[$asignatura]['contenidosMinimo'][$contenidoMinimo]['unidades'][$unidad] = [
+            
+            'temas' => []
+        ];
+    }
+    
+    if (!isset($asignaturas[$asignatura]['contenidosMinimo'][$contenidoMinimo]['unidades'][$unidad]['temas'][$tema])) {
+        $asignaturas[$asignatura]['contenidosMinimo'][$contenidoMinimo]['unidades'][$unidad]['temas'][$tema] = [
+            
+            'topicos' => []
+        ];
+    }
+    
+    if (!isset($asignaturas[$asignatura]['contenidosMinimo'][$contenidoMinimo]['unidades'][$unidad]['temas'][$tema]['topicos'][$topico])){
+        // Añadir el tópico
+        $asignaturas[$asignatura]['contenidosMinimo'][$contenidoMinimo]['unidades'][$unidad]['temas'][$tema]['topicos'][$topico] = [
+            
+            'tipos' => [], // Puedes agregar tipos si los obtienes de la consulta
+            'partes' => [], // Puedes agregar partes si los obtienes de la consulta
+            'soportes' => [] // Puedes agregar soportes si los obtienes de la consulta
+        ];
+    }
+
+    if ($topicotipo!="" && !isset($asignaturas[$asignatura]['contenidosMinimo'][$contenidoMinimo]['unidades'][$unidad]['temas'][$tema]['topicos'][$topico]['tipos'][$topicotipo])){
+        $asignaturas[$asignatura]['contenidosMinimo'][$contenidoMinimo]['unidades'][$unidad]['temas'][$tema]['topicos'][$topico]['tipos'][$topicotipo] = $topicotipo;
+    }
+
+    if ($topicoparte!="" && !isset($asignaturas[$asignatura]['contenidosMinimo'][$contenidoMinimo]['unidades'][$unidad]['temas'][$tema]['topicos'][$topico]['partes'][$topicoparte])){
+        $asignaturas[$asignatura]['contenidosMinimo'][$contenidoMinimo]['unidades'][$unidad]['temas'][$tema]['topicos'][$topico]['partes'][$topicoparte] = $topicoparte;
+    }
+
+    if ($topicosoporte!="" && !isset($asignaturas[$asignatura]['contenidosMinimo'][$contenidoMinimo]['unidades'][$unidad]['temas'][$tema]['topicos'][$topico]['soportes'][$topicosoporte])){
+        $asignaturas[$asignatura]['contenidosMinimo'][$contenidoMinimo]['unidades'][$unidad]['temas'][$tema]['topicos'][$topico]['soportes'][$topicosoporte] = $topicosoporte;
+    }
+    
 }
+
+
 
 $query1 = '
 PREFIX ex: <http://www.semanticweb.org/valer/ontologies/OntoOA#>
@@ -373,121 +457,8 @@ foreach ($result1 as $row) {
     // echo "SPARQL: " . $row->nivelRAAsignatura . "\n";
 }
 
-// Encuentra la asignatura 'MAD'
-// Configura los prefijos necesarios
-\EasyRdf\RdfNamespace::set('ex', 'http://www.semanticweb.org/valer/ontologies/OntoOA#'); // Ajusta el prefijo según tu OWL
-
-$asignaturaUri = null;
-foreach ($graph->allOfType('ex:Asignatura') as $asignatura) {
-        // Obtener el URI y etiqueta de la instancia
-        $uri = $asignatura->getUri();
-
-        // Extraer la etiqueta de la URI (texto después del carácter #)
-        $etiqueta = substr($uri, strrpos($uri, '#') + 1);
-        // echo "etiqueta: " . $etiqueta . "\n";
-
-    if ($etiqueta == 'MatematicaDiscreta') {//TODO esto deberia venir como parametro
-        $asignaturaUri = $uri;
-        break;
-    }
-}
-
-$instanciasOA = array();
-
-if ($asignaturaUri) {
-    $asignatura = $graph->resource($asignaturaUri);
-
-    // Agregar asignatura al array
-    $instanciasOA['asignatura'] = $asignatura->getUri();
-
-    // Obtener RAs de la asignatura
-    $RAsAsignatura = $asignatura->allResources('ex:asignaturaTieneRAAsignatura');
-    $instanciasOA['RAsAsignatura'] = array();
-    
-    foreach ($RAsAsignatura as $RAAsignatura) {
-        $instanciasOA['RAsAsignatura'][] = $RAAsignatura->getUri();
-    }
-
-    // Obtener contenidos mínimos de la asignatura
-    $contenidosMinimo = $asignatura->allResources('ex:asignaturaTieneContenidoMinimo');
-    $instanciasOA['contenidosMinimo'] = array();
-
-    foreach ($contenidosMinimo as $contenidoMinimo) {
-        $contenidoMinimoArray = array();
-        $contenidoMinimoArray['uri'] = $contenidoMinimo->getUri();
-        
-        // Obtener unidades del contenido mínimo
-        $unidades = $contenidoMinimo->allResources('ex:contenidoMinimoSeOrganizaEnUnidad');
-        $contenidoMinimoArray['unidades'] = array();
-
-        foreach ($unidades as $unidad) {
-            $unidadArray = array();
-            $unidadArray['uri'] = $unidad->getUri();
-
-            // Obtener temas de la unidad
-            $temas = $unidad->allResources('ex:unidadCompuestaDeTema');
-            $unidadArray['temas'] = array();
-            
-            foreach ($temas as $tema) {
-                $temaArray = array();
-                $temaArray['uri'] = $tema->getUri();
-
-                // Obtener tópicos del tema
-                $topicos = $tema->allResources('ex:temaContieneTopico');
-                $temaArray['topicos'] = array();
-
-                foreach ($topicos as $topico) {
-                    $topicoArray = array();
-                    $topicoArray['uri'] = $topico->getUri();
-
-                    // Obtener tipos del tópico
-                    $tipos = $topico->allResources('ex:topicoTieneTipo');
-                    $topicoArray['tipos'] = array();
-                    
-                    foreach ($tipos as $tipo) {
-                        $topicoArray['tipos'][] = $tipo->getUri();
-                    }
-
-                    // Obtener partes del tópico
-                    $partes = $topico->allResources('ex:topicoTieneParte');
-                    $topicoArray['partes'] = array();
-                    
-                    foreach ($partes as $parte) {
-                        $topicoArray['partes'][] = $parte->getUri();
-                    }
-
-                    // Obtener soportes del tópico
-                    $soportes = $topico->allResources('ex:topicoTieneSoporte');
-                    $topicoArray['soportes'] = array();
-                    
-                    foreach ($soportes as $soporte) {
-                        $topicoArray['soportes'][] = $soporte->getUri();
-                    }
-
-                    // Agregar el tópico al array de tópicos del tema
-                    $temaArray['topicos'][] = $topicoArray;
-                }
-
-                // Agregar el tema al array de temas de la unidad
-                $unidadArray['temas'][] = $temaArray;
-            }
-
-            // Agregar la unidad al array de unidades del contenido mínimo
-            $contenidoMinimoArray['unidades'][] = $unidadArray;
-        }
-
-        // Agregar el contenido mínimo al array de contenidos mínimos de la asignatura
-        $instanciasOA['contenidosMinimo'][] = $contenidoMinimoArray;
-    }
-
-
-// Convertir la matriz a formato JSON
-$instanciasOAJSON = json_encode($instanciasOA);
-    
-} else {
-    echo "Asignatura 'MAD' no encontrada.\n";
-}
-
+$instanciasOAJSON = json_encode($asignaturas);
+// echo $instanciasOAJSON;
 $PAGE->requires->js_call_amd('local_yourplugin/main', 'init', array($instanciasOAJSON));
 
 echo $OUTPUT->footer();

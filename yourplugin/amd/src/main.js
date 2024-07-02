@@ -12,9 +12,8 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
 
                 // Hacer algo con los datos
                 log.debug(datos);
-
+                var rasAsignaturaArray = [];
                 log.debug("CHECK IF DRAFT SAVED");
-
                 // Get the query string portion of the URL.
                 var queryString = window.location.search;
 
@@ -40,7 +39,7 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                 log.debug(paramCourseid);
 
                 // Create form elements
-                    var selectTopicosH5P = [];
+                    // var selectTopicosH5P = [];
                     var seleccionarUnidadTitulo = document.createElement('h3');
                     seleccionarUnidadTitulo.textContent = 'Seleccionar Unidad y Topicos:';
 
@@ -52,19 +51,69 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                      */
                     function obtenerUnidadesConTemasYTopicos(datos) {
                         let unidadesConTemasYTopicos = [];
-                        datos.contenidosMinimo.forEach(contenido => {
-                            contenido.unidades.forEach(unidad => {
-                                let temasYTopicos = unidad.temas.map(tema => ({
-                                    tema: tema.uri.replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""),
-                                    topicos: tema.topicos.map(topico =>
-                                        topico.uri.replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""))
-                                }));
-                                unidadesConTemasYTopicos.push({
-                                    unidad: unidad.uri.replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""),
-                                    temasYTopicos: temasYTopicos
-                                });
-                            });
-                        });
+                        // Recorriendo el JSON para obtener la estructura deseada
+                        for (const asignaturaUri in datos) {
+                            const asignatura = datos[asignaturaUri];
+
+                            for (const raasignatura in asignatura.RAsAsignatura){
+                                rasAsignaturaArray.push(raasignatura);
+                            }
+
+                            for (const contenidoUri in asignatura.contenidosMinimo) {
+                                const contenido = asignatura.contenidosMinimo[contenidoUri];
+
+                                for (const unidadUri in contenido.unidades) {
+                                    const unidad = contenido.unidades[unidadUri];
+                                    let temasYTopicos = [];
+                                    for (const temaUri in unidad.temas) {
+                                        let topicos = [];
+                                        let topicosYsubs = [];
+                                        const tema = unidad.temas[temaUri];
+
+                                        for (const topicoUri in tema.topicos) {
+                                            let partes = [];
+                                            // console.log(`Partes: ${topico.partes}`);
+                                            // console.log(`Soportes: ${topico.soportes}`);
+                                            const topico = tema.topicos[topicoUri];
+                                            for (const parteUri in topico.partes) {
+                                                partes.push(parteUri
+                                                            .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""));
+                                            }
+                                            topicos.push(topicoUri
+                                                        .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""));
+                                            topicosYsubs.push({"topico":topicoUri,
+                                                                "partes":partes});
+                                        }
+                                        temasYTopicos.push({tema: temaUri
+                                            .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""),
+                                            topicos: topicos,
+                                            topicosYsubs: topicosYsubs});
+
+
+                                    }
+                                    unidadesConTemasYTopicos.push({
+                                        unidad: unidadUri
+                                        .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""),
+                                        temasYTopicos: temasYTopicos
+                                    });
+
+                            }
+                            }
+                        }
+                        // let unidadesConTemasYTopicos = [];
+                        // datos.contenidosMinimo.forEach(contenido => {
+                        //     contenido.unidades.forEach(unidad => {
+                        //         let temasYTopicos = unidad.temas.map(tema => ({
+                        //             tema: tema.uri.replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""),
+                        //             topicos: tema.topicos.map(topico =>
+                        //                 topico.uri.replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""))
+                        //         }));
+                        //         unidadesConTemasYTopicos.push({
+                        //             unidad: unidad.uri.replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""),
+                        //             temasYTopicos: temasYTopicos
+                        //         });
+                        //     });
+                        // });
                         return unidadesConTemasYTopicos;
                     }
 
@@ -74,13 +123,35 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
 
                     // Obtener las unidades con sus temas y tópicos y añadirlas al select como opciones
                     var unidadesConTemasYTopicos = obtenerUnidadesConTemasYTopicos(datos);
+                    var temasTopicosDic = {};
+
                     unidadesConTemasYTopicos.forEach(function(unidadConTemasYTopicos) {
                         var option = document.createElement('option');
                         option.textContent = unidadConTemasYTopicos.unidad;
                         option.value = unidadConTemasYTopicos.unidad.toUpperCase().replace(/\s+/g, '_');
                         option.dataset.temasYTopicos = JSON.stringify(unidadConTemasYTopicos.temasYTopicos); // Guardar los temas y
+                        log.debug("topicosYsubs:"+JSON.stringify(unidadConTemasYTopicos.temasYTopicos));
                         select.appendChild(option);
+                        var i = 1;
+                        //info for table later
+                        unidadConTemasYTopicos.temasYTopicos.forEach(function(tema){
+
+                            tema.topicosYsubs.forEach(function(topico){
+                                temasTopicosDic[topico.topico
+                                    .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", "")
+                                    .toUpperCase().replace(/\s+/g, '_')]={
+                                    name: topico.topico
+                                    .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""),
+                                    order: i,
+                                    incluido: {},
+                                    parte: topico.partes,
+                                    soporte: {}};
+                                i++;
+                            });
+                        });
+
                     });
+                    log.debug("temasTopicosDic: "+JSON.stringify(temasTopicosDic));
                     // Append form to container
                     var mainDiv = document.querySelector('div[role="main"]');
                     // var mform = document.getElementsByClassName("mform")[0];
@@ -95,9 +166,11 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
 
                     select.insertAdjacentElement('afterend', ul);
 
+
                     // Add event listener to select for change event
-                    select.addEventListener('change', function(event) {
-                        selectTopicosH5P = [];
+                    select.addEventListener('change', function(event) {//TODO si se cambia la Unidad se
+                                                         // deseleccionan todos los topicos, borrar del array
+                        // selectTopicosH5P = [];
                         var selectedOption = event.target.selectedOptions[0];
                         var temasYTopicos = JSON.parse(selectedOption.dataset.temasYTopicos);
 
@@ -119,31 +192,51 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
 
                                 var label = document.createElement('label');
                                 label.textContent = topico;
-                                selectTopicosH5P.push(topico);
-                                log.debug(selectTopicosH5P);
+
+                                // log.debug(selectTopicosH5P);
                                 label.prepend(checkbox);
 
                                 liTopico.appendChild(label);
                                 liTopico.style.marginLeft = '20px'; // Sangría para los tópicos
                                 ul.appendChild(liTopico);
+
+                                //enventlistener para armar los datos que van en la tabla
+                                checkbox.addEventListener('change', function(event) {
+                                    // Check the state of the checkbox
+                                    if (event.target.checked) {
+                                        var tableRow = {name: temasTopicosDic[event.target.value].name,
+                                            order: temasTopicosDic[event.target.value].order,
+                                            incluido: {},
+                                            parte: temasTopicosDic[event.target.value].parte,
+                                            ejemplos:"",
+                                            actividades:"Definición de límite - Actividad 1"
+                                        };
+                                        var select = document.getElementById('menutopic');
+                                        var option = document.createElement('option');
+                                        option.textContent = temasTopicosDic[event.target.value].name;
+                                        option.value = event.target.value;
+                                        select.appendChild(option);
+                                        fillTable(tableRow, event.target.value);
+                                    } else {
+                                        removeItemFromTable(event.target.value);
+                                        var select = document.getElementById('menutopic');
+                                        removeOptionByValue(select,event.target.value);
+                                    }
+                                });
                             });
                         });
 
-                        var select = document.getElementById('menutopic');
-                        if(select){
-                            // select.setAttribute('id','id_unidadSelect');
-                            // Add options to select element
-                            // var options = ['Introducción', 'Enfoque Basado en Agentes', 'Búsqueda'];
-
-                            var options = selectTopicosH5P;
-                            log.debug(selectTopicosH5P);
-                            options.forEach(function(optionText) {
-                                var option = document.createElement('option');
-                                option.textContent = optionText;
-                                option.value = optionText.toUpperCase().replace(/\s+/g, '_');
-                                select.appendChild(option);
-                            });
-                        }
+                        // var select = document.getElementById('menutopic');
+                        // if(select){
+                        //     var options = selectTopicosH5P;
+                        //     // log.debug(selectTopicosH5P);
+                        //     options.forEach(function(optionText) {
+                        //         var option = document.createElement('option');
+                        //         option.textContent = optionText;
+                        //         option.value = optionText.toUpperCase().replace(/\s+/g, '_');
+                        //         select.appendChild(option);
+                        //     });
+                        // }
                     });
 
                     var seleccionarRAsTitulo = document.createElement('h3');
@@ -151,7 +244,8 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
 
                     var checkboxesContainer = document.createElement('div'); // Add multiple select element
                     checkboxesContainer.setAttribute('id', 'resultadoAprendizaje'); // Set attributes for multiple select element
-                    var resultadosAprendizaje = datos['RAsAsignatura'];
+                    var resultadosAprendizaje = rasAsignaturaArray;
+                    log.debug("resultadosAprendizaje: "+resultadosAprendizaje);
 
                     resultadosAprendizaje.forEach(function(raText) {
                         raText = raText.replace("http://www.semanticweb.org/valer/ontologies/OntoOA#","");
@@ -180,13 +274,6 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                     var objetoConocimientoInput = createTextInput('Objeto de Conocimiento:');
                     var condicionInput = createTextInput('Condición:');
                     var finalidadInput = createTextInput('Finalidad:');
-
-                    // Append elements to form
-                    // mform.appendChild(title);
-                    // mform.appendChild(verboInput);
-                    // mform.appendChild(objetoConocimientoInput);
-                    // mform.appendChild(condicionInput);
-                    // mform.appendChild(finalidadInput);
 
                     checkboxesContainer.insertAdjacentElement('afterend', title);
                     title.insertAdjacentElement('afterend', verboInput);
@@ -310,57 +397,86 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
 
                 // Create tbody element with sample data
                 var tbody = document.createElement('tbody');
-                var rowData = [
-                    { name: 'Definición de límite',order: 1,  incluido: {}, parte:{}, ordenParte: "",ejemplos:"",
-                    actividades:"Definición de límite - Actividad 1" },
-                    { name: 'No existencia de límite',order: 2,  incluido: {}, parte:{},ordenParte: "",ejemplos:"Ejemplo 1",
-                    actividades:""  },
-                    { name: 'Indeterminaciones',order: 2,  incluido: {"0/0":1,"Inf/Inf":2}, parte:{},ordenParte: "",ejemplos:"",
-                    actividades:"0/0 Actividad a,Inf/Inf Actividad b "},
-                ];
 
-                rowData.forEach(function(data) {
-                    var row = document.createElement('tr');
-                    row.style.border = '1px solid black';
-                     // Agregar asa de arrastre a la primera celda
-                    var dragHandleCell = document.createElement('td');
-                    dragHandleCell.className = 'drag-handle';
-                    dragHandleCell.textContent = '☰';
-                    dragHandleCell.draggable = true; // Asegurar que la celda sea arrastrable
-                    row.appendChild(dragHandleCell);
+                /**
+                     * remove item from table
+                     *
+                     * @param {String} id - El id de datos.
+                */
+                function removeItemFromTable(id) {
+                    const row = tbody.querySelector(`tr[id="${id}"]`);
+                    if (row) {
+                        tbody.removeChild(row);
+                    }
+                }
 
-                    Object.keys(data).forEach(function(key) {
-                        var td = document.createElement('td');
-                        var tdOrdenIncluido = document.createElement('td');
-                        if (key === 'incluido') {
-                            // Iterate through the object
-                            for (const incluido in data[key]) {
-                                if (data[key].hasOwnProperty(incluido)) {
-                                    var div = document.createElement('div');
-                                    div.className = 'draggable';
-                                    div.draggable = true;
-                                    div.textContent = incluido;
-                                    td.appendChild(div);
+                /**
+                     * remove item from select
+                     *@param {HTMLElement} select - El id de datos.
+                     * @param {String} value - El id de datos.
+                */
+                function removeOptionByValue(select,value) {
+                    // var select = document.getElementById(selectId);
+                    var options = select.options;
+                    for (var i = 0; i < options.length; i++) {
+                        if (options[i].value === value) {
+                            select.remove(i);
+                            break;
+                        }
+                    }
+                }
+                 /**
+                     * fill table
+                     *
+                     * @param {Array<Object>} data - El array de datos.
+                     * @param {String} id - El id de datos.
+                */
+                function fillTable(data, id) {
+                    // rowData.forEach(function(data) {
+                        var row = document.createElement('tr');
+                        row.setAttribute("id",id);
+                        row.style.border = '1px solid black';
+                         // Agregar asa de arrastre a la primera celda
+                        var dragHandleCell = document.createElement('td');
+                        dragHandleCell.className = 'drag-handle';
+                        dragHandleCell.textContent = '☰';
+                        dragHandleCell.draggable = true; // Asegurar que la celda sea arrastrable
+                        row.appendChild(dragHandleCell);
 
-                                    var divOrdenIncluido = document.createElement('div');
-                                    divOrdenIncluido.className = 'draggable';
-                                    divOrdenIncluido.draggable = true;
-                                    divOrdenIncluido.textContent = data[key][incluido];
-                                    tdOrdenIncluido.appendChild(divOrdenIncluido);
+                        Object.keys(data).forEach(function(key) {
+                            var td = document.createElement('td');
+                            var tdOrdenIncluido = document.createElement('td');
+                            if (key === 'incluido') {
+                                // Iterate through the object
+                                for (const incluido in data[key]) {
+                                    if (data[key].hasOwnProperty(incluido)) {
+                                        var div = document.createElement('div');
+                                        div.className = 'draggable';
+                                        div.draggable = true;
+                                        div.textContent = incluido;
+                                        td.appendChild(div);
+
+                                        var divOrdenIncluido = document.createElement('div');
+                                        divOrdenIncluido.className = 'draggable';
+                                        divOrdenIncluido.draggable = true;
+                                        divOrdenIncluido.textContent = data[key][incluido];
+                                        tdOrdenIncluido.appendChild(divOrdenIncluido);
+                                    }
                                 }
+                                row.appendChild(td);
+                                tdOrdenIncluido.style.border = '1px solid black';
+                                row.appendChild(tdOrdenIncluido);
                             }
-                            row.appendChild(td);
-                            tdOrdenIncluido.style.border = '1px solid black';
-                            row.appendChild(tdOrdenIncluido);
-                        }
-                        else{
-                            td.textContent = data[key];
-                            row.appendChild(td);
-                        }
-                        td.style.border = '1px solid black';
-                    });
-                    tbody.appendChild(row);
-                });
+                            else{
+                                td.textContent = data[key];
+                                row.appendChild(td);
+                            }
+                            td.style.border = '1px solid black';
+                        });
+                        tbody.appendChild(row);
+                    // });
+                }
+
                 table.appendChild(tbody);
 
                 // Add event listeners to editable cells
