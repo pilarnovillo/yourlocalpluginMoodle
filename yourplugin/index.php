@@ -81,6 +81,41 @@ class test_editor_form extends moodleform {
     public function save_h5p(stdClass $data) {
         $this->editor->save_content($data);
     }
+
+    // Custom validation should be added here.
+    function validation($data, $files) {
+        $errors= array();
+        // TODO enviar info a la ontologia 
+        //Hacer las consultas correspondientes ej Multiple choice
+        //
+
+
+        // Decodificar el valor de 'h5pparams' como un array asociativo
+        $h5pparams = json_decode($data['h5pparams'], true);
+        $question = $h5pparams['params']['question'];
+        $questionText = str_replace(array("\n", "\r"), '', strip_tags($question));
+
+        echo "PREGUNTA";
+        echo $question;
+        echo "FIN";
+        echo "questionText";
+        echo $questionText;
+        echo "FIN";
+
+        if ($questionText === 'Pregunta6') {
+            echo 'The question is Pregunta6';
+            return [];
+        } else {
+            echo '<div id="error-message" style="color: red;">HERE</div>';
+            echo 'The question is not Pregunta6';
+            echo "IM ON THE VALIDATION";
+            $errors['name'] = "FAKE ERROR";
+            // return [];
+        }
+
+        return $errors;
+        
+    }
 }
 
 class myform extends moodleform {
@@ -131,6 +166,7 @@ $contentid = optional_param('id', null, PARAM_INT);
 $library = optional_param('library', null, PARAM_TEXT);
 $contextid = optional_param('contextid', null, PARAM_INT);
 $topic = optional_param('topic', null, PARAM_TEXT);
+$oaid = optional_param('oaid', null, PARAM_INT);
 
 $context = context_system::instance();
 $fs = new file_storage();
@@ -174,21 +210,30 @@ if ($mform->is_cancelled()) {
     $library = null;
 } else if ($data = $mform->get_data()) {
 
+    // print_r($data);
+    // return;
+    // Display the form.
+    // $mform->display();
     // Decode the JSON string inside h5pparams into an associative array
     $h5pparams = json_decode($data->h5pparams, true);
     //TODO verificar si ya tiene el nombre del topico o no porque al editarlo intenta agregarlo nuevamente
     // Update the value of the "extraTitle" field
-    $h5pparams['metadata']['extraTitle'] = $data->topic."-" . $h5pparams['metadata']['extraTitle'];
-    $h5pparams['metadata']['title'] = $data->topic ."-" .$h5pparams['metadata']['title'] ;
+    $h5pparams['metadata']['extraTitle'] = $data->topic."-" . $h5pparams['metadata']['extraTitle']. "-ID".$oaid;
+    $h5pparams['metadata']['title'] = $data->topic ."-" .$h5pparams['metadata']['title']."-ID".$oaid;
 
     // Encode the modified h5pparams array back into JSON format
     $data->h5pparams = json_encode($h5pparams);
+
+    // echo "TIENE QUE PONER 3 OPCIONES";
 
     // When the form is submitted, and the data is successfully validated,
     // the `get_data()` function will return the data posted in the form.
     $mform->save_h5p($data);
     $contentid = null;
     $library = null;
+}
+else{
+    echo "I AM ON THE LAST ELSE";
 }
 
 echo $OUTPUT->header();
@@ -237,6 +282,15 @@ echo html_writer::end_div();
 //     $mform1->display();
 // }
 
+function checkTitleEndsWith($title, $searchString) {
+    // Get the length of the search string
+    $searchStringLength = strlen($searchString);
+    // Get the ending part of the title that is the same length as the search string
+    $ending = substr($title, -$searchStringLength);
+    // Compare the ending with the search string
+    return $ending === $searchString;
+}
+
 if ($contentid === null && empty($library)) {
     // Create a form.
     echo html_writer::start_tag('form', array('method' => 'post', 'action' => ''));
@@ -257,27 +311,31 @@ if ($contentid === null && empty($library)) {
                 // $modulename = ($course) ? ' - Module: ' . ($cm->name ?? 'ERROR: No module') : '';
                 $params = json_decode($h5pcontent->jsoncontent);
                 $h5pcontenttitle = ' - ' . ($params->metadata->title ?? 'ERROR: No title');
-                $options[$h5pcontent->id] = $coursename .  $h5pcontenttitle;
-                if($h5pcontent->id==33){    
+                if(checkTitleEndsWith($h5pcontenttitle, "-ID".$oaid)){
+                    $options[$h5pcontent->id] = $coursename .  $h5pcontenttitle;
+
+                }
+                
+                // if($h5pcontent->id==33){    
                     // Send the file to the user for download
                     // Get the URL of the file
 
-                    $url = moodle_url::make_pluginfile_url(
-                        $file->get_contextid(),
-                        $file->get_component(),
-                        $file->get_filearea(),
-                        $file->get_itemid(),
-                        $file->get_filepath(),
-                        $file->get_filename(),
-                        false                     // Do not force download of the file.
-                    );
+                    // $url = moodle_url::make_pluginfile_url(
+                    //     $file->get_contextid(),
+                    //     $file->get_component(),
+                    //     $file->get_filearea(),
+                    //     $file->get_itemid(),
+                    //     $file->get_filepath(),
+                    //     $file->get_filename(),
+                    //     false                     // Do not force download of the file.
+                    // );
 
                     // echo $url;
                     // echo $file->get_contextid().$file->get_component().$file->get_filearea().$file->get_itemid().$file->get_filepath().$file->get_filename();
                     // // Echo the HTML button with the file URL
                     // echo '<a href="' . $url . '" download>Download File</a>';
 
-                }
+                // }
             }
         }
     }
@@ -305,7 +363,8 @@ if ($contentid === null && empty($library)) {
     $tipos = array(
         'contenido' => 'Contenido',
         'ejemplo' => 'Ejemplo',
-        'actividad' => 'Actividad'
+        'actividad' => 'Actividad',
+        'evaluacion' => 'Evaluacion'
     );
     echo html_writer::label('Select a content to create for specific topic', 'library');
     echo html_writer::select($topics, 'topic');

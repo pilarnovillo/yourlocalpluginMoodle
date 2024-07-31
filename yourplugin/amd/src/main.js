@@ -38,6 +38,13 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                 var paramCourseid = paramsObject['courseid'];
                 log.debug(paramCourseid);
 
+                var resultadoAprendizajeOA = {"raasignatura":[],
+                                                "verbo":"",
+                                                "objeto":"",
+                                                "condicion":"",
+                                                "finalidad":""
+                };
+
                 // Create form elements
                     // var selectTopicosH5P = [];
                     var seleccionarUnidadTitulo = document.createElement('h3');
@@ -117,9 +124,17 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                         return unidadesConTemasYTopicos;
                     }
 
+                     // Crear la opción por defecto
+                    var defaultOption = document.createElement('option');
+                    defaultOption.text = 'Seleccione una opción';
+                    defaultOption.value = '';
+                    defaultOption.disabled = true;
+                    defaultOption.selected = true;
+
                     // Crear el elemento select
                     var select = document.createElement('select');
                     select.setAttribute('id', 'id_unidadSelect');
+                    select.appendChild(defaultOption);
 
                     // Obtener las unidades con sus temas y tópicos y añadirlas al select como opciones
                     var unidadesConTemasYTopicos = obtenerUnidadesConTemasYTopicos(datos);
@@ -130,7 +145,7 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                         option.textContent = unidadConTemasYTopicos.unidad;
                         option.value = unidadConTemasYTopicos.unidad.toUpperCase().replace(/\s+/g, '_');
                         option.dataset.temasYTopicos = JSON.stringify(unidadConTemasYTopicos.temasYTopicos); // Guardar los temas y
-                        log.debug("topicosYsubs:"+JSON.stringify(unidadConTemasYTopicos.temasYTopicos));
+                        // log.debug("topicosYsubs:"+JSON.stringify(unidadConTemasYTopicos.temasYTopicos));
                         select.appendChild(option);
                         var i = 1;
                         //info for table later
@@ -151,7 +166,7 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                         });
 
                     });
-                    log.debug("temasTopicosDic: "+JSON.stringify(temasTopicosDic));
+                    // log.debug("temasTopicosDic: "+JSON.stringify(temasTopicosDic));
                     // Append form to container
                     var mainDiv = document.querySelector('div[role="main"]');
                     // var mform = document.getElementsByClassName("mform")[0];
@@ -251,7 +266,7 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                         raText = raText.replace("http://www.semanticweb.org/valer/ontologies/OntoOA#","");
                         var checkbox = document.createElement('input');
                         checkbox.type = 'checkbox';
-                        checkbox.value = raText.toUpperCase().replace(/\s+/g, '_');
+                        checkbox.value = raText;//.toUpperCase().replace(/\s+/g, '_'); TODO ver si es necesario
                         var label = document.createElement('label');
                         label.textContent = raText;
                         label.appendChild(checkbox);
@@ -260,6 +275,24 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                         // Crear y añadir un elemento <br> después del label
                         var br = document.createElement('br');
                         checkboxesContainer.appendChild(br);
+
+                        //enventlistener para armar los datos que van en la ontologia
+                        checkbox.addEventListener('change', function(event) {
+                            // Check the state of the checkbox
+                            if (event.target.checked) {
+                                //TODO enviar a la ontologia en el momento?
+                                resultadoAprendizajeOA["raasignatura"].push(event.target.value);
+
+                            } else {
+                                //Eliminar ra del array
+                                for (let i = resultadoAprendizajeOA["raasignatura"].length - 1; i >= 0; i--) {
+                                    if (resultadoAprendizajeOA["raasignatura"][i] === event.target.value) {
+                                        resultadoAprendizajeOA["raasignatura"].splice(i, 1);
+                                    }
+                                }
+                            }
+                            // log.debug("resultadoAprendizajeOA: "+resultadoAprendizajeOA["raasignatura"]);
+                        });
                     });
 
                     ul.insertAdjacentElement('afterend',seleccionarRAsTitulo);
@@ -311,6 +344,9 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                         // Your event handling code here
                         log.debug('Input VERBO value changed:', event.target.value);
 
+                        resultadoAprendizajeOA["verbo"] = event.target.value;
+                        // log.debug(resultadoAprendizajeOA["verbo"]);
+
                         const id = paramsObject['oaid'];
                         const name = event.target.value;
 
@@ -326,6 +362,8 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
 
                      /**
                         * Function to create
+                        * Manejo de traer las cosas seleccionadas de OA ya creados pero no terminados
+                        *seleccionar la unidad y los topicos
                     */
                      async function setOAFields() {
                         // ...
@@ -350,6 +388,111 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
 
                                 // Set the value of the input element
                                 input.value = storedName;
+
+                                var selectUnidad = document.getElementById("id_unidadSelect");
+                                //TODO eliminar hardcodeo como es la relacion de OA a UNIDAD?
+                                var topicosOntologia = ["TOPICO001","TOPICO004"];
+                                var selectedOption = Array.from(selectUnidad.options).find(option => option.value === 'MADUNIDAD1');
+
+                                selectUnidad.value = selectedOption.value;
+
+                                var temasYTopicos = JSON.parse(selectedOption.dataset.temasYTopicos);
+
+                                // Limpiar la lista anterior
+                                ul.innerHTML = '';
+
+                                // Añadir los temas y tópicos a la lista
+                                temasYTopicos.forEach(item => {
+                                    var liTema = document.createElement('li');
+                                    liTema.textContent = item.tema;
+                                    ul.appendChild(liTema);
+
+                                    item.topicos.forEach(topico => {
+                                        var liTopico = document.createElement('li');
+
+                                        var checkbox = document.createElement('input');
+                                        checkbox.type = 'checkbox';
+                                        checkbox.value = topico.toUpperCase().replace(/\s+/g, '_');
+
+                                        var label = document.createElement('label');
+                                        label.textContent = topico;
+
+                                        // log.debug(selectTopicosH5P);
+                                        label.prepend(checkbox);
+
+                                        liTopico.appendChild(label);
+                                        liTopico.style.marginLeft = '20px'; // Sangría para los tópicos
+                                        ul.appendChild(liTopico);
+
+                                        // Establecer el checkbox como seleccionado TODO implemenrar una lista que venga
+                                        // desde la ontologia con la data
+                                        if(topicosOntologia.includes(checkbox.value)){
+                                            checkbox.checked = true;
+                                            var tableRow = {name: temasTopicosDic[checkbox.value].name,
+                                                order: temasTopicosDic[checkbox.value].order,
+                                                incluido: {},
+                                                parte: temasTopicosDic[checkbox.value].parte,
+                                                ejemplos:"",
+                                                actividades:"Definición de límite - Actividad 1"
+                                            };
+                                            var select = document.getElementById('menutopic');
+                                            var option = document.createElement('option');
+                                            option.textContent = temasTopicosDic[checkbox.value].name;
+                                            option.value = checkbox.value;
+                                            select.appendChild(option);
+                                            fillTable(tableRow, checkbox.value);
+                                        }
+
+                                        //enventlistener para armar los datos que van en la tabla
+                                        checkbox.addEventListener('change', function(event) {
+                                            // Check the state of the checkbox
+                                            if (event.target.checked) {
+                                                var tableRow = {name: temasTopicosDic[event.target.value].name,
+                                                    order: temasTopicosDic[event.target.value].order,
+                                                    incluido: {},
+                                                    parte: temasTopicosDic[event.target.value].parte,
+                                                    ejemplos:"",
+                                                    actividades:"Definición de límite - Actividad 1"
+                                                };
+                                                var select = document.getElementById('menutopic');
+                                                var option = document.createElement('option');
+                                                option.textContent = temasTopicosDic[event.target.value].name;
+                                                option.value = event.target.value;
+                                                select.appendChild(option);
+                                                fillTable(tableRow, event.target.value);
+                                            } else {
+                                                removeItemFromTable(event.target.value);
+                                                var select = document.getElementById('menutopic');
+                                                removeOptionByValue(select,event.target.value);
+                                            }
+                                        });
+                                    });
+                                });
+                                //RA Asignatura
+
+                                const getOAFromOntology = (
+                                    id
+                                ) => ajax.call([{
+                                    methodname: 'local_yourplugin_get_oa_ontology',
+                                    args: {
+                                        id
+                                    },
+                                }])[0];
+
+                                try {
+                                    const responseOAFromOntology = await getOAFromOntology(id);
+                                    responseOAFromOntology.forEach(ra => {
+                                        var valueRaAsig = ra.raasig
+                                        .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", "");
+                                        let checkboxRaAsig = document
+                                        .querySelectorAll(`#resultadoAprendizaje input[type="checkbox"][value="${valueRaAsig}"]`);
+                                        checkboxRaAsig[0].checked = true;
+                                    });
+                                } catch (error) {
+                                    log.debug('Error fetching OA RAsAsig: ', error);
+                                    log.debug( error);
+                                }
+
                             }
                         } catch (error) {
                             log.debug('Error fetching OA fields:', error);
@@ -623,8 +766,145 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                     });
                 });
 
+                /**
+                     * saveChanges
+                     *
+                */
+                async function saveChanges() {
+                    // fetch('/save_changes.php', {
+                    //     method: 'POST',
+                    //     headers: {
+                    //         'Content-Type': 'application/json',
+                    //     },
+                    //     body: JSON.stringify({ /* datos a guardar */ }),
+                    // })
+                    // .then(response => response.json())
+                    // .then(data => {
+                    //     console.log('Success:', data);
+                    // })
+                    // .catch((error) => {
+                    //     console.error('Error:', error);
+                    // });
+                    const saveChangesOnOntology = (
+                        oaid,
+                        raoa,
+                        contenidos,
+                        actividades,
+                        metadatos,
+                    ) => ajax.call([{
+                        methodname: 'local_yourplugin_save_changes_automatically',
+                        args: {
+                            oaid,
+                            raoa,
+                            contenidos,
+                            actividades,
+                            metadatos,
+                        },
+                    }])[0];
 
+                    var input = verboInput.querySelector('input');
+                    resultadoAprendizajeOA["verbo"] = input.value;
+                    log.debug("resultadoAprendizajeOA:",resultadoAprendizajeOA["verbo"]);
+                    const saveChangesOnOntologyResponse =
+                     await saveChangesOnOntology(paramsObject['oaid'], resultadoAprendizajeOA,[],[],[]);
+                    log.debug(saveChangesOnOntologyResponse);
+                    log.debug("RUN saveChanges");
+                }
+                var input = verboInput.querySelector('input');
+                log.debug("verbo: ", input.value);
+                setInterval(saveChanges, 150000); // Cada 5 minutos
 
+                var saveChangesButtonH5P = document.getElementById('id_submitbutton');
+                log.debug("saveChangesButton:" + saveChangesButtonH5P);
+                log.debug(saveChangesButtonH5P);
+
+                var errorMessage = document.getElementById("error-message");
+                if (errorMessage){
+                    saveChangesButtonH5P.insertAdjacentElement('afterend', errorMessage);
+                }
+                // if(saveChangesButtonH5P){
+                    // saveChangesButtonH5P.addEventListener('click', function(event) {
+                        // event.preventDefault();
+                        // // Create the modal dialog
+                        // var modal = document.createElement('div');
+                        // modal.style.position = 'fixed';
+                        // modal.style.top = '50%';
+                        // modal.style.left = '50%';
+                        // modal.style.transform = 'translate(-50%, -50%)';
+                        // modal.style.zIndex = '1000';
+                        // modal.style.padding = '20px';
+                        // modal.style.backgroundColor = 'white';
+                        // modal.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.5)';
+
+                        // var question = document.createElement('p');
+                        // question.textContent = 'Are you sure you want to continue?';
+                        // modal.appendChild(question);
+
+                        // var cancelButton = document.createElement('button');
+                        // cancelButton.textContent = 'Cancel';
+                        // cancelButton.addEventListener('click', function() {
+                        //     // event.preventDefault();
+                        //     // Find the H5P editor container element
+                        //     // var h5pEditorContainer = $('.h5p-editor');
+
+                        //     // // Check if the container is found
+                        //     // if (h5pEditorContainer) {
+                        //     //     // Get the H5P editor instance from the container
+                        //     //     // var H5P;
+                        //     //     // Use H5P here
+                        //     //     var h5pEditorInstance = window.H5P.jQuery(h5pEditorContainer).data('h5peditor');
+                        //     //     // Check if the editor instance is found
+                        //     //     if (h5pEditorInstance) {
+                        //     //         log.debug('H5P Editor instance found:', h5pEditorInstance);
+
+                        //     //         // Get the current content of the H5P editor
+                        //     //         h5pEditorInstance.getContent(function(content) {
+                        //     //             log.debug('H5P Editor content:', content);
+                        //     //         });
+                        //     //     } else {
+                        //     //         log.debug('H5P editor instance not found');
+                        //     //     }
+                        //     // } else {
+                        //     //     log.debug('H5P editor container not found');
+                        //     // }
+                        //     // var h5peditor;
+                        //     // const editor = $('.h5p-editor');
+                        //     // const library = $('input[name="h5plibrary"]');
+                        //     // const params = $('input[name="h5pparams"]');
+                        //     // if (h5peditor === undefined) {
+                        //     //     h5peditor = new ns.Editor(library.val(), params.val(), editor[0]);
+                        //     // }
+                        //     // h5peditor.getContent(function(content) {
+                        //     //     log.debug('H5P Editor content:', content);
+                        //     // });
+                        //     log.debug('Logging form fields:');
+                        //     Array.from(document.getElementById('coolh5peditor').elements).forEach(element => {
+                        //         if (element.name) {
+                        //             log.debug(element.name + ': ' + element.value);
+                        //         }
+                        //     });
+                        //     // Get form data
+                        //     var formData = new FormData(document.getElementById('coolh5peditor'));
+                        //     formData.forEach(function(value, key){
+                        //         log.debug(key + ': ' + value);
+                        //     });
+                        //     document.body.removeChild(modal);
+                        // });
+                        // modal.appendChild(cancelButton);
+
+                        // var continueButton = document.createElement('button');
+                        // continueButton.textContent = 'Continue';
+                        // continueButton.style.marginLeft = '10px';
+                        // continueButton.addEventListener('click', function() {
+                        //     // Perform the new action here
+                        //     document.body.removeChild(modal);
+                        //     document.getElementById('coolh5peditor').submit();
+                        // });
+                        // modal.appendChild(continueButton);
+
+                        // document.body.appendChild(modal);
+                    // });
+                // }
             });
         }
     };
