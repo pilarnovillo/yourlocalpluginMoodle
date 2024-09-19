@@ -71,12 +71,12 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
 
                 const createNewOA = (
                     courseid,
-                    name,
+                    name
                 ) => ajax.call([{
                     methodname: 'local_yourplugin_store_oa',
                     args: {
                         courseid,
-                        name,
+                        name
                     },
                 }])[0];
 
@@ -87,8 +87,9 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                     const courseid = eventDataObject.courseid ;
                     const name ="empty name";
 
-                    const response = await createNewOA(courseid, name);
+                    const response = await createNewOA(courseid, name, oaid);
                     var oaid = response[0].id;
+
 
                     // Redirigir a la página de tu plugin local
                     window.location.href = 'http://localhost/local/yourplugin/index.php?courseid=' + eventDataObject.courseid +

@@ -41,6 +41,8 @@ class test_editor_form extends moodleform {
         $library = $this->_customdata['library'] ?? null;
         $contextid = $this->_customdata['contextid'];
         $topic = $this->_customdata['topic'] ?? null;
+        $oaid = $this->_customdata['oaid'] ?? null;
+        $tipo = $this->_customdata['tipo'] ?? null;
 
         $editor = new editor();
 
@@ -61,6 +63,12 @@ class test_editor_form extends moodleform {
             $mform->addElement('hidden', 'topic', $topic);
             $mform->setType('topic', PARAM_RAW);
 
+            $mform->addElement('hidden', 'oaid', $oaid);
+            $mform->setType('oaid', PARAM_RAW);
+
+            $mform->addElement('hidden', 'tipo', $tipo);
+            $mform->setType('tipo', PARAM_RAW);
+
             $context = context_user::instance($USER->id);
             // $editor->set_library($library, $context->id, 'user', 'private', 0);
             $editor->set_library($library, $contextid, 'contentbank', 'public');
@@ -75,7 +83,14 @@ class test_editor_form extends moodleform {
 
         $editor->add_editor_to_form($mform);
 
+        // Add a checkbox to ignore validation
+        $mform->addElement('advcheckbox', 'ignorevalidation', 'ignorevalidation');
+        $mform->setDefault('ignorevalidation', 0);
+
         $this->add_action_buttons();
+
+        // Add custom Delete button
+        $mform->addElement('submit', 'deletebutton', 'Delete', array('style' => 'background-color: red; color: white; padding: 10px 20px;'));
     }
 
     public function save_h5p(stdClass $data) {
@@ -84,34 +99,182 @@ class test_editor_form extends moodleform {
 
     // Custom validation should be added here.
     function validation($data, $files) {
+        //Si se quiere eliminar se saltea la validacion 
+        if (isset($data['deletebutton'])) {
+            // Bypass validation when delete is pressed
+            return array();
+        }
+
+        global $DB;
         $errors= array();
         // TODO enviar info a la ontologia 
-        //Hacer las consultas correspondientes ej Multiple choice
-        //
-
+        
+        
+        print_r($data);
 
         // Decodificar el valor de 'h5pparams' como un array asociativo
         $h5pparams = json_decode($data['h5pparams'], true);
-        $question = $h5pparams['params']['question'];
-        $questionText = str_replace(array("\n", "\r"), '', strip_tags($question));
-
-        echo "PREGUNTA";
-        echo $question;
-        echo "FIN";
-        echo "questionText";
-        echo $questionText;
-        echo "FIN";
-
-        if ($questionText === 'Pregunta6') {
-            echo 'The question is Pregunta6';
-            return [];
+            
+        //Necesito saber a que OA pertenece(lo saco del param o del nombre), a que Actividad va a ser la unica del OA
+        if (isset($data['oaid'])) {
+            $oaid = $data['oaid'];
         } else {
-            echo '<div id="error-message" style="color: red;">HERE</div>';
-            echo 'The question is not Pregunta6';
-            echo "IM ON THE VALIDATION";
-            $errors['name'] = "FAKE ERROR";
-            // return [];
+            $parts = explode('-', $h5pparams['metadata']['extraTitle']);
+            $oaid = $parts[2];
+            $oaid = str_replace(array("ID"), '', strip_tags($oaid));
         }
+        // Mostrar el resultado
+        echo "OAID:".$oaid;
+
+        //Necesito saber a que subactividad pertenece--->ID del h5p puede ser el id(param) de la subactividad 
+        
+        if (isset($data['id'])) {
+            $idSubAct = $data['id'];
+        } else {
+            // Obtener el último ID de la tabla
+            $last_id = $DB->get_field("h5p", 'MAX(id)', array());
+            
+            // Si `get_field` no retorna resultados, inicializa $last_id en 0
+            $idSubAct = $last_id ? $last_id + 1 : 1;
+
+        }
+        echo "ID h5p:".$idSubAct;
+        
+
+        //Necesito saber que tipo es el h5p si acti, evaluacion, contenido u ejemplo
+        //Si es nuevo tengo el tipo como parametro sino lo saco del nombre
+        if (isset($data['tipo'])) {
+            $tipo = $data['tipo'];
+        } else {
+            $parts = explode('-', $h5pparams['metadata']['extraTitle']);
+            $tipo = $parts[3];
+        }
+        // Mostrar el resultado
+        echo "TIPO:".$tipo;
+
+        //TOPICO esta en el parametro si es un nuevo h5p o en el nombre si se esta Editando
+        // Necesito saber a que topico satisface esta subActividad
+        if (isset($data['topic'])) {
+            $topic = $data['topic'];
+        } else {
+            $parts = explode('-', $h5pparams['metadata']['extraTitle']);
+            $topic = $parts[0];
+        }
+        // Mostrar el resultado
+        echo "TOPIC:".$topic;
+
+
+        //Tipo de libreria para saber como recorrer el JSON
+        echo "LIB: ".$data['h5plibrary'];
+
+        // Configura el endpoint SPARQL
+        $endpoint1 = 'http://localhost:3030/OA'; // Cambia 'dataset' por el nombre de tu dataset
+        
+        $sparql1 = new \EasyRdf\Sparql\Client($endpoint1);
+    
+        //TODO que tipo es para crear en la ontologia ej Actividad
+        $insertQuery = "PREFIX oaca: <http://www.semanticweb.org/valer/ontologies/OntoOA#>
+        INSERT DATA {
+            oaca:Actividad{$oaid} a oaca:ActividadDeAprendizaje .
+    
+            oaca:Subactividad{$idSubAct}OA{$oaid} a oaca:Subactividad .
+    
+            oaca:Actividad{$oaid} oaca:actividadSeComponeDe oaca:Subactividad{$idSubAct}OA{$oaid}.
+    
+        }";
+    
+        $resultInsert = $sparql1->update($insertQuery);
+
+        echo $resultInsert;
+        
+        // Función recursiva para buscar una cadena en un array o un objeto
+        function searchInArray($array, $search) {
+            foreach ($array as $key => $value) {
+                if (is_array($value) || is_object($value)) {
+                    if (searchInArray((array)$value, $search)) {
+                        return true;
+                    }
+                } else {
+                    if (strpos($value, $search) !== false) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }    
+
+
+        // Function to recursively find all "text" fields que REPRESENTA LAS OPCIONES
+        function findTextFields($array, &$textFields = []) {
+            foreach ($array as $key => $value) {
+                if (is_array($value)) {
+                    // Recursively search if the value is an array
+                    findTextFields($value, $textFields);
+                } elseif ($key === 'text') {
+                    // If the key is "text", add the value to the result
+                    $textFields[] = $value;
+                }
+            }
+        }
+
+
+
+        //Hacer las consultas correspondientes ej Multiple choice
+        // Check if the user chose to ignore validation
+        if (!isset($data['ignorevalidation']) || !$data['ignorevalidation']) {
+            
+            // Buscar la cadena "H5P.MultiChoice"
+            $searchString = "H5P.MultiChoice";
+            $found = searchInArray($h5pparams, $searchString);
+
+            if ($found) {
+                echo "The string '$searchString' was found in the JSON.";
+            } else {
+                echo "The string '$searchString' was not found in the JSON.";
+            }
+
+            $question = $h5pparams['params']['question'];
+            $questionText = str_replace(array("\n", "\r"), '', strip_tags($question));
+            if ($questionText === 'Pregunta6') {
+                echo 'The question is Pregunta6';
+                return [];
+            } else {
+                echo '<div id="error-message" style="color: red;">HERE</div>';
+                echo 'The question is not Pregunta6';
+                echo "IM ON THE VALIDATION";
+                $errors['name'] = "FAKE ERROR";
+            }
+
+            // Initialize the array to store text fields
+            $textFields = [];
+            findTextFields($h5pparams, $textFields);
+
+            // Output the text fields
+            echo "\nNumber of 'text' fields found OPCIONES: " . count($textFields);
+
+            // Check if "Ninguna de las anteriores" or "Todas las anteriores" exists
+            $foundNinguna = false;
+            $foundTodas = false;
+
+            foreach ($textFields as $text) {
+                if (strpos($text, "Ninguna de las anteriores") !== false) {
+                    $foundNinguna = true;
+                }
+                if (strpos($text, "Todas las anteriores") !== false) {
+                    $foundTodas = true;
+                }
+            }
+
+            if ($foundNinguna) {
+                echo "'Ninguna de las anteriores' was found.\n";
+            }
+
+            if ($foundTodas) {
+                echo "'Todas las anteriores' was found.\n";
+            }
+
+        }
+        
 
         return $errors;
         
@@ -167,6 +330,7 @@ $library = optional_param('library', null, PARAM_TEXT);
 $contextid = optional_param('contextid', null, PARAM_INT);
 $topic = optional_param('topic', null, PARAM_TEXT);
 $oaid = optional_param('oaid', null, PARAM_INT);
+$tipo = optional_param('tipo', null, PARAM_TEXT);
 
 $context = context_system::instance();
 $fs = new file_storage();
@@ -196,6 +360,8 @@ $values = [
     'library' => $library,
     'contextid' => $contextid,
     'topic' => $topic,
+    'oaid' => $oaid,
+    'tipo' => $tipo,
 ];
 
 // Instantiate the myform form from within the plugin.
@@ -210,27 +376,38 @@ if ($mform->is_cancelled()) {
     $library = null;
 } else if ($data = $mform->get_data()) {
 
-    // print_r($data);
-    // return;
-    // Display the form.
-    // $mform->display();
-    // Decode the JSON string inside h5pparams into an associative array
-    $h5pparams = json_decode($data->h5pparams, true);
-    //TODO verificar si ya tiene el nombre del topico o no porque al editarlo intenta agregarlo nuevamente
-    // Update the value of the "extraTitle" field
-    $h5pparams['metadata']['extraTitle'] = $data->topic."-" . $h5pparams['metadata']['extraTitle']. "-ID".$oaid;
-    $h5pparams['metadata']['title'] = $data->topic ."-" .$h5pparams['metadata']['title']."-ID".$oaid;
+    if (isset($data->deletebutton)) {
+        // Handle delete button submission here
+        // TODO For example: delete the relevant record, or perform any deletion action. 
+        echo "Delete button pressed";
+        redirect($current_url, 'Item deleted successfully', 2);
+    } else {
 
-    // Encode the modified h5pparams array back into JSON format
-    $data->h5pparams = json_encode($h5pparams);
+        // Decode the JSON string inside h5pparams into an associative array
+        $h5pparams = json_decode($data->h5pparams, true);
+        //TODO verificar si ya tiene el nombre del topico o no porque al editarlo intenta agregarlo nuevamente LISTO abajo
+        // Update the value of the "extraTitle" field
+        // Verificar si el tópico ya está en el extraTitle
+        if (strpos($h5pparams['metadata']['extraTitle'], $data->topic) === false) {
+            // Si el tópico no está en extraTitle, lo agregamos
+            $h5pparams['metadata']['extraTitle'] = $data->topic . "-" . $h5pparams['metadata']['extraTitle'] . "-ID" . $oaid;
+        }
 
-    // echo "TIENE QUE PONER 3 OPCIONES";
+        // Verificar si el tópico ya está en el title
+        if (strpos($h5pparams['metadata']['title'], $data->topic) === false) {
+            // Si el tópico no está en title, lo agregamos
+            $h5pparams['metadata']['title'] = $data->topic . "-" . $h5pparams['metadata']['title'] . "-ID" . $oaid;
+        }
 
-    // When the form is submitted, and the data is successfully validated,
-    // the `get_data()` function will return the data posted in the form.
-    $mform->save_h5p($data);
-    $contentid = null;
-    $library = null;
+        // Encode the modified h5pparams array back into JSON format
+        $data->h5pparams = json_encode($h5pparams);
+
+        // When the form is submitted, and the data is successfully validated,
+        // the `get_data()` function will return the data posted in the form.
+        $mform->save_h5p($data);
+        $contentid = null;
+        $library = null;
+    }
 }
 else{
     echo "I AM ON THE LAST ELSE";
@@ -305,12 +482,14 @@ if ($contentid === null && empty($library)) {
             
             $filecontextid = $file->get_contextid();
             $options[] = [];
-            if($filecontextid == $contextid){//TODO Filtar solo los correspondientes a este curso, TODO podria filtrar tambien correspondientes solo a este OA?
+            if($filecontextid == $contextid){//Filtar solo los correspondientes a este curso, mas abajo filtro por OA
                 list($filecontext, $course, $cm) = get_context_info_array($filecontextid);
                 $coursename = $course->fullname ?? $SITE->fullname;
                 // $modulename = ($course) ? ' - Module: ' . ($cm->name ?? 'ERROR: No module') : '';
                 $params = json_decode($h5pcontent->jsoncontent);
                 $h5pcontenttitle = ' - ' . ($params->metadata->title ?? 'ERROR: No title');
+                //Filtramos solo los h5p correspondientes a este OA 
+                // TODO filtrar los que corresponden a los topicos seleccionados
                 if(checkTitleEndsWith($h5pcontenttitle, "-ID".$oaid)){
                     $options[$h5pcontent->id] = $coursename .  $h5pcontenttitle;
 

@@ -45,6 +45,9 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                                                 "finalidad":""
                 };
 
+                //Variable para almacenar los topicos id seleccionados y luego mandar a la Ontologia
+                var selectedTopics = [];
+
                 // Create form elements
                     // var selectTopicosH5P = [];
                     var seleccionarUnidadTitulo = document.createElement('h3');
@@ -390,8 +393,31 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                                 input.value = storedName;
 
                                 var selectUnidad = document.getElementById("id_unidadSelect");
+
                                 //TODO eliminar hardcodeo como es la relacion de OA a UNIDAD?
-                                var topicosOntologia = ["TOPICO001","TOPICO004"];
+                                const getOATopicsFromOntology = (
+                                    oaid
+                                ) => ajax.call([{
+                                    methodname: 'local_yourplugin_get_oa_topics',
+                                    args: {
+                                        oaid
+                                    },
+                                }])[0];
+                                var topicosOntologia = [];
+                                try {
+                                    const responseOATopicsFromOntology = await getOATopicsFromOntology(paramsObject['oaid']);
+                                    log.debug("Getting topics:");
+                                    log.debug(responseOATopicsFromOntology);
+                                    responseOATopicsFromOntology.forEach(topico => {
+                                        var valueTopico = topico.topic
+                                        .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", "");
+                                        topicosOntologia.push(valueTopico);
+                                    });
+                                } catch (error) {
+                                    log.debug('Error fetching OA Topicos: ', error);
+                                    log.debug( error);
+                                }
+
                                 var selectedOption = Array.from(selectUnidad.options).find(option => option.value === 'MADUNIDAD1');
 
                                 selectUnidad.value = selectedOption.value;
@@ -400,6 +426,7 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
 
                                 // Limpiar la lista anterior
                                 ul.innerHTML = '';
+
 
                                 // Añadir los temas y tópicos a la lista
                                 temasYTopicos.forEach(item => {
@@ -443,8 +470,23 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                                             fillTable(tableRow, checkbox.value);
                                         }
 
-                                        //enventlistener para armar los datos que van en la tabla
-                                        checkbox.addEventListener('change', function(event) {
+                                        //enventlistener para armar los datos que van en la tabla/ontologia
+                                        checkbox.addEventListener('change', async function(event) {
+                                            //Guardar los topicos seleccionados en la Ontologia (MEJOR GUARDAR AUTOMATICALLY
+                                                //                  menos llamadas a la ontolgia?? Pero si deselecciono uno?)
+                                                const guardarTopicoOA = (
+                                                    idTopico,
+                                                    oaid,
+                                                    selected,//boolean que indica si es para almacenar en el oa o eliminar
+                                                ) => ajax.call([{
+                                                    methodname: 'local_yourplugin_guardar_topico_oa',
+                                                    args: {
+                                                        idTopico,
+                                                        oaid,
+                                                        selected
+                                                    },
+                                                }])[0];
+
                                             // Check the state of the checkbox
                                             if (event.target.checked) {
                                                 var tableRow = {name: temasTopicosDic[event.target.value].name,
@@ -460,10 +502,22 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                                                 option.value = event.target.value;
                                                 select.appendChild(option);
                                                 fillTable(tableRow, event.target.value);
+
+                                                const response = await guardarTopicoOA(event.target.value,
+                                                    paramsObject['oaid'], true);
+                                                log.debug(response);
+
+                                                //Agregar topico a la lista para luego mandarlo a la ontologia
+                                                // selectedTopics.push(event.target.value);
                                             } else {
                                                 removeItemFromTable(event.target.value);
                                                 var select = document.getElementById('menutopic');
                                                 removeOptionByValue(select,event.target.value);
+
+                                                const response = await guardarTopicoOA(event.target.value,
+                                                    paramsObject['oaid'], false);
+                                                log.debug(response);
+                                                // selectedTopics.filter(event.target.value);
                                             }
                                         });
                                     });
@@ -731,7 +785,8 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                     log.debug("CLICKED");
 
                     // Redirigir a la página de tu plugin local
-                    window.location.href = 'http://localhost/local/yourplugin/metadatos.php';
+                    window.location.href = 'http://localhost/local/yourplugin/metadatos.php?courseid=' + paramCourseid
+                    + '&oaid=' + paramsObject['oaid'];
                 });
 
                 h5pform.insertAdjacentElement('afterend', buttonFin);
@@ -806,7 +861,7 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                     resultadoAprendizajeOA["verbo"] = input.value;
                     log.debug("resultadoAprendizajeOA:",resultadoAprendizajeOA["verbo"]);
                     const saveChangesOnOntologyResponse =
-                     await saveChangesOnOntology(paramsObject['oaid'], resultadoAprendizajeOA,[],[],[]);
+                     await saveChangesOnOntology(paramsObject['oaid'], resultadoAprendizajeOA, selectedTopics,[],[]);
                     log.debug(saveChangesOnOntologyResponse);
                     log.debug("RUN saveChanges");
                 }
@@ -818,6 +873,7 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                 log.debug("saveChangesButton:" + saveChangesButtonH5P);
                 log.debug(saveChangesButtonH5P);
 
+                //move error message to correct place
                 var errorMessage = document.getElementById("error-message");
                 if (errorMessage){
                     saveChangesButtonH5P.insertAdjacentElement('afterend', errorMessage);
