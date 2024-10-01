@@ -2,7 +2,9 @@
 // define(['jquery','core/log', 'core_h5p/editor_display'], function($, log, Editor){
 // define(['jquery','core/log','editor_atto'], function($, log, editor_atto){
 // import call  from 'core/ajax';
-define(['jquery','core/log','core/ajax'], function($, log, ajax){
+define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events',
+    'https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js'], function($, log, ajax, ModalFactory,
+    ModalEvents, Sortable){
     log.debug('Your module is loading2.');
     return {
         init: function(datos_json) {
@@ -12,7 +14,7 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
 
                 // Hacer algo con los datos
                 log.debug(datos);
-                var rasAsignaturaArray = [];
+                var rasAsignaturaArray = datos.raAsignaturaList;
                 log.debug("CHECK IF DRAFT SAVED");
                 // Get the query string portion of the URL.
                 var queryString = window.location.search;
@@ -45,6 +47,15 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                                                 "finalidad":""
                 };
 
+                const tree = document.createElement('div');
+                Sortable.create(tree, {
+                    group: 'topics',
+                    animation: 150,
+                    onEnd: function(evt) {
+                        log.debug('Nuevo orden de temas/tópicos:'+evt);
+                        // Aquí puedes hacer una llamada AJAX para guardar el nuevo orden en la base de datos
+                    }});
+
                 //Variable para almacenar los topicos id seleccionados y luego mandar a la Ontologia
                 var selectedTopics = [];
 
@@ -53,79 +64,79 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                     var seleccionarUnidadTitulo = document.createElement('h3');
                     seleccionarUnidadTitulo.textContent = 'Seleccionar Unidad y Topicos:';
 
-                    /**
-                     * Obtiene todas las unidades de los contenidos mínimos en el objeto de datos.
-                     *
-                     * @param {Object} datos - El objeto que contiene los OA
-                     * @returns {string[]} Array de URIs de todas las unidades.
-                     */
-                    function obtenerUnidadesConTemasYTopicos(datos) {
-                        let unidadesConTemasYTopicos = [];
-                        // Recorriendo el JSON para obtener la estructura deseada
-                        for (const asignaturaUri in datos) {
-                            const asignatura = datos[asignaturaUri];
+                    // /**
+                    //  * Obtiene todas las unidades de los contenidos mínimos en el objeto de datos.
+                    //  *
+                    //  * @param {Object} datos - El objeto que contiene los OA
+                    //  * @returns {string[]} Array de URIs de todas las unidades.
+                    //  */
+                    // function obtenerUnidadesConTemasYTopicos(datos) {
+                    //     let unidadesConTemasYTopicos = [];
+                    //     // Recorriendo el JSON para obtener la estructura deseada
+                    //     for (const asignaturaUri in datos) {
+                    //         const asignatura = datos[asignaturaUri];
 
-                            for (const raasignatura in asignatura.RAsAsignatura){
-                                rasAsignaturaArray.push(raasignatura);
-                            }
+                    //         for (const raasignatura in asignatura.RAsAsignatura){
+                    //             rasAsignaturaArray.push(raasignatura);
+                    //         }
 
-                            for (const contenidoUri in asignatura.contenidosMinimo) {
-                                const contenido = asignatura.contenidosMinimo[contenidoUri];
+                    //         for (const contenidoUri in asignatura.contenidosMinimo) {
+                    //             const contenido = asignatura.contenidosMinimo[contenidoUri];
 
-                                for (const unidadUri in contenido.unidades) {
-                                    const unidad = contenido.unidades[unidadUri];
-                                    let temasYTopicos = [];
-                                    for (const temaUri in unidad.temas) {
-                                        let topicos = [];
-                                        let topicosYsubs = [];
-                                        const tema = unidad.temas[temaUri];
+                    //             for (const unidadUri in contenido.unidades) {
+                    //                 const unidad = contenido.unidades[unidadUri];
+                    //                 let temasYTopicos = [];
+                    //                 for (const temaUri in unidad.temas) {
+                    //                     let topicos = [];
+                    //                     let topicosYsubs = [];
+                    //                     const tema = unidad.temas[temaUri];
 
-                                        for (const topicoUri in tema.topicos) {
-                                            let partes = [];
-                                            // console.log(`Partes: ${topico.partes}`);
-                                            // console.log(`Soportes: ${topico.soportes}`);
-                                            const topico = tema.topicos[topicoUri];
-                                            for (const parteUri in topico.partes) {
-                                                partes.push(parteUri
-                                                            .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""));
-                                            }
-                                            topicos.push(topicoUri
-                                                        .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""));
-                                            topicosYsubs.push({"topico":topicoUri,
-                                                                "partes":partes});
-                                        }
-                                        temasYTopicos.push({tema: temaUri
-                                            .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""),
-                                            topicos: topicos,
-                                            topicosYsubs: topicosYsubs});
+                    //                     for (const topicoUri in tema.topicos) {
+                    //                         let partes = [];
+                    //                         // console.log(`Partes: ${topico.partes}`);
+                    //                         // console.log(`Soportes: ${topico.soportes}`);
+                    //                         const topico = tema.topicos[topicoUri];
+                    //                         for (const parteUri in topico.partes) {
+                    //                             partes.push(parteUri
+                    //                                         .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""));
+                    //                         }
+                    //                         topicos.push(topicoUri
+                    //                                     .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""));
+                    //                         topicosYsubs.push({"topico":topicoUri,
+                    //                                             "partes":partes});
+                    //                     }
+                    //                     temasYTopicos.push({tema: temaUri
+                    //                         .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""),
+                    //                         topicos: topicos,
+                    //                         topicosYsubs: topicosYsubs});
 
 
-                                    }
-                                    unidadesConTemasYTopicos.push({
-                                        unidad: unidadUri
-                                        .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""),
-                                        temasYTopicos: temasYTopicos
-                                    });
+                    //                 }
+                    //                 unidadesConTemasYTopicos.push({
+                    //                     unidad: unidadUri
+                    //                     .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""),
+                    //                     temasYTopicos: temasYTopicos
+                    //                 });
 
-                            }
-                            }
-                        }
-                        // let unidadesConTemasYTopicos = [];
-                        // datos.contenidosMinimo.forEach(contenido => {
-                        //     contenido.unidades.forEach(unidad => {
-                        //         let temasYTopicos = unidad.temas.map(tema => ({
-                        //             tema: tema.uri.replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""),
-                        //             topicos: tema.topicos.map(topico =>
-                        //                 topico.uri.replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""))
-                        //         }));
-                        //         unidadesConTemasYTopicos.push({
-                        //             unidad: unidad.uri.replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""),
-                        //             temasYTopicos: temasYTopicos
-                        //         });
-                        //     });
-                        // });
-                        return unidadesConTemasYTopicos;
-                    }
+                    //         }
+                    //         }
+                    //     }
+                    //     // let unidadesConTemasYTopicos = [];
+                    //     // datos.contenidosMinimo.forEach(contenido => {
+                    //     //     contenido.unidades.forEach(unidad => {
+                    //     //         let temasYTopicos = unidad.temas.map(tema => ({
+                    //     //             tema: tema.uri.replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""),
+                    //     //             topicos: tema.topicos.map(topico =>
+                    //     //                 topico.uri.replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""))
+                    //     //         }));
+                    //     //         unidadesConTemasYTopicos.push({
+                    //     //             unidad: unidad.uri.replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""),
+                    //     //             temasYTopicos: temasYTopicos
+                    //     //         });
+                    //     //     });
+                    //     // });
+                    //     return unidadesConTemasYTopicos;
+                    // }
 
                      // Crear la opción por defecto
                     var defaultOption = document.createElement('option');
@@ -139,36 +150,46 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                     select.setAttribute('id', 'id_unidadSelect');
                     select.appendChild(defaultOption);
 
-                    // Obtener las unidades con sus temas y tópicos y añadirlas al select como opciones
-                    var unidadesConTemasYTopicos = obtenerUnidadesConTemasYTopicos(datos);
-                    var temasTopicosDic = {};
-
-                    unidadesConTemasYTopicos.forEach(function(unidadConTemasYTopicos) {
-                        var option = document.createElement('option');
-                        option.textContent = unidadConTemasYTopicos.unidad;
-                        option.value = unidadConTemasYTopicos.unidad.toUpperCase().replace(/\s+/g, '_');
-                        option.dataset.temasYTopicos = JSON.stringify(unidadConTemasYTopicos.temasYTopicos); // Guardar los temas y
-                        // log.debug("topicosYsubs:"+JSON.stringify(unidadConTemasYTopicos.temasYTopicos));
+                    // Cargar unidades en la lista desplegable
+                    // const unidadSelect = document.getElementById('unidadSelect');
+                    datos.unidades.forEach((unidad, index) => {
+                        const option = document.createElement('option');
+                        option.value = index; // Guardar el índice para referencia
+                        option.textContent = unidad.nombre;
                         select.appendChild(option);
-                        var i = 1;
-                        //info for table later
-                        unidadConTemasYTopicos.temasYTopicos.forEach(function(tema){
-
-                            tema.topicosYsubs.forEach(function(topico){
-                                temasTopicosDic[topico.topico
-                                    .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", "")
-                                    .toUpperCase().replace(/\s+/g, '_')]={
-                                    name: topico.topico
-                                    .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""),
-                                    order: i,
-                                    incluido: {},
-                                    parte: topico.partes,
-                                    soporte: {}};
-                                i++;
-                            });
-                        });
-
                     });
+
+                    // Obtener las unidades con sus temas y tópicos y añadirlas al select como opciones
+                    // var unidadesConTemasYTopicos = obtenerUnidadesConTemasYTopicos(datos);
+                    // var temasTopicosDic = {};
+
+                    // unidadesConTemasYTopicos.forEach(function(unidadConTemasYTopicos) {
+                    //     var option = document.createElement('option');
+                    //     option.textContent = unidadConTemasYTopicos.unidad;
+                    //     option.value = unidadConTemasYTopicos.unidad.toUpperCase().replace(/\s+/g, '_');
+                    //     option.dataset.temasYTopicos = JSON.stringify(unidadConTemasYTopicos.temasYTopicos);
+                    // Guardar los temas y
+                    //     // log.debug("topicosYsubs:"+JSON.stringify(unidadConTemasYTopicos.temasYTopicos));
+                    //     select.appendChild(option);
+                    //     var i = 1;
+                    //     //info for table later
+                    //     unidadConTemasYTopicos.temasYTopicos.forEach(function(tema){
+
+                    //         tema.topicosYsubs.forEach(function(topico){
+                    //             temasTopicosDic[topico.topico
+                    //                 .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", "")
+                    //                 .toUpperCase().replace(/\s+/g, '_')]={
+                    //                 name: topico.topico
+                    //                 .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", ""),
+                    //                 order: i,
+                    //                 incluido: {},
+                    //                 parte: topico.partes,
+                    //                 soporte: {}};
+                    //             i++;
+                    //         });
+                    //     });
+
+                    // });
                     // log.debug("temasTopicosDic: "+JSON.stringify(temasTopicosDic));
                     // Append form to container
                     var mainDiv = document.querySelector('div[role="main"]');
@@ -184,78 +205,243 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
 
                     select.insertAdjacentElement('afterend', ul);
 
+                    // Manejar el cambio de selección de unidad
+                    select.addEventListener('change', (event) => {
+                        const selectedIndex = event.target.value;
+                        // const temasContainer = document.getElementById('temasContainer');
+                        ul.innerHTML = ''; // Limpiar contenido anterior
 
-                    // Add event listener to select for change event
-                    select.addEventListener('change', function(event) {//TODO si se cambia la Unidad se
-                                                         // deseleccionan todos los topicos, borrar del array
-                        // selectTopicosH5P = [];
-                        var selectedOption = event.target.selectedOptions[0];
-                        var temasYTopicos = JSON.parse(selectedOption.dataset.temasYTopicos);
+                        if (selectedIndex !== '') {
+                            const temas = datos.unidades[selectedIndex].temas;
+                            const temasList = document.createElement('div');
 
-                        // Limpiar la lista anterior
-                        ul.innerHTML = '';
+                            temas.forEach(tema => {
+                                const checkboxDiv = document.createElement('div');
+                                const label = document.createElement('label');
+                                label.htmlFor = tema.nombre;
+                                label.textContent = tema.nombre;
+                                checkboxDiv.appendChild(label);
 
-                        // Añadir los temas y tópicos a la lista
-                        temasYTopicos.forEach(item => {
-                            var liTema = document.createElement('li');
-                            liTema.textContent = item.tema;
-                            ul.appendChild(liTema);
+                                // Botón para agregar subtemas
+                                const addSubtemaButton = document.createElement('button');
+                                addSubtemaButton.textContent = '+';
+                                addSubtemaButton.style.cssText = 'background-color: transparent; border: none;'+
+                                ' color: grey; font-size: 14px; cursor: pointer; margin-left: 10px;';
+                                checkboxDiv.appendChild(addSubtemaButton);
 
-                            item.topicos.forEach(topico => {
-                                var liTopico = document.createElement('li');
+                                temasList.appendChild(checkboxDiv);
 
-                                var checkbox = document.createElement('input');
-                                checkbox.type = 'checkbox';
-                                checkbox.value = topico.toUpperCase().replace(/\s+/g, '_');
+                                // Iniciar la función recursiva para el primer nivel
+                                agregarSubtema(checkboxDiv, addSubtemaButton, 1);
 
-                                var label = document.createElement('label');
-                                label.textContent = topico;
+                                // Llamar a la función recursiva para agregar tópicos
+                                agregarTopicos(tema.topicos, temasList, 1);
+                            });
 
-                                // log.debug(selectTopicosH5P);
-                                label.prepend(checkbox);
+                            ul.appendChild(temasList);
+                        }
+                    });
 
-                                liTopico.appendChild(label);
-                                liTopico.style.marginLeft = '20px'; // Sangría para los tópicos
-                                ul.appendChild(liTopico);
 
-                                //enventlistener para armar los datos que van en la tabla
-                                checkbox.addEventListener('change', function(event) {
-                                    // Check the state of the checkbox
-                                    if (event.target.checked) {
-                                        var tableRow = {name: temasTopicosDic[event.target.value].name,
-                                            order: temasTopicosDic[event.target.value].order,
-                                            incluido: {},
-                                            parte: temasTopicosDic[event.target.value].parte,
-                                            ejemplos:"",
-                                            actividades:"Definición de límite - Actividad 1"
-                                        };
-                                        var select = document.getElementById('menutopic');
-                                        var option = document.createElement('option');
-                                        option.textContent = temasTopicosDic[event.target.value].name;
-                                        option.value = event.target.value;
-                                        select.appendChild(option);
-                                        fillTable(tableRow, event.target.value);
+                    // Función recursiva para agregar subtemas
+                    const agregarSubtema = (parentElement, addSubtemaButton, nivel) => {
+                        addSubtemaButton.addEventListener('click', async () => {
+                            await ModalFactory.create({
+                                type: ModalFactory.types.SAVE_CANCEL,
+                                title: 'Agregar subtema',
+                                body: `
+                                    <form id="subtopicForm">
+                                        <div class="form-group">
+                                            <label for="subtopicName">Nombre</label>
+                                            <input type="text" id="subtopicName" class="form-control" 
+                                            placeholder="Ingresar nombre" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="subtopicRelation">Relación</label>
+                                            <select id="subtopicRelation" class="form-control" required>
+                                                <option value="parte">Parte</option>
+                                                <option value="tipo">Tipo</option>
+                                                <option value="soporte">Soporte</option>
+                                            </select>
+                                        </div>
+                                    </form>`, // Formulario con campos de texto y select
+                                removeOnClose: true,
+                            }).then(function (modalVar) {
+                                modalVar.setSaveButtonText('Guardar');
+                                let root = modalVar.getRoot();
+
+                                root.on(ModalEvents.save, function () {
+                                    const topicName = document.getElementById('subtopicName').value;
+                                    const topicRelation = document.getElementById('subtopicRelation').value;
+
+                                    if (topicName && topicRelation) {
+                                        // Crear un nuevo subtema
+                                        const newSubtopicDiv = document.createElement('div');
+                                        newSubtopicDiv.style.marginLeft = `${nivel * 20}px`;
+                                        const newSubtopicCheckbox = document.createElement('input');
+                                        newSubtopicCheckbox.type = 'checkbox';
+                                        newSubtopicCheckbox.id = topicName;
+                                        newSubtopicDiv.appendChild(newSubtopicCheckbox);
+
+                                        const newSubtopicLabel = document.createElement('label');
+                                        newSubtopicLabel.htmlFor = topicName;
+                                        newSubtopicLabel.textContent = `${topicName} (${topicRelation})`;
+                                        newSubtopicDiv.appendChild(newSubtopicLabel);
+
+                                        // Botón para agregar más subtemas
+                                        const newAddSubtemaButton = document.createElement('button');
+                                        newAddSubtemaButton.textContent = '+';
+                                        newAddSubtemaButton.style.cssText = 'background-color: transparent; border: ' +
+                                            'none; color: grey; font-size: 14px; cursor: pointer; margin-left: 10px;';
+                                        newSubtopicDiv.appendChild(newAddSubtemaButton);
+
+                                        // Agregar el subtema al contenedor padre
+                                        parentElement.appendChild(newSubtopicDiv);
+
+                                        // Llamar de nuevo a la función recursiva para que el nuevo subtema
+                                        agregarSubtema(newSubtopicDiv, newAddSubtemaButton, nivel + 1);
+
+                                        // modalVar.hide(); // Ocultar el modal después de agregar el subtema
                                     } else {
-                                        removeItemFromTable(event.target.value);
-                                        var select = document.getElementById('menutopic');
-                                        removeOptionByValue(select,event.target.value);
+                                        log.debug('Formulario inválido');
                                     }
                                 });
+
+                                root.on(ModalEvents.cancel, function () {
+                                    modalVar.hide();
+                                });
+
+                                modalVar.show();
                             });
                         });
+                    };
 
-                        // var select = document.getElementById('menutopic');
-                        // if(select){
-                        //     var options = selectTopicosH5P;
-                        //     // log.debug(selectTopicosH5P);
-                        //     options.forEach(function(optionText) {
-                        //         var option = document.createElement('option');
-                        //         option.textContent = optionText;
-                        //         option.value = optionText.toUpperCase().replace(/\s+/g, '_');
-                        //         select.appendChild(option);
-                        //     });
-                        // }
-                    });
+                    // Función recursiva para agregar tópicos
+                    /**
+                     * Función recursiva para agregar tópicos en un contenedor con checkbox, respetando la jerarquía de anidamiento.
+                     * @param {Array} topicos - Array de tópicos que pueden contener subcategorías (parte, tipo, soporte).
+                     * @param {HTMLElement} container - El contenedor HTML donde se añadirán los checkbox y etiquetas.
+                     * @param {number} level - El nivel de profundidad actual en la jerarquía de tópicos, usado para la recursión.
+                     */
+                    function agregarTopicos(topicos, container, level) {
+                        if (topicos.length === 0) {return;} // Salir si no hay tópicos
+
+                        const checkboxList = document.createElement('div');
+                        checkboxList.className = 'checkbox-list';
+
+                        topicos.forEach(topico => {
+                            const checkboxDiv = document.createElement('div');
+                            // Aplicar tabulación basada en el nivel
+                            checkboxDiv.style.marginLeft = `${level * 20}px`; // Indentar por nivel (20px por cada nivel)
+
+                            // Crear checkbox para cada tópico
+                            const checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.id = topico.nombre;
+                            checkboxDiv.appendChild(checkbox);
+
+                            // Crear label para cada checkbox
+                            const label = document.createElement('label');
+                            label.htmlFor = topico.nombre;
+                            label.textContent = topico.nombre;
+                            checkboxDiv.appendChild(label);
+
+                            // Botón para agregar subtemas
+                            const addSubtemaButton = document.createElement('button');
+                            addSubtemaButton.textContent = '+';
+                            addSubtemaButton.style.cssText = 'background-color: transparent; border: none;'+
+                                ' color: grey; font-size: 14px; cursor: pointer; margin-left: 10px;';
+                            checkboxDiv.appendChild(addSubtemaButton);
+
+                            // Iniciar la función recursiva para el primer nivel
+                            agregarSubtema(checkboxDiv, addSubtemaButton, level+1);
+
+                            // Agregar el div del checkbox al contenedor de la lista
+                            checkboxList.appendChild(checkboxDiv);
+
+                            // Llamar recursivamente para las subcategorías (parte)
+                            agregarTopicos(topico.parte, checkboxList, level + 1);
+                        });
+
+                        // Añadir la lista de checkboxes al contenedor principal
+                        container.appendChild(checkboxList);
+                    }
+
+
+                    // Add event listener to select for change event
+                    // select.addEventListener('change', function(event) {//TODO si se cambia la Unidad se
+                    //                                      // deseleccionan todos los topicos, borrar del array
+                    //     // selectTopicosH5P = [];
+                    //     var selectedOption = event.target.selectedOptions[0];
+                    //     var temasYTopicos = JSON.parse(selectedOption.dataset.temasYTopicos);
+
+                    //     // Limpiar la lista anterior
+                    //     ul.innerHTML = '';
+
+                    //     // Añadir los temas y tópicos a la lista
+                    //     temasYTopicos.forEach(item => {
+                    //         var liTema = document.createElement('li');
+                    //         liTema.textContent = item.tema;
+                    //         ul.appendChild(liTema);
+
+                    //         log.debug("Topico busco parte");
+                    //         log.debug(item.topicosYsubs);
+
+                    //         item.topicos.forEach(topico => {
+                    //             var liTopico = document.createElement('li');
+
+                    //             var checkbox = document.createElement('input');
+                    //             checkbox.type = 'checkbox';
+                    //             checkbox.value = topico.toUpperCase().replace(/\s+/g, '_');
+
+                    //             var label = document.createElement('label');
+                    //             label.textContent = topico;
+
+                    //             // log.debug(selectTopicosH5P);
+                    //             label.prepend(checkbox);
+
+                    //             liTopico.appendChild(label);
+                    //             liTopico.style.marginLeft = '20px'; // Sangría para los tópicos
+                    //             ul.appendChild(liTopico);
+
+                    //             //enventlistener para armar los datos que van en la tabla
+                    //             checkbox.addEventListener('change', function(event) {
+                    //                 // Check the state of the checkbox
+                    //                 if (event.target.checked) {
+                    //                     var tableRow = {name: temasTopicosDic[event.target.value].name,
+                    //                         order: temasTopicosDic[event.target.value].order,
+                    //                         incluido: {},
+                    //                         parte: temasTopicosDic[event.target.value].parte,
+                    //                         ejemplos:"",
+                    //                         actividades:"Definición de límite - Actividad 1"
+                    //                     };
+                    //                     var select = document.getElementById('menutopic');
+                    //                     var option = document.createElement('option');
+                    //                     option.textContent = temasTopicosDic[event.target.value].name;
+                    //                     option.value = event.target.value;
+                    //                     select.appendChild(option);
+                    //                     fillTable(tableRow, event.target.value);
+                    //                 } else {
+                    //                     removeItemFromTable(event.target.value);
+                    //                     var select = document.getElementById('menutopic');
+                    //                     removeOptionByValue(select,event.target.value);
+                    //                 }
+                    //             });
+                    //         });
+                    //     });
+
+                    //     // var select = document.getElementById('menutopic');
+                    //     // if(select){
+                    //     //     var options = selectTopicosH5P;
+                    //     //     // log.debug(selectTopicosH5P);
+                    //     //     options.forEach(function(optionText) {
+                    //     //         var option = document.createElement('option');
+                    //     //         option.textContent = optionText;
+                    //     //         option.value = optionText.toUpperCase().replace(/\s+/g, '_');
+                    //     //         select.appendChild(option);
+                    //     //     });
+                    //     // }
+                    // });
 
                     var seleccionarRAsTitulo = document.createElement('h3');
                     seleccionarRAsTitulo.textContent = 'Seleccionar Resultados de Aprendizaje de la Asignatura:';
@@ -422,106 +608,106 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
 
                                 selectUnidad.value = selectedOption.value;
 
-                                var temasYTopicos = JSON.parse(selectedOption.dataset.temasYTopicos);
+                                // var temasYTopicos = JSON.parse(selectedOption.dataset.temasYTopicos);
 
                                 // Limpiar la lista anterior
                                 ul.innerHTML = '';
 
 
                                 // Añadir los temas y tópicos a la lista
-                                temasYTopicos.forEach(item => {
-                                    var liTema = document.createElement('li');
-                                    liTema.textContent = item.tema;
-                                    ul.appendChild(liTema);
+                                // temasYTopicos.forEach(item => {
+                                //     var liTema = document.createElement('li');
+                                //     liTema.textContent = item.tema;
+                                //     ul.appendChild(liTema);
 
-                                    item.topicos.forEach(topico => {
-                                        var liTopico = document.createElement('li');
+                                //     item.topicos.forEach(topico => {
+                                //         var liTopico = document.createElement('li');
 
-                                        var checkbox = document.createElement('input');
-                                        checkbox.type = 'checkbox';
-                                        checkbox.value = topico.toUpperCase().replace(/\s+/g, '_');
+                                //         var checkbox = document.createElement('input');
+                                //         checkbox.type = 'checkbox';
+                                //         checkbox.value = topico.toUpperCase().replace(/\s+/g, '_');
 
-                                        var label = document.createElement('label');
-                                        label.textContent = topico;
+                                //         var label = document.createElement('label');
+                                //         label.textContent = topico;
 
-                                        // log.debug(selectTopicosH5P);
-                                        label.prepend(checkbox);
+                                //         // log.debug(selectTopicosH5P);
+                                //         label.prepend(checkbox);
 
-                                        liTopico.appendChild(label);
-                                        liTopico.style.marginLeft = '20px'; // Sangría para los tópicos
-                                        ul.appendChild(liTopico);
+                                //         liTopico.appendChild(label);
+                                //         liTopico.style.marginLeft = '20px'; // Sangría para los tópicos
+                                //         ul.appendChild(liTopico);
 
-                                        // Establecer el checkbox como seleccionado TODO implemenrar una lista que venga
-                                        // desde la ontologia con la data
-                                        if(topicosOntologia.includes(checkbox.value)){
-                                            checkbox.checked = true;
-                                            var tableRow = {name: temasTopicosDic[checkbox.value].name,
-                                                order: temasTopicosDic[checkbox.value].order,
-                                                incluido: {},
-                                                parte: temasTopicosDic[checkbox.value].parte,
-                                                ejemplos:"",
-                                                actividades:"Definición de límite - Actividad 1"
-                                            };
-                                            var select = document.getElementById('menutopic');
-                                            var option = document.createElement('option');
-                                            option.textContent = temasTopicosDic[checkbox.value].name;
-                                            option.value = checkbox.value;
-                                            select.appendChild(option);
-                                            fillTable(tableRow, checkbox.value);
-                                        }
+                                //         // Establecer el checkbox como seleccionado TODO implemenrar una lista que venga
+                                //         // desde la ontologia con la data
+                                //         if(topicosOntologia.includes(checkbox.value)){
+                                //             checkbox.checked = true;
+                                //             var tableRow = {name: temasTopicosDic[checkbox.value].name,
+                                //                 order: temasTopicosDic[checkbox.value].order,
+                                //                 incluido: {},
+                                //                 parte: temasTopicosDic[checkbox.value].parte,
+                                //                 ejemplos:"",
+                                //                 actividades:"Definición de límite - Actividad 1"
+                                //             };
+                                //             var select = document.getElementById('menutopic');
+                                //             var option = document.createElement('option');
+                                //             option.textContent = temasTopicosDic[checkbox.value].name;
+                                //             option.value = checkbox.value;
+                                //             select.appendChild(option);
+                                //             fillTable(tableRow, checkbox.value);
+                                //         }
 
-                                        //enventlistener para armar los datos que van en la tabla/ontologia
-                                        checkbox.addEventListener('change', async function(event) {
-                                            //Guardar los topicos seleccionados en la Ontologia (MEJOR GUARDAR AUTOMATICALLY
-                                                //                  menos llamadas a la ontolgia?? Pero si deselecciono uno?)
-                                                const guardarTopicoOA = (
-                                                    idTopico,
-                                                    oaid,
-                                                    selected,//boolean que indica si es para almacenar en el oa o eliminar
-                                                ) => ajax.call([{
-                                                    methodname: 'local_yourplugin_guardar_topico_oa',
-                                                    args: {
-                                                        idTopico,
-                                                        oaid,
-                                                        selected
-                                                    },
-                                                }])[0];
+                                //         //enventlistener para armar los datos que van en la tabla/ontologia
+                                //         checkbox.addEventListener('change', async function(event) {
+                                //             //Guardar los topicos seleccionados en la Ontologia (MEJOR GUARDAR AUTOMATICALLY
+                                //                 //                  menos llamadas a la ontolgia?? Pero si deselecciono uno?)
+                                //                 const guardarTopicoOA = (
+                                //                     idTopico,
+                                //                     oaid,
+                                //                     selected,//boolean que indica si es para almacenar en el oa o eliminar
+                                //                 ) => ajax.call([{
+                                //                     methodname: 'local_yourplugin_guardar_topico_oa',
+                                //                     args: {
+                                //                         idTopico,
+                                //                         oaid,
+                                //                         selected
+                                //                     },
+                                //                 }])[0];
 
-                                            // Check the state of the checkbox
-                                            if (event.target.checked) {
-                                                var tableRow = {name: temasTopicosDic[event.target.value].name,
-                                                    order: temasTopicosDic[event.target.value].order,
-                                                    incluido: {},
-                                                    parte: temasTopicosDic[event.target.value].parte,
-                                                    ejemplos:"",
-                                                    actividades:"Definición de límite - Actividad 1"
-                                                };
-                                                var select = document.getElementById('menutopic');
-                                                var option = document.createElement('option');
-                                                option.textContent = temasTopicosDic[event.target.value].name;
-                                                option.value = event.target.value;
-                                                select.appendChild(option);
-                                                fillTable(tableRow, event.target.value);
+                                //             // Check the state of the checkbox
+                                //             if (event.target.checked) {
+                                //                 var tableRow = {name: temasTopicosDic[event.target.value].name,
+                                //                     order: temasTopicosDic[event.target.value].order,
+                                //                     incluido: {},
+                                //                     parte: temasTopicosDic[event.target.value].parte,
+                                //                     ejemplos:"",
+                                //                     actividades:"Definición de límite - Actividad 1"
+                                //                 };
+                                //                 var select = document.getElementById('menutopic');
+                                //                 var option = document.createElement('option');
+                                //                 option.textContent = temasTopicosDic[event.target.value].name;
+                                //                 option.value = event.target.value;
+                                //                 select.appendChild(option);
+                                //                 fillTable(tableRow, event.target.value);
 
-                                                const response = await guardarTopicoOA(event.target.value,
-                                                    paramsObject['oaid'], true);
-                                                log.debug(response);
+                                //                 const response = await guardarTopicoOA(event.target.value,
+                                //                     paramsObject['oaid'], true);
+                                //                 log.debug(response);
 
-                                                //Agregar topico a la lista para luego mandarlo a la ontologia
-                                                // selectedTopics.push(event.target.value);
-                                            } else {
-                                                removeItemFromTable(event.target.value);
-                                                var select = document.getElementById('menutopic');
-                                                removeOptionByValue(select,event.target.value);
+                                //                 //Agregar topico a la lista para luego mandarlo a la ontologia
+                                //                 // selectedTopics.push(event.target.value);
+                                //             } else {
+                                //                 removeItemFromTable(event.target.value);
+                                //                 var select = document.getElementById('menutopic');
+                                //                 removeOptionByValue(select,event.target.value);
 
-                                                const response = await guardarTopicoOA(event.target.value,
-                                                    paramsObject['oaid'], false);
-                                                log.debug(response);
-                                                // selectedTopics.filter(event.target.value);
-                                            }
-                                        });
-                                    });
-                                });
+                                //                 const response = await guardarTopicoOA(event.target.value,
+                                //                     paramsObject['oaid'], false);
+                                //                 log.debug(response);
+                                //                 // selectedTopics.filter(event.target.value);
+                                //             }
+                                //         });
+                                //     });
+                                // });
                                 //RA Asignatura
 
                                 const getOAFromOntology = (
@@ -595,84 +781,84 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                 // Create tbody element with sample data
                 var tbody = document.createElement('tbody');
 
-                /**
-                     * remove item from table
-                     *
-                     * @param {String} id - El id de datos.
-                */
-                function removeItemFromTable(id) {
-                    const row = tbody.querySelector(`tr[id="${id}"]`);
-                    if (row) {
-                        tbody.removeChild(row);
-                    }
-                }
+                // /**
+                //      * remove item from table
+                //      *
+                //      * @param {String} id - El id de datos.
+                // */
+                // function removeItemFromTable(id) {
+                //     const row = tbody.querySelector(`tr[id="${id}"]`);
+                //     if (row) {
+                //         tbody.removeChild(row);
+                //     }
+                // }
 
-                /**
-                     * remove item from select
-                     *@param {HTMLElement} select - El id de datos.
-                     * @param {String} value - El id de datos.
-                */
-                function removeOptionByValue(select,value) {
-                    // var select = document.getElementById(selectId);
-                    var options = select.options;
-                    for (var i = 0; i < options.length; i++) {
-                        if (options[i].value === value) {
-                            select.remove(i);
-                            break;
-                        }
-                    }
-                }
-                 /**
-                     * fill table
-                     *
-                     * @param {Array<Object>} data - El array de datos.
-                     * @param {String} id - El id de datos.
-                */
-                function fillTable(data, id) {
-                    // rowData.forEach(function(data) {
-                        var row = document.createElement('tr');
-                        row.setAttribute("id",id);
-                        row.style.border = '1px solid black';
-                         // Agregar asa de arrastre a la primera celda
-                        var dragHandleCell = document.createElement('td');
-                        dragHandleCell.className = 'drag-handle';
-                        dragHandleCell.textContent = '☰';
-                        dragHandleCell.draggable = true; // Asegurar que la celda sea arrastrable
-                        row.appendChild(dragHandleCell);
+                // /**
+                //      * remove item from select
+                //      *@param {HTMLElement} select - El id de datos.
+                //      * @param {String} value - El id de datos.
+                // */
+                // function removeOptionByValue(select,value) {
+                //     // var select = document.getElementById(selectId);
+                //     var options = select.options;
+                //     for (var i = 0; i < options.length; i++) {
+                //         if (options[i].value === value) {
+                //             select.remove(i);
+                //             break;
+                //         }
+                //     }
+                // }
+                //  /**
+                //      * fill table
+                //      *
+                //      * @param {Array<Object>} data - El array de datos.
+                //      * @param {String} id - El id de datos.
+                // */
+                // function fillTable(data, id) {
+                //     // rowData.forEach(function(data) {
+                //         var row = document.createElement('tr');
+                //         row.setAttribute("id",id);
+                //         row.style.border = '1px solid black';
+                //          // Agregar asa de arrastre a la primera celda
+                //         var dragHandleCell = document.createElement('td');
+                //         dragHandleCell.className = 'drag-handle';
+                //         dragHandleCell.textContent = '☰';
+                //         dragHandleCell.draggable = true; // Asegurar que la celda sea arrastrable
+                //         row.appendChild(dragHandleCell);
 
-                        Object.keys(data).forEach(function(key) {
-                            var td = document.createElement('td');
-                            var tdOrdenIncluido = document.createElement('td');
-                            if (key === 'incluido') {
-                                // Iterate through the object
-                                for (const incluido in data[key]) {
-                                    if (data[key].hasOwnProperty(incluido)) {
-                                        var div = document.createElement('div');
-                                        div.className = 'draggable';
-                                        div.draggable = true;
-                                        div.textContent = incluido;
-                                        td.appendChild(div);
+                //         Object.keys(data).forEach(function(key) {
+                //             var td = document.createElement('td');
+                //             var tdOrdenIncluido = document.createElement('td');
+                //             if (key === 'incluido') {
+                //                 // Iterate through the object
+                //                 for (const incluido in data[key]) {
+                //                     if (data[key].hasOwnProperty(incluido)) {
+                //                         var div = document.createElement('div');
+                //                         div.className = 'draggable';
+                //                         div.draggable = true;
+                //                         div.textContent = incluido;
+                //                         td.appendChild(div);
 
-                                        var divOrdenIncluido = document.createElement('div');
-                                        divOrdenIncluido.className = 'draggable';
-                                        divOrdenIncluido.draggable = true;
-                                        divOrdenIncluido.textContent = data[key][incluido];
-                                        tdOrdenIncluido.appendChild(divOrdenIncluido);
-                                    }
-                                }
-                                row.appendChild(td);
-                                tdOrdenIncluido.style.border = '1px solid black';
-                                row.appendChild(tdOrdenIncluido);
-                            }
-                            else{
-                                td.textContent = data[key];
-                                row.appendChild(td);
-                            }
-                            td.style.border = '1px solid black';
-                        });
-                        tbody.appendChild(row);
-                    // });
-                }
+                //                         var divOrdenIncluido = document.createElement('div');
+                //                         divOrdenIncluido.className = 'draggable';
+                //                         divOrdenIncluido.draggable = true;
+                //                         divOrdenIncluido.textContent = data[key][incluido];
+                //                         tdOrdenIncluido.appendChild(divOrdenIncluido);
+                //                     }
+                //                 }
+                //                 row.appendChild(td);
+                //                 tdOrdenIncluido.style.border = '1px solid black';
+                //                 row.appendChild(tdOrdenIncluido);
+                //             }
+                //             else{
+                //                 td.textContent = data[key];
+                //                 row.appendChild(td);
+                //             }
+                //             td.style.border = '1px solid black';
+                //         });
+                //         tbody.appendChild(row);
+                //     // });
+                // }
 
                 table.appendChild(tbody);
 
