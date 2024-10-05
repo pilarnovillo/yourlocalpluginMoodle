@@ -695,7 +695,56 @@ foreach ($result1 as $row) {
     // echo "SPARQL: " . $row->nivelRAAsignatura . "\n";
 }
 
-$instanciasOAJSON = json_encode($asignaturas);
+
+// Inicializa cURL
+$ch = curl_init();
+
+$apiUrl = 'http://localhost:8080/ontology/razonar?ontologia=OntoU'; // URL del endpoint para razonar
+
+// Configura la URL y otras opciones
+curl_setopt($ch, CURLOPT_URL, $apiUrl);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // Para obtener el resultado en una variable en lugar de imprimirlo
+
+// Ejecuta la solicitud y guarda la respuesta
+$response = curl_exec($ch);
+
+// Verifica si ocurrió algún error
+if (curl_errno($ch)) {
+    echo 'Error:' . curl_error($ch);
+} else {
+
+        $asignatura = 'Lógica y Estructuras Discretas';  // TODO Asignatura que deseas consultar 
+        $apiUrl = 'http://localhost:8080/ontology/unidadesTemasTopicosOntoU?asignatura=' . urlencode($asignatura); // URL del endpoint con el parámetro 'asignatura'
+
+        // Configura la URL y otras opciones
+        curl_setopt($ch, CURLOPT_URL, $apiUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // Para obtener el resultado en una variable en lugar de imprimirlo
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json')); // Cabecera para aceptar JSON
+
+        // Ejecuta la solicitud y guarda la respuesta
+        $response = curl_exec($ch);
+
+        // Verifica si ocurrió algún error
+        if (curl_errno($ch)) {
+            echo 'Error:' . curl_error($ch);
+        } else {
+            // Decodifica la respuesta JSON
+            $unidadesTemasTopicos = json_decode($response, true);
+            
+            if ($unidadesTemasTopicos === null) {
+                echo 'Error al decodificar la respuesta JSON.';
+            } else {
+                // Muestra los datos obtenidos
+                echo 'Respuesta del servicio: ';
+                print_r($unidadesTemasTopicos);
+        }
+    }
+}    
+
+// Cierra el recurso cURL
+curl_close($ch);
+
+$instanciasOAJSON = json_encode($unidadesTemasTopicos);
 // echo $instanciasOAJSON;
 $PAGE->requires->js_call_amd('local_yourplugin/main', 'init', array($instanciasOAJSON));
 

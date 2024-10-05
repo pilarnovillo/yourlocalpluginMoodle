@@ -11,7 +11,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
             $(document).ready(function(){
                 // Convertir los datos JSON de PHP a objetos JavaScript
                 var datos = JSON.parse(datos_json);
-
+                var datosCopyAux = datos.unidades;
                 // Hacer algo con los datos
                 log.debug(datos);
                 var rasAsignaturaArray = datos.raAsignaturaList;
@@ -38,7 +38,6 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
 
                 // Now you can access the parameters and their values from the paramsObject.
                 var paramCourseid = paramsObject['courseid'];
-                log.debug(paramCourseid);
 
                 var resultadoAprendizajeOA = {"raasignatura":[],
                                                 "verbo":"",
@@ -46,18 +45,12 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                                                 "condicion":"",
                                                 "finalidad":""
                 };
-
-                const tree = document.createElement('div');
-                Sortable.create(tree, {
-                    group: 'topics',
-                    animation: 150,
-                    onEnd: function(evt) {
-                        log.debug('Nuevo orden de temas/tópicos:'+evt);
-                        // Aquí puedes hacer una llamada AJAX para guardar el nuevo orden en la base de datos
-                    }});
+                let selectedTopics = [];
+                var treeData = [];
+                const sortableTreeDiv = document.createElement('div');
 
                 //Variable para almacenar los topicos id seleccionados y luego mandar a la Ontologia
-                var selectedTopics = [];
+                // var selectedTopics = [];
 
                 // Create form elements
                     // var selectTopicosH5P = [];
@@ -156,6 +149,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                         const option = document.createElement('option');
                         option.value = index; // Guardar el índice para referencia
                         option.textContent = unidad.nombre;
+                        option.id = unidad.id;
                         select.appendChild(option);
                     });
 
@@ -204,22 +198,27 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                     ul.style.listStyleType = 'none'; // Eliminar los puntos de la lista
 
                     select.insertAdjacentElement('afterend', ul);
-
+                    var selectedIndex = null;
                     // Manejar el cambio de selección de unidad
                     select.addEventListener('change', (event) => {
-                        const selectedIndex = event.target.value;
+                        selectedIndex = event.target.value;
                         // const temasContainer = document.getElementById('temasContainer');
                         ul.innerHTML = ''; // Limpiar contenido anterior
+                        selectedTopics = [];
 
                         if (selectedIndex !== '') {
+                            //TODO guardar unidad en la ontologia
+                            //implement new service to store de unidad
+
                             const temas = datos.unidades[selectedIndex].temas;
                             const temasList = document.createElement('div');
 
                             temas.forEach(tema => {
                                 const checkboxDiv = document.createElement('div');
                                 const label = document.createElement('label');
-                                label.htmlFor = tema.nombre;
+                                label.htmlFor = tema.id;
                                 label.textContent = tema.nombre;
+                                label.id = tema.id;
                                 checkboxDiv.appendChild(label);
 
                                 // Botón para agregar subtemas
@@ -232,10 +231,13 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                                 temasList.appendChild(checkboxDiv);
 
                                 // Iniciar la función recursiva para el primer nivel
-                                agregarSubtema(checkboxDiv, addSubtemaButton, 1);
+                                agregarNuevoTopico(checkboxDiv,tema.id, addSubtemaButton, 1, tema.id);
 
                                 // Llamar a la función recursiva para agregar tópicos
-                                agregarTopicos(tema.topicos, temasList, 1);
+                                agregarTopicos(tema.topicos, tema.id, temasList, 1, tema.id, "parte");
+
+                                // Llamar a la función recursiva para agregar tópicos
+                                agregarTopicos(tema.topicosSoporte, tema.id, temasList, 1, tema.id, "soporte");
                             });
 
                             ul.appendChild(temasList);
@@ -244,13 +246,19 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
 
 
                     // Función recursiva para agregar subtemas
-                    const agregarSubtema = (parentElement, addSubtemaButton, nivel) => {
+                    const agregarNuevoTopico = (parentElement, parentName, addSubtemaButton, nivel, tema) => {
                         addSubtemaButton.addEventListener('click', async () => {
                             await ModalFactory.create({
                                 type: ModalFactory.types.SAVE_CANCEL,
                                 title: 'Agregar subtema',
                                 body: `
                                     <form id="subtopicForm">
+                                        <div class="form-group">
+                                            <label for="topicoSoporte">Posibles Topico Soporte</label>
+                                            <select id="topicoSoporte" class="form-control" required>
+                                                <!-- Options will be added dynamically here -->
+                                            </select>
+                                        </div>
                                         <div class="form-group">
                                             <label for="subtopicName">Nombre</label>
                                             <input type="text" id="subtopicName" class="form-control" 
@@ -268,19 +276,151 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                                 removeOnClose: true,
                             }).then(function (modalVar) {
                                 modalVar.setSaveButtonText('Guardar');
+
+                                // Función recursiva para obtener temas y subtemas (parte y tipo)
+                                const obtenerTemasYSubtemas = (unidad, temaActual) => {
+                                    let resultados = [];
+
+                                    // Función recursiva que extrae temas, partes y tipos
+                                    const extraerTopicos = (topico, nivel = 0) =>{
+                                        // Añadir el tópico actual al resultado
+                                        resultados.push({
+                                            nombre: topico.nombre,
+                                            id: topico.id,
+                                            nivel: nivel
+                                        });
+
+                                        // Recorrer las partes del tópico
+                                        if (topico.parte && topico.parte.length > 0) {
+                                            topico.parte.forEach(subParte => {
+                                                extraerTopicos(subParte, nivel + 1); // Recursión para partes
+                                            });
+                                        }
+
+                                        // Recorrer los tipos del tópico
+                                        if (topico.tipo && topico.tipo.length > 0) {
+                                            topico.tipo.forEach(subTipo => {
+                                                extraerTopicos(subTipo, nivel + 1); // Recursión para tipos
+                                            });
+                                        }
+                                    };
+
+                                    // Recorrer los temas de la unidad
+                                    unidad.temas.forEach(tema => {
+                                        if (tema.id !== temaActual) {
+                                        // Añadir el tema principal
+                                        resultados.push({
+                                            nombre: tema.nombre,
+                                            id: tema.id,
+                                            nivel: 0
+                                        });
+
+                                        // Recorrer los tópicos de cada tema
+                                        tema.topicos.forEach(topico => {
+                                            extraerTopicos(topico, 1); // Recursión para tópicos
+                                        });
+                                        }
+                                    });
+
+                                    return resultados;
+                                };
+
+                                // Obtener los temas y subtemas de la unidad
+                                const temasYSubtemas = obtenerTemasYSubtemas(datosCopyAux[selectedIndex], tema.split('-')[0]);
+                                log.debug("temasYSubtemas:");
+                                log.debug(temasYSubtemas);
+
                                 let root = modalVar.getRoot();
 
                                 root.on(ModalEvents.save, function () {
                                     const topicName = document.getElementById('subtopicName').value;
                                     const topicRelation = document.getElementById('subtopicRelation').value;
 
+                                    // Función para agregar un subtema a un tópico
+                                    const guardarSubtema = (unidad, nombreTopico, nuevoSubtema, tipoRelacion) =>{
+                                        // Recorre cada tema en la unidad
+                                        unidad.temas.forEach(tema => {
+                                            // Verifica si el nombre del tópico coincide con el tema
+                                            if (tema.id === nombreTopico) {
+                                                // Crea el nuevo subtema
+                                                const subtema = {
+                                                    nombre: nuevoSubtema,
+                                                    parte: [],
+                                                    tipo: [],
+                                                    soporte: []
+                                                };
+
+                                                // Agrega el subtema en la lista correspondiente según el tipo de relación
+                                                if (tipoRelacion === 'soporte') {
+                                                    tema.topicosSoporte.push(subtema);
+                                                }else  {
+                                                    tema.topicos.push(subtema);
+                                                }
+                                                return; // Sale de la función después de agregar el subtema
+                                            }
+                                            // Recorre cada tópico dentro del tema
+                                            tema.topicos.forEach(topico => {
+                                                // Llama a la función recursiva para encontrar el tópico
+                                                buscarYGuardarSubtema(topico, nombreTopico, nuevoSubtema, tipoRelacion);
+                                            });
+                                        });
+                                    };
+
+                                    // Función recursiva para buscar el tópico y agregar el subtema
+                                    const buscarYGuardarSubtema=(topico, nombreTopico, nuevoSubtema, tipoRelacion)=> {
+                                        // Verifica si el nombre del tópico coincide
+                                        if (topico.id === nombreTopico) {
+                                            // Crea el nuevo subtema
+                                            const subtema = {
+                                                nombre: nuevoSubtema,
+                                                id: nuevoSubtema,
+                                                parte: [],
+                                                tipo: [],
+                                                soporte: []
+                                            };
+
+                                            // Agrega el subtema en la lista correspondiente según el tipo de relación
+                                            if (tipoRelacion === 'parte') {
+                                                topico.parte.push(subtema);
+                                            } else if (tipoRelacion === 'tipo') {
+                                                topico.tipo.push(subtema);
+                                            } else if (tipoRelacion === 'soporte') {
+                                                topico.soporte.push(subtema);
+                                            }
+                                            return; // Sale de la función después de agregar el subtema
+                                        }
+
+                                        // Si el tópico tiene partes, busca recursivamente en ellas
+                                        if (topico.parte && topico.parte.length > 0) {
+                                            topico.parte.forEach(subParte => {
+                                                buscarYGuardarSubtema(subParte, nombreTopico, nuevoSubtema, tipoRelacion);
+                                            });
+                                        }
+
+                                        // Si el tópico tiene tipos, busca recursivamente en ellas
+                                        if (topico.tipo && topico.tipo.length > 0) {
+                                            topico.tipo.forEach(subParte => {
+                                                buscarYGuardarSubtema(subParte, nombreTopico, nuevoSubtema, tipoRelacion);
+                                            });
+                                        }
+                                    };
+
                                     if (topicName && topicRelation) {
+                                        //TODO implemantar en la ontologia
+
+                                        guardarSubtema(datosCopyAux[selectedIndex], parentName, topicName, topicRelation);
+
                                         // Crear un nuevo subtema
                                         const newSubtopicDiv = document.createElement('div');
                                         newSubtopicDiv.style.marginLeft = `${nivel * 20}px`;
                                         const newSubtopicCheckbox = document.createElement('input');
                                         newSubtopicCheckbox.type = 'checkbox';
                                         newSubtopicCheckbox.id = topicName;
+                                        newSubtopicCheckbox.setAttribute('data-parent', parentName);
+                                        newSubtopicCheckbox.setAttribute('data-level', nivel);
+                                        newSubtopicCheckbox.setAttribute('data-tema', tema+'-'+topicName);
+                                        newSubtopicCheckbox.setAttribute('data-relation', topicRelation);
+                                        addEventListenerToCheckbox(newSubtopicCheckbox);
                                         newSubtopicDiv.appendChild(newSubtopicCheckbox);
 
                                         const newSubtopicLabel = document.createElement('label');
@@ -288,18 +428,22 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                                         newSubtopicLabel.textContent = `${topicName} (${topicRelation})`;
                                         newSubtopicDiv.appendChild(newSubtopicLabel);
 
-                                        // Botón para agregar más subtemas
-                                        const newAddSubtemaButton = document.createElement('button');
-                                        newAddSubtemaButton.textContent = '+';
-                                        newAddSubtemaButton.style.cssText = 'background-color: transparent; border: ' +
-                                            'none; color: grey; font-size: 14px; cursor: pointer; margin-left: 10px;';
-                                        newSubtopicDiv.appendChild(newAddSubtemaButton);
+                                        var newAddSubtemaButton = null;
+                                        if(!(topicRelation ==="soporte")){
+                                            // Botón para agregar más subtemas
+                                            newAddSubtemaButton = document.createElement('button');
+                                            newAddSubtemaButton.textContent = '+';
+                                            newAddSubtemaButton.style.cssText = 'background-color: transparent; border: ' +
+                                                'none; color: grey; font-size: 14px; cursor: pointer; margin-left: 10px;';
+                                            newSubtopicDiv.appendChild(newAddSubtemaButton);
+
+                                            // Llamar de nuevo a la función recursiva para que el nuevo subtema tena el boton
+                                            agregarNuevoTopico(newSubtopicDiv, topicName, newAddSubtemaButton, nivel + 1,
+                                                tema+'-'+topicName);
+                                        }
 
                                         // Agregar el subtema al contenedor padre
                                         parentElement.appendChild(newSubtopicDiv);
-
-                                        // Llamar de nuevo a la función recursiva para que el nuevo subtema
-                                        agregarSubtema(newSubtopicDiv, newAddSubtemaButton, nivel + 1);
 
                                         // modalVar.hide(); // Ocultar el modal después de agregar el subtema
                                     } else {
@@ -320,10 +464,13 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                     /**
                      * Función recursiva para agregar tópicos en un contenedor con checkbox, respetando la jerarquía de anidamiento.
                      * @param {Array} topicos - Array de tópicos que pueden contener subcategorías (parte, tipo, soporte).
+                     * @param {String} parentName - parentName
                      * @param {HTMLElement} container - El contenedor HTML donde se añadirán los checkbox y etiquetas.
                      * @param {number} level - El nivel de profundidad actual en la jerarquía de tópicos, usado para la recursión.
+                     * @param {String} tema - tema al que pertenece el topico
+                     * @param {String} topicRelation - relacion con el topico padre, si es soporte no puede tener hijos
                      */
-                    function agregarTopicos(topicos, container, level) {
+                    function agregarTopicos(topicos, parentName, container, level, tema, topicRelation) {
                         if (topicos.length === 0) {return;} // Salir si no hay tópicos
 
                         const checkboxList = document.createElement('div');
@@ -337,111 +484,268 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                             // Crear checkbox para cada tópico
                             const checkbox = document.createElement('input');
                             checkbox.type = 'checkbox';
-                            checkbox.id = topico.nombre;
+                            checkbox.id = topico.id;
+                            checkbox.setAttribute('data-parent', parentName);
+                            checkbox.setAttribute('data-level', level);
+                            checkbox.setAttribute('data-tema', tema+'-'+topico.id);
+                            checkbox.setAttribute('data-relation', topicRelation);
+                            addEventListenerToCheckbox(checkbox);
                             checkboxDiv.appendChild(checkbox);
 
                             // Crear label para cada checkbox
                             const label = document.createElement('label');
-                            label.htmlFor = topico.nombre;
+                            label.htmlFor = topico.id;
                             label.textContent = topico.nombre;
                             checkboxDiv.appendChild(label);
 
-                            // Botón para agregar subtemas
-                            const addSubtemaButton = document.createElement('button');
-                            addSubtemaButton.textContent = '+';
-                            addSubtemaButton.style.cssText = 'background-color: transparent; border: none;'+
-                                ' color: grey; font-size: 14px; cursor: pointer; margin-left: 10px;';
-                            checkboxDiv.appendChild(addSubtemaButton);
+                            if(!(topicRelation ==="soporte")){
+                                // Botón para agregar subtemas
+                                const addSubtemaButton = document.createElement('button');
+                                addSubtemaButton.textContent = '+';
+                                addSubtemaButton.style.cssText = 'background-color: transparent; border: none;'+
+                                    ' color: grey; font-size: 14px; cursor: pointer; margin-left: 10px;';
+                                checkboxDiv.appendChild(addSubtemaButton);
 
-                            // Iniciar la función recursiva para el primer nivel
-                            agregarSubtema(checkboxDiv, addSubtemaButton, level+1);
-
+                                // Iniciar la función recursiva para el primer nivel
+                                agregarNuevoTopico(checkboxDiv, topico.id, addSubtemaButton, level+1, tema+'-'+topico.id);
+                            }
                             // Agregar el div del checkbox al contenedor de la lista
                             checkboxList.appendChild(checkboxDiv);
 
                             // Llamar recursivamente para las subcategorías (parte)
-                            agregarTopicos(topico.parte, checkboxList, level + 1);
+                            agregarTopicos(topico.parte, topico.id, checkboxList, level + 1, tema+'-'+topico.id,
+                                 "parte");
+
+                            // Llamar recursivamente para las subcategorías (tipo)
+                            agregarTopicos(topico.tipo, topico.id, checkboxList, level + 1, tema+'-'+topico.id,
+                                 "tipo");
+
+                            // Llamar recursivamente para las subcategorías (soporte)
+                            agregarTopicos(topico.soporte, topico.id, checkboxList, level + 1, tema+'-'+topico.id,
+                                 "soporte");
                         });
 
                         // Añadir la lista de checkboxes al contenedor principal
                         container.appendChild(checkboxList);
                     }
 
+                    // Lógica para capturar la selección de tópicos y agregar subniveles
+                    const addEventListenerToCheckbox = (checkbox) => {
+                    // document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                        checkbox.addEventListener('change', async (e) => {
+                            const topicId = e.target.id; // El id del checkbox es el nombre del tópico
+                            const parentName = e.target.getAttribute('data-parent');
+                            const level = e.target.getAttribute('data-level');
+                            const tema = e.target.getAttribute('data-tema');
+                            const topicRelation = e.target.getAttribute('data-relation');
 
-                    // Add event listener to select for change event
-                    // select.addEventListener('change', function(event) {//TODO si se cambia la Unidad se
-                    //                                      // deseleccionan todos los topicos, borrar del array
-                    //     // selectTopicosH5P = [];
-                    //     var selectedOption = event.target.selectedOptions[0];
-                    //     var temasYTopicos = JSON.parse(selectedOption.dataset.temasYTopicos);
+                            const guardarTopicoOA = (idTopico,
+                                                    oaid,
+                                                    selected,//boolean que indica si es para almacenar en el oa o eliminar
+                                                ) => ajax.call([{
+                                                    methodname: 'local_yourplugin_guardar_topico_oa',
+                                                    args: {
+                                                        idTopico,
+                                                        oaid,
+                                                        selected
+                                                    },
+                            }])[0];
 
-                    //     // Limpiar la lista anterior
-                    //     ul.innerHTML = '';
+                            if (e.target.checked) {
+                                const response = await guardarTopicoOA(topicId, paramsObject['oaid'], true);
+                                log.debug(response);
 
-                    //     // Añadir los temas y tópicos a la lista
-                    //     temasYTopicos.forEach(item => {
-                    //         var liTema = document.createElement('li');
-                    //         liTema.textContent = item.tema;
-                    //         ul.appendChild(liTema);
+                                addTopicToJSON(topicId, topicRelation, parentName, level, tema);
+                                log.debug(`Added ${topicId}-${parentName} al JSON`);
+                            } else {
+                                const response = await guardarTopicoOA(topicId, paramsObject['oaid'], false);
+                                log.debug(response);
 
-                    //         log.debug("Topico busco parte");
-                    //         log.debug(item.topicosYsubs);
+                                // Lógica para eliminar del JSON si el checkbox se desmarca
+                                selectedTopics = selectedTopics.filter(topic => topic.name !== topicId);
+                                log.debug(`Eliminar ${topicId} del JSON`);
+                            }
 
-                    //         item.topicos.forEach(topico => {
-                    //             var liTopico = document.createElement('li');
+                            // Elimina todas las opciones del select para que las vuelva a cargar con el boton
+                            var selectMenutopic = document.getElementById('menutopic');
+                            selectMenutopic.options.length = 0;
 
-                    //             var checkbox = document.createElement('input');
-                    //             checkbox.type = 'checkbox';
-                    //             checkbox.value = topico.toUpperCase().replace(/\s+/g, '_');
+                            // Actualizar la vista
+                            // Inicializar el árbol y renderizar
+                            treeData = buildTreeJSON(selectedTopics);
+                            log.debug("treeData:");
+                            log.debug(treeData);
 
-                    //             var label = document.createElement('label');
-                    //             label.textContent = topico;
+                            // Llamar a la función y agregar el árbol al DOM
+                            while (sortableTreeDiv.firstChild) {
+                                sortableTreeDiv.removeChild(sortableTreeDiv.firstChild);
+                            }
+                            // const tree = document.createElement('ul');
+                            // tree.setAttribute("class","sortable");
+                            // sortableTreeDiv.appendChild(tree);
+                            const container = document.createElement('div');
+                            container.textContent = "Unidad";
+                            container.className = 'unidad';
+                            container.id = 'topicosSeleccionados';
+                            treeData.forEach(item => {
+                                const temaDiv = createDivTema(item); //createTree(item, item.name, container);
+                                createDivTopico(item, item.name, temaDiv);
+                                container.appendChild(temaDiv);
+                                new Sortable(temaDiv, {
+                                    // group: {
+                                    //     name: item.name,
+                                    //     put: false // Asegúrate de que no puedan anidarse
+                                    // },
+                                    // animation: 150,
+                                    // fallbackOnBody: true,
+                                    // swapThreshold: 0.65,
+                                    // nested: false,
+                                    animation: 150,
+                                    ghostClass: 'blue-background-class'
+                                });
+                            });
+                            sortableTreeDiv.appendChild(container);
+                            Sortable.create(container, {
+                                group: 'topics',
+                                animation: 150,
+                                onEnd: function(evt) {
+                                    log.debug('Nuevo orden de temas/tópicos:', evt);
+                                },
+                                draggable: '.topic', // Selector para los temas
+                                handle: '.topic', // Permite arrastrar solo desde el tema
+                                swap: true, // Permite el intercambio
+                                nested: false, // Habilitar soporte para elementos anidados,
+                            });
+                            tablaTitulo.insertAdjacentElement('afterend', sortableTreeDiv);
 
-                    //             // log.debug(selectTopicosH5P);
-                    //             label.prepend(checkbox);
+                        });
+                    };
 
-                    //             liTopico.appendChild(label);
-                    //             liTopico.style.marginLeft = '20px'; // Sangría para los tópicos
-                    //             ul.appendChild(liTopico);
+                    const createDivTema = (item) => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.textContent = '-'.repeat(item.level * 5) + item.name;
+                        itemDiv.className = 'tema'; // Clase para aplicar estilos
+                        itemDiv.draggable = true; // Habilitar draggable
+                        // itemDiv.style.marginLeft = `${item.level * 20}px`;
+                        // new Sortable(itemDiv, {
+                        //     group: groupNameTema,
+                        //     animation: 150,
+                        //     fallbackOnBody: true,
+                        //     swapThreshold: 0.65,
+                        //     nested: false,
+                        //     onEnd: function(evt) {
+                        //         // Aquí puedes actualizar el JSON si los elementos cambian de orden
+                        //         log.debug('El elemento fue movido:', evt);
+                        //     }
+                        // });
+                        return itemDiv;
+                    };
 
-                    //             //enventlistener para armar los datos que van en la tabla
-                    //             checkbox.addEventListener('change', function(event) {
-                    //                 // Check the state of the checkbox
-                    //                 if (event.target.checked) {
-                    //                     var tableRow = {name: temasTopicosDic[event.target.value].name,
-                    //                         order: temasTopicosDic[event.target.value].order,
-                    //                         incluido: {},
-                    //                         parte: temasTopicosDic[event.target.value].parte,
-                    //                         ejemplos:"",
-                    //                         actividades:"Definición de límite - Actividad 1"
-                    //                     };
-                    //                     var select = document.getElementById('menutopic');
-                    //                     var option = document.createElement('option');
-                    //                     option.textContent = temasTopicosDic[event.target.value].name;
-                    //                     option.value = event.target.value;
-                    //                     select.appendChild(option);
-                    //                     fillTable(tableRow, event.target.value);
-                    //                 } else {
-                    //                     removeItemFromTable(event.target.value);
-                    //                     var select = document.getElementById('menutopic');
-                    //                     removeOptionByValue(select,event.target.value);
-                    //                 }
-                    //             });
-                    //         });
-                    //     });
+                    const createDivTopico = (item, groupNameTema, temaDiv) => {
+                        // Si tiene hijos, crear un subárbol
+                        if (item.children && item.children.length > 0) {
+                            item.children.forEach(kid=> {
+                                const itemDiv = document.createElement('div');
+                                itemDiv.textContent = '-'.repeat(kid.level * 5) + kid.name;
+                                itemDiv.className = 'topic'; // Clase para aplicar estilos
+                                itemDiv.draggable = true; // Habilitar draggable
+                                // itemDiv.style.marginLeft = `${item.level * 20}px`;
 
-                    //     // var select = document.getElementById('menutopic');
-                    //     // if(select){
-                    //     //     var options = selectTopicosH5P;
-                    //     //     // log.debug(selectTopicosH5P);
-                    //     //     options.forEach(function(optionText) {
-                    //     //         var option = document.createElement('option');
-                    //     //         option.textContent = optionText;
-                    //     //         option.value = optionText.toUpperCase().replace(/\s+/g, '_');
-                    //     //         select.appendChild(option);
-                    //     //     });
-                    //     // }
-                    // });
+                                new Sortable(itemDiv, {
+                                    group: groupNameTema,
+                                    animation: 150,
+                                    fallbackOnBody: true,
+                                    swapThreshold: 0.65,
+                                    onEnd: function(evt) {
+                                        // Aquí puedes actualizar el JSON si los elementos cambian de orden
+                                        log.debug('El elemento fue movido:', evt);
+                                    }
+                                });
+                                temaDiv.appendChild(itemDiv);
+                                createDivTopico(kid, groupNameTema, temaDiv);
+                                // childrenContainer.appendChild(childrenDiv);
+                            });
+                        }
+                    };
+
+
+                    // Función para agregar tópicos al JSON
+                    const addTopicToJSON = (topicId, topicRelation, parentName, level, tema) => {
+                        const newTopic = { name: topicId, parentName: parentName, relation: topicRelation, level: level,
+                             tema: tema};
+
+                        selectedTopics.push(newTopic);
+
+                    };
+
+
+                    const createNode=(name, fullPath, level, topicRelation)=> {
+                        return {
+                            name: name,
+                            fullPath: fullPath,
+                            level: level,
+                            relation: topicRelation,
+                            children: []
+                        };
+                    };
+
+                    const findParentNodeRecursive=(node, fullPath)=> {
+
+                        for (let child of node.children) {
+                            if(fullPath.includes('-'+child.name+'-')){
+                                const foundNode = findParentNodeRecursive(child, fullPath);
+                                if (foundNode) {
+                                    return foundNode; // Devolver el nodo encontrado
+                                }
+                                return child;
+                            }
+                        }
+
+                        return null; // Si no se encuentra ningún padre
+                    };
+
+                    const buildTreeJSON = (selectedTopics) => {
+                        // Crear un diccionario para acceder a los nodos por su fullPath
+                        const topicDict = {};
+                        // Ordenar los tópicos por nivel para asegurarnos de que procesamos los padres primero
+                        selectedTopics.sort((a, b) => a.level - b.level);
+
+                        // Inicializamos los nodos en el diccionario
+                        selectedTopics.forEach(({ tema, level, relation }) => {
+                            const fullPath = tema;
+                            const name = fullPath.split('-').pop(); // Obtener el nombre del tópico (última parte del fullPath)
+                            const rootName = fullPath.split('-')[0]; // El primer elemento es el "raíz" o tema
+
+                            // Asegúrate de crear un nodo raíz para cada tema único
+                            if (!topicDict[rootName]) {
+                                topicDict[rootName] = createNode(rootName, null, 0, null);
+                            }
+
+                            // Si hay un guion pero no más, se trata de un tópico de nivel 1
+                            if (fullPath.split('-').length === 2) {
+                                const rootNode = topicDict[rootName];
+                                rootNode.children.push(createNode(name, fullPath, level, relation));
+                            } else {
+                                // Intentar encontrar el padre en el fullPath
+                                const parentNode = findParentNodeRecursive(topicDict[rootName], fullPath);
+                                if (parentNode) {
+                                    parentNode.children.push(createNode(name, fullPath, level, relation));
+                                } else {
+                                    // Si no se encuentra un padre seleccionado, añadir a la raíz
+                                    const rootNode = topicDict[rootName];
+                                    rootNode.children.push(createNode(name, fullPath, level, relation));
+                                }
+                            }
+
+                            // Agregar el nodo al diccionario
+                            // topicDict[name] = createNode(name, fullPath);
+                        });
+
+                        // Construir el árbol final desde las raíces
+                        const finalTree = Object.values(topicDict);
+
+                        return finalTree;
+                    };
 
                     var seleccionarRAsTitulo = document.createElement('h3');
                     seleccionarRAsTitulo.textContent = 'Seleccionar Resultados de Aprendizaje de la Asignatura:';
@@ -549,69 +853,70 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
 
 
 
-                     /**
-                        * Function to create
-                        * Manejo de traer las cosas seleccionadas de OA ya creados pero no terminados
-                        *seleccionar la unidad y los topicos
-                    */
-                     async function setOAFields() {
-                        // ...
-                        const id = paramsObject['oaid'];
+                    //  /**
+                    //     * Function to create
+                    //     * Manejo de traer las cosas seleccionadas de OA ya creados pero no terminados
+                    //     *seleccionar la unidad y los topicos
+                    // */
+                    //  async function setOAFields() {
+                    //     // ...
+                    //     const id = paramsObject['oaid'];
 
-                        const getOAfields = async (id) => {
-                            const response = await ajax.call([{
-                                methodname: 'local_yourplugin_get_oa_fields',
-                                args: { id }
-                            }]);
-                            return response[0]; // Assuming ajax.call returns an array and you're interested in the first element
-                        };
+                    //     const getOAfields = async (id) => {
+                    //         const response = await ajax.call([{
+                    //             methodname: 'local_yourplugin_get_oa_fields',
+                    //             args: { id }
+                    //         }]);
+                    //         return response[0]; // Assuming ajax.call returns an array and you're interested in the first element
+                    //     };
 
-                        try {
-                            const response = await getOAfields(id);
-                            log.debug( response[0].name);
+                    //     try {
+                    //         const response = await getOAfields(id);
+                    //         log.debug( response[0].name);
 
-                            var storedName = response[0].name;
-                            if(storedName != "empty name"){
-                                // Select the input element within the container
-                                var input = verboInput.querySelector('input');
+                    //         var storedName = response[0].name;
+                    //         if(storedName != "empty name"){
+                    //             // Select the input element within the container
+                    //             var input = verboInput.querySelector('input');
 
-                                // Set the value of the input element
-                                input.value = storedName;
+                    //             // Set the value of the input element
+                    //             input.value = storedName;
 
-                                var selectUnidad = document.getElementById("id_unidadSelect");
+                    //             var selectUnidad = document.getElementById("id_unidadSelect");
 
-                                //TODO eliminar hardcodeo como es la relacion de OA a UNIDAD?
-                                const getOATopicsFromOntology = (
-                                    oaid
-                                ) => ajax.call([{
-                                    methodname: 'local_yourplugin_get_oa_topics',
-                                    args: {
-                                        oaid
-                                    },
-                                }])[0];
-                                var topicosOntologia = [];
-                                try {
-                                    const responseOATopicsFromOntology = await getOATopicsFromOntology(paramsObject['oaid']);
-                                    log.debug("Getting topics:");
-                                    log.debug(responseOATopicsFromOntology);
-                                    responseOATopicsFromOntology.forEach(topico => {
-                                        var valueTopico = topico.topic
-                                        .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", "");
-                                        topicosOntologia.push(valueTopico);
-                                    });
-                                } catch (error) {
-                                    log.debug('Error fetching OA Topicos: ', error);
-                                    log.debug( error);
-                                }
+                    //             //TODO eliminar hardcodeo como es la relacion de OA a UNIDAD?
+                    //             const getOATopicsFromOntology = (
+                    //                 oaid
+                    //             ) => ajax.call([{
+                    //                 methodname: 'local_yourplugin_get_oa_topics',
+                    //                 args: {
+                    //                     oaid
+                    //                 },
+                    //             }])[0];
+                    //             var topicosOntologia = [];
+                    //             try {
+                    //                 const responseOATopicsFromOntology = await getOATopicsFromOntology(paramsObject['oaid']);
+                    //                 log.debug("Getting topics:");
+                    //                 log.debug(responseOATopicsFromOntology);
+                    //                 responseOATopicsFromOntology.forEach(topico => {
+                    //                     var valueTopico = topico.topic
+                    //                     .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", "");
+                    //                     topicosOntologia.push(valueTopico);
+                    //                 });
+                    //             } catch (error) {
+                    //                 log.debug('Error fetching OA Topicos: ', error);
+                    //                 log.debug( error);
+                    //             }
 
-                                var selectedOption = Array.from(selectUnidad.options).find(option => option.value === 'MADUNIDAD1');
+                    //             var selectedOption = Array.from(selectUnidad.options).find(option =>
+                        //  option.value === 'MADUNIDAD1');
 
-                                selectUnidad.value = selectedOption.value;
+                    //             selectUnidad.value = selectedOption.value;
 
-                                // var temasYTopicos = JSON.parse(selectedOption.dataset.temasYTopicos);
+                    //             // var temasYTopicos = JSON.parse(selectedOption.dataset.temasYTopicos);
 
-                                // Limpiar la lista anterior
-                                ul.innerHTML = '';
+                    //             // Limpiar la lista anterior
+                    //             ul.innerHTML = '';
 
 
                                 // Añadir los temas y tópicos a la lista
@@ -710,36 +1015,37 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                                 // });
                                 //RA Asignatura
 
-                                const getOAFromOntology = (
-                                    id
-                                ) => ajax.call([{
-                                    methodname: 'local_yourplugin_get_oa_ontology',
-                                    args: {
-                                        id
-                                    },
-                                }])[0];
+                //                 const getOAFromOntology = (
+                //                     id
+                //                 ) => ajax.call([{
+                //                     methodname: 'local_yourplugin_get_oa_ontology',
+                //                     args: {
+                //                         id
+                //                     },
+                //                 }])[0];
 
-                                try {
-                                    const responseOAFromOntology = await getOAFromOntology(id);
-                                    responseOAFromOntology.forEach(ra => {
-                                        var valueRaAsig = ra.raasig
-                                        .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", "");
-                                        let checkboxRaAsig = document
-                                        .querySelectorAll(`#resultadoAprendizaje input[type="checkbox"][value="${valueRaAsig}"]`);
-                                        checkboxRaAsig[0].checked = true;
-                                    });
-                                } catch (error) {
-                                    log.debug('Error fetching OA RAsAsig: ', error);
-                                    log.debug( error);
-                                }
+                //                 try {
+                //                     const responseOAFromOntology = await getOAFromOntology(id);
+                //                     responseOAFromOntology.forEach(ra => {
+                //                         var valueRaAsig = ra.raasig
+                //                         .replace("http://www.semanticweb.org/valer/ontologies/OntoOA#", "");
+                //                         let checkboxRaAsig = document
+                //                         .querySelectorAll(`#resultadoAprendizaje input[type="checkbox"]
+                // [value="${valueRaAsig}"]`);
+                //                         checkboxRaAsig[0].checked = true;
+                //                     });
+                //                 } catch (error) {
+                //                     log.debug('Error fetching OA RAsAsig: ', error);
+                //                     log.debug( error);
+                //                 }
 
-                            }
-                        } catch (error) {
-                            log.debug('Error fetching OA fields:', error);
-                        }
-                    }
+                //             }
+                //         } catch (error) {
+                //             log.debug('Error fetching OA fields:', error);
+                //         }
+                //     }
 
-                    setOAFields();
+                //     setOAFields();
                 // Function to create text input with label
                 /**
                 * Function to create text input with label
@@ -761,25 +1067,54 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                 var tablaTitulo = document.createElement('h3');
                 tablaTitulo.textContent = 'Ordenar Topicos:';
                 finalidadInput.insertAdjacentElement('afterend', tablaTitulo);
-                // var table = document.createElement('table');
-                var table = document.getElementsByClassName("generaltable")[0];
 
-                table.id = 'editableTable';
-                // Create thead element
-                var thead = document.createElement('thead');
-                var headerRow = document.createElement('tr');
-                ['','Tópico', 'Order', 'Tópico incluido','Orden Tópico incluido','Tópico Parte',
-                'Orden Tópico Parte','Ejemplos', 'Actividades']
-                .forEach(function(headerText) {
-                    var th = document.createElement('th');
-                    th.textContent = headerText;
-                    headerRow.appendChild(th);
+                var buttonCargarOrden = document.createElement('button');
+                buttonCargarOrden.setAttribute('id', 'cargarOrdenTopicos');
+                buttonCargarOrden.textContent = 'Cargar Orden';
+                // Add event listener to button
+                buttonCargarOrden.addEventListener('click', async function() {
+                    log.debug("CLICKED cargar");
+                    log.debug("treeData inside Cargar:");
+                    log.debug(treeData);
+                    var topicosSeleccionadosDiv = document.getElementById('topicosSeleccionados');
+                    // Seleccionamos todos los divs con la clase "topic" dentro del div principal
+                    const topicosSeleccionados = topicosSeleccionadosDiv.querySelectorAll('.topic');
+                    // Creamos una lista de strings con el contenido de cada tópico
+                    const listaTopicos = Array.from(topicosSeleccionados).map(topico => topico.textContent.trim());
+                    log.debug(listaTopicos);
+
+                    var selectMenutopic = document.getElementById('menutopic');
+                    // Elimina todas las opciones del select
+                    selectMenutopic.options.length = 0;
+                    listaTopicos.forEach(topico => {
+                        var option = document.createElement('option');
+                        option.textContent = topico;
+                        option.value = topico;
+                        selectMenutopic.appendChild(option);
+                    });
+
                 });
-                thead.appendChild(headerRow);
-                table.appendChild(thead);
+                tablaTitulo.insertAdjacentElement('beforeend', buttonCargarOrden);
 
-                // Create tbody element with sample data
-                var tbody = document.createElement('tbody');
+                // // var table = document.createElement('table');
+                // var table = document.getElementsByClassName("generaltable")[0];
+
+                // table.id = 'editableTable';
+                // // Create thead element
+                // var thead = document.createElement('thead');
+                // var headerRow = document.createElement('tr');
+                // ['','Tópico', 'Order', 'Tópico incluido','Orden Tópico incluido','Tópico Parte',
+                // 'Orden Tópico Parte','Ejemplos', 'Actividades']
+                // .forEach(function(headerText) {
+                //     var th = document.createElement('th');
+                //     th.textContent = headerText;
+                //     headerRow.appendChild(th);
+                // });
+                // thead.appendChild(headerRow);
+                // table.appendChild(thead);
+
+                // // Create tbody element with sample data
+                // var tbody = document.createElement('tbody');
 
                 // /**
                 //      * remove item from table
@@ -860,100 +1195,100 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                 //     // });
                 // }
 
-                table.appendChild(tbody);
+                // table.appendChild(tbody);
 
-                // Add event listeners to editable cells
-                table.addEventListener('click', function(event) {
-                    var target = event.target;
-                    if (target.classList.contains('editable')) {
-                        var value = target.textContent;
-                        var input = document.createElement('input');
-                        input.type = 'text';
-                        input.value = value;
-                        input.addEventListener('blur', function() {
-                            var newValue = this.value;
-                            target.textContent = newValue;
-                        });
-                        target.textContent = '';
-                        target.appendChild(input);
-                        input.focus();
-                    }
-                });
+                // // Add event listeners to editable cells
+                // table.addEventListener('click', function(event) {
+                //     var target = event.target;
+                //     if (target.classList.contains('editable')) {
+                //         var value = target.textContent;
+                //         var input = document.createElement('input');
+                //         input.type = 'text';
+                //         input.value = value;
+                //         input.addEventListener('blur', function() {
+                //             var newValue = this.value;
+                //             target.textContent = newValue;
+                //         });
+                //         target.textContent = '';
+                //         target.appendChild(input);
+                //         input.focus();
+                //     }
+                // });
 
-                // Agregar estilos CSS directamente desde JavaScript
-                var style = document.createElement('style');
-                style.textContent = `
-                    .drag-handle {
-                        cursor: grab;
-                    }
-                    .dragging {
-                        background-color: lightblue;
-                    }
-                    .draggable-container {
-                        display: flex;
-                        flex-direction: column;
-                    }
-                    .draggable {
-                        padding: 10px;
-                        border: 1px solid #ccc;
-                        background-color: #f9f9f9;
-                        margin-bottom: 5px;
-                        cursor: move;
-                    }
-                `;
-                document.head.appendChild(style);
+                // // Agregar estilos CSS directamente desde JavaScript
+                // var style = document.createElement('style');
+                // style.textContent = `
+                //     .drag-handle {
+                //         cursor: grab;
+                //     }
+                //     .dragging {
+                //         background-color: lightblue;
+                //     }
+                //     .draggable-container {
+                //         display: flex;
+                //         flex-direction: column;
+                //     }
+                //     .draggable {
+                //         padding: 10px;
+                //         border: 1px solid #ccc;
+                //         background-color: #f9f9f9;
+                //         margin-bottom: 5px;
+                //         cursor: move;
+                //     }
+                // `;
+                // document.head.appendChild(style);
 
-                // Agregar eventos de arrastre
-                var draggingElement = null;
+                // // Agregar eventos de arrastre
+                // var draggingElement = null;
 
-                // Función para manejar el evento de inicio de arrastre
-                /**
-                 * Función para manejar el evento de inicio de arrastre.
-                 * @param {DragEvent} event - El evento de arrastre.
-                 */
-                function handleDragStart(event){
-                    draggingElement = event.target.closest('tr');
-                    draggingElement.classList.add('dragging');
-                }
+                // // Función para manejar el evento de inicio de arrastre
+                // /**
+                //  * Función para manejar el evento de inicio de arrastre.
+                //  * @param {DragEvent} event - El evento de arrastre.
+                //  */
+                // function handleDragStart(event){
+                //     draggingElement = event.target.closest('tr');
+                //     draggingElement.classList.add('dragging');
+                // }
 
-                // Función para manejar el evento de soltar
-                /**
-                 * Función para manejar el evento de soltar.
-                 * @param {DragEvent} event - El evento de soltar.
-                 */
-                function handleDrop(event) {
-                    event.preventDefault();
-                    if (draggingElement) {
-                        var targetElement = event.target.closest('tr');
-                        if (targetElement && targetElement !== draggingElement) {
-                            var parent = draggingElement.parentNode;
-                            parent.removeChild(draggingElement);
-                            var referenceNode = (targetElement.nextSibling &&
-                                targetElement.nextSibling.nodeType === Node.ELEMENT_NODE) ?
-                                                targetElement.nextSibling : null;
-                            parent.insertBefore(draggingElement, referenceNode);
-                        }
-                        draggingElement.classList.remove('dragging');
-                        draggingElement = null;
-                    }
-                }
+                // // Función para manejar el evento de soltar
+                // /**
+                //  * Función para manejar el evento de soltar.
+                //  * @param {DragEvent} event - El evento de soltar.
+                //  */
+                // function handleDrop(event) {
+                //     event.preventDefault();
+                //     if (draggingElement) {
+                //         var targetElement = event.target.closest('tr');
+                //         if (targetElement && targetElement !== draggingElement) {
+                //             var parent = draggingElement.parentNode;
+                //             parent.removeChild(draggingElement);
+                //             var referenceNode = (targetElement.nextSibling &&
+                //                 targetElement.nextSibling.nodeType === Node.ELEMENT_NODE) ?
+                //                                 targetElement.nextSibling : null;
+                //             parent.insertBefore(draggingElement, referenceNode);
+                //         }
+                //         draggingElement.classList.remove('dragging');
+                //         draggingElement = null;
+                //     }
+                // }
 
-                // Agregar eventos de arrastre a las celdas de asa de arrastre
-                var dragHandleElements = document.querySelectorAll('.drag-handle');
-                dragHandleElements.forEach(function(element) {
-                    element.addEventListener('dragstart', handleDragStart);
-                });
-                tbody.addEventListener('dragover', function(event) {
-                    event.preventDefault();
-                });
-                tbody.addEventListener('drop', handleDrop);
+                // // Agregar eventos de arrastre a las celdas de asa de arrastre
+                // var dragHandleElements = document.querySelectorAll('.drag-handle');
+                // dragHandleElements.forEach(function(element) {
+                //     element.addEventListener('dragstart', handleDragStart);
+                // });
+                // tbody.addEventListener('dragover', function(event) {
+                //     event.preventDefault();
+                // });
+                // tbody.addEventListener('drop', handleDrop);
 
-                // Append the table to the container
-                tablaTitulo.insertAdjacentElement('afterend', table);
+                // // Append the table to the container
+                // tablaTitulo.insertAdjacentElement('afterend', table);
 
                 var editarcrearTitulo = document.createElement('h3');
                 editarcrearTitulo.textContent = 'Crear o editar H5P:';
-                table.insertAdjacentElement('afterend', editarcrearTitulo);
+                tablaTitulo.insertAdjacentElement('afterend', editarcrearTitulo);
 
                 var formElements = document.getElementsByTagName("form");
                 var h5pform = formElements[1];
@@ -977,35 +1312,35 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
 
                 h5pform.insertAdjacentElement('afterend', buttonFin);
 
-                let draggedElement = null;
+                // let draggedElement = null;
 
-                document.querySelectorAll('.draggable').forEach(item => {
-                    item.addEventListener('dragstart', function(e) {
-                        draggedElement = this;
-                        e.dataTransfer.effectAllowed = 'move';
-                        e.dataTransfer.setData('text/html', this.innerHTML);
-                    });
+                // document.querySelectorAll('.draggable').forEach(item => {
+                //     item.addEventListener('dragstart', function(e) {
+                //         draggedElement = this;
+                //         e.dataTransfer.effectAllowed = 'move';
+                //         e.dataTransfer.setData('text/html', this.innerHTML);
+                //     });
 
-                    item.addEventListener('dragover', function(e) {
-                        if (e.preventDefault) {
-                            e.preventDefault();
-                        }
-                        return false;
-                    });
+                //     item.addEventListener('dragover', function(e) {
+                //         if (e.preventDefault) {
+                //             e.preventDefault();
+                //         }
+                //         return false;
+                //     });
 
-                    item.addEventListener('drop', function(e) {
-                        if (e.stopPropagation) {
-                            e.stopPropagation();
-                        }
+                //     item.addEventListener('drop', function(e) {
+                //         if (e.stopPropagation) {
+                //             e.stopPropagation();
+                //         }
 
-                        if (draggedElement !== this) {
-                            draggedElement.innerHTML = this.innerHTML;
-                            this.innerHTML = e.dataTransfer.getData('text/html');
-                        }
+                //         if (draggedElement !== this) {
+                //             draggedElement.innerHTML = this.innerHTML;
+                //             this.innerHTML = e.dataTransfer.getData('text/html');
+                //         }
 
-                        return false;
-                    });
-                });
+                //         return false;
+                //     });
+                // });
 
                 /**
                      * saveChanges

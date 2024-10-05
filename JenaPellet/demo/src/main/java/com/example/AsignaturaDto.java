@@ -5,18 +5,25 @@ import java.util.List;
 
 public class AsignaturaDto {
     private String nombre;              // Name of the Asignatura
+    private String id;
     private List<String> raAsignaturaList;
     private List<UnidadDto> unidades;   // List of UnidadDto
 
     // Constructor
-    public AsignaturaDto(String nombre) {
+    public AsignaturaDto(String nombre, String id) {
         this.nombre = nombre;
+        this.id = id;
         this.unidades = new ArrayList<>();
     }
 
     // Getter for nombre
     public String getNombre() {
         return nombre;
+    }
+
+    // Getter for id
+    public String getId() {
+        return id;
     }
 
     // Getter for unidades

@@ -41,6 +41,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.List;
+import java.util.Optional;
 
 
 
@@ -267,13 +268,44 @@ public class OntologyController {
     @GetMapping("/unidadesTemasTopicosOntoU")
     public ResponseEntity<AsignaturaDto> obtenerUnidadesConTopicos(@RequestParam String asignatura) {
         try {
+            OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
             // Llama al servicio para obtener las unidades con sus tópicos
-            AsignaturaDto asignaturaDto = new AsignaturaDto(asignatura);
-            List<UnidadDto> unidadesDto = getUnidadesDeAsignatura(asignatura);
-            List<String> raAsignaturaList = getRAAsignaturaList(asignatura);
-            asignaturaDto.setUnidades(unidadesDto);
-            asignaturaDto.setRAAsignaturaList(raAsignaturaList);
-            return new ResponseEntity<>(asignaturaDto, HttpStatus.OK); // Retorna la lista en formato JSON
+            AsignaturaDto asignaturaDto;
+
+            // Identificar la clase Asignatura
+            OWLClass asignaturaClass = dataFactory.getOWLClass(IRI.create(baseOntoU + "Asignatura"));
+
+            // Identificar la propiedad de datos (nombre)
+            OWLDataProperty nombrePropiedad = dataFactory.getOWLDataProperty(IRI.create(baseOntoU + "nombre"));
+
+            // Buscar el primer individuo que tiene la propiedad nombre igual a nombreBuscado y que sea de tipo Asignatura
+            Optional<OWLNamedIndividual> individuoEncontrado = ontologyOntoU.getIndividualsInSignature()
+                    .stream()
+                    .filter(individuo -> ontologyOntoU.getDataPropertyAssertionAxioms(individuo)
+                            .stream()
+                            .anyMatch(axiom -> axiom.getProperty().equals(nombrePropiedad) &&
+                                               axiom.getObject().getLiteral().equals(asignatura)))
+                    .filter(individuo -> ontologyOntoU.getClassAssertionAxioms(individuo)
+                            .stream()
+                            .anyMatch(axiom -> axiom.getClassesInSignature().contains(asignaturaClass)))
+                    .findFirst();  // Solo queremos el primer individuo que cumpla la condición
+
+            // Mostrar el resultado
+            if (individuoEncontrado.isPresent()) {
+                String asignaturaIRI = individuoEncontrado.get().getIRI().getShortForm();
+                System.out.println("Se encontró la asignatura: " + individuoEncontrado.get().getIRI().getShortForm());
+                // Llama al servicio para obtener las unidades con sus tópicos
+                asignaturaDto = new AsignaturaDto(asignatura, asignaturaIRI);
+
+                List<UnidadDto> unidadesDto = getUnidadesDeAsignatura(asignaturaIRI);
+                List<String> raAsignaturaList = getRAAsignaturaList(asignaturaIRI);
+                asignaturaDto.setUnidades(unidadesDto);
+                asignaturaDto.setRAAsignaturaList(raAsignaturaList);
+                return new ResponseEntity<>(asignaturaDto, HttpStatus.OK); // Retorna la lista en formato JSON
+            } else {
+                System.out.println("No se encontró ninguna asignatura con el nombre " + asignatura);
+                return  new ResponseEntity<>(null, HttpStatus.OK);
+            }
         } catch (Exception e) {
             e.printStackTrace(); // Manejo de excepciones
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -284,13 +316,13 @@ public class OntologyController {
     
     private List<String> getRAAsignaturaList(String asignatura) {
         OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
-        OWLClass asignaturaClass = dataFactory.getOWLClass(IRI.create(baseIRI+"Asignatura"));
+        OWLClass asignaturaClass = dataFactory.getOWLClass(IRI.create(baseOntoU+"Asignatura"));
 
         List<String> raAsignaturaList = new ArrayList<>();
 
         for (OWLNamedIndividual asignaturaIndividual : reasonerOntoU.getInstances(asignaturaClass, false).getFlattened()) {
             if (asignaturaIndividual.getIRI().getShortForm().equals(asignatura)) {
-                OWLObjectProperty asignaturaTieneRAAsignatura = dataFactory.getOWLObjectProperty(IRI.create(baseIRI+"asignaturaTieneRAAsignatura"));
+                OWLObjectProperty asignaturaTieneRAAsignatura = dataFactory.getOWLObjectProperty(IRI.create(baseOntoU+"asignaturaTieneRAAsignatura"));
                 for (OWLNamedIndividual raAsignatura : reasonerOntoU.getObjectPropertyValues(asignaturaIndividual, asignaturaTieneRAAsignatura).getFlattened()) {
                     System.out.println("raAsignatura");
                     System.out.println(raAsignatura.getIRI().getShortForm());
@@ -311,16 +343,30 @@ public class OntologyController {
         for (OWLNamedIndividual asignaturaIndividual : reasonerOntoU.getInstances(asignaturaClass, false).getFlattened()) {
             if (asignaturaIndividual.getIRI().getShortForm().equals(asignatura)) {
                 OWLObjectProperty tieneContenidoMinimo = dataFactory.getOWLObjectProperty(IRI.create(baseOntoU + "asignaturaTieneContenidoMinimo"));
+                
+                // Identificar la propiedad de datos (descripcion)
+                OWLDataProperty descripcionPropiedad = dataFactory.getOWLDataProperty(IRI.create(baseOntoU + "descripcion"));
+
                 for (OWLNamedIndividual contenidoMinimo : reasonerOntoU.getObjectPropertyValues(asignaturaIndividual, tieneContenidoMinimo).getFlattened()) {
                     System.out.println("contenidoMinimo");
                     System.out.println(contenidoMinimo.getIRI().getShortForm());
+
+                    Optional<OWLLiteral> descripcionContenidoMinimo = ontologyOntoU.getDataPropertyAssertionAxioms(contenidoMinimo)
+                    .stream()
+                    .filter(axiom -> axiom.getProperty().equals(descripcionPropiedad))
+                    .map(OWLDataPropertyAssertionAxiom::getObject)
+                    .findFirst();
+
+                    if (descripcionContenidoMinimo.isPresent()) {
+                        System.out.println("El nombre actual es: " + descripcionContenidoMinimo.get().getLiteral());
+                    } else {
+                        System.out.println("No se encontró ningún valor para el nombre.");
+                    }
 
                     OWLObjectProperty seOrganizaEnUnidad = dataFactory.getOWLObjectProperty(IRI.create(baseOntoU + "contenidoMinimoSeOrganizaEnUnidad"));
 
                     for (OWLNamedIndividual unidad : reasonerOntoU.getObjectPropertyValues(contenidoMinimo, seOrganizaEnUnidad).getFlattened()) {
                         
-    
-    
                         UnidadDto unidadDto= procesarUnidad(unidad);
                         unidades.add(unidadDto);
                     }
@@ -335,13 +381,29 @@ public class OntologyController {
         return unidades;
     }
 
-   
-    
 
     private UnidadDto procesarUnidad(OWLNamedIndividual unidad) {
-        UnidadDto unidadDto = new UnidadDto(unidad.getIRI().getShortForm());
-        
+        UnidadDto unidadDto;
         OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
+        
+        // Identificar la propiedad de datos (nombre)
+        OWLDataProperty nombrePropiedad = dataFactory.getOWLDataProperty(IRI.create(baseOntoU + "nombre"));
+
+        Optional<OWLLiteral> nombreUnidad = ontologyOntoU.getDataPropertyAssertionAxioms(unidad)
+                        .stream()
+                        .filter(axiom -> axiom.getProperty().equals(nombrePropiedad))
+                        .map(OWLDataPropertyAssertionAxiom::getObject)
+                        .findFirst();
+
+        if (nombreUnidad.isPresent()) {
+            System.out.println("El nombre actual es: " + nombreUnidad.get().getLiteral());
+            unidadDto = new UnidadDto(nombreUnidad.get().getLiteral(), unidad.getIRI().getShortForm());
+        } else {
+            System.out.println("No se encontró ningún valor para el nombre.");
+            unidadDto = new UnidadDto("", unidad.getIRI().getShortForm());
+        }
+        
+        
         OWLObjectProperty compuestaDeTema = dataFactory.getOWLObjectProperty(IRI.create(baseOntoU + "unidadCompuestaDeTema"));
 
         for (OWLIndividual tema : reasonerOntoU.getObjectPropertyValues(unidad, compuestaDeTema).getFlattened()) {
@@ -353,9 +415,26 @@ public class OntologyController {
     }
 
     private TemaDto procesarTema(OWLNamedIndividual tema) {
-        TemaDto temaDto = new TemaDto(tema.getIRI().getShortForm());
+        TemaDto temaDto;
 
         OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
+        // Identificar la propiedad de datos (nombre)
+        OWLDataProperty nombrePropiedad = dataFactory.getOWLDataProperty(IRI.create(baseOntoU + "nombre"));
+
+        Optional<OWLLiteral> nombreTema = ontologyOntoU.getDataPropertyAssertionAxioms(tema)
+                        .stream()
+                        .filter(axiom -> axiom.getProperty().equals(nombrePropiedad))
+                        .map(OWLDataPropertyAssertionAxiom::getObject)
+                        .findFirst();
+
+        if (nombreTema.isPresent()) {
+            System.out.println("El nombre actual es: " + nombreTema.get().getLiteral());
+            temaDto = new TemaDto(nombreTema.get().getLiteral(), tema.getIRI().getShortForm());
+        } else {
+            System.out.println("No se encontró ningún valor para el nombre.");
+            temaDto = new TemaDto("", tema.getIRI().getShortForm());
+        }
+
         OWLObjectProperty contieneTopico = dataFactory.getOWLObjectProperty(IRI.create(baseOntoU + "temaContieneTopico"));
 
         for (OWLIndividual topico : reasonerOntoU.getObjectPropertyValues(tema, contieneTopico).getFlattened()) {
@@ -376,9 +455,26 @@ public class OntologyController {
     }
 
     private TopicoDto procesarTopico(OWLNamedIndividual topico) {
-        TopicoDto topicoDto = new TopicoDto(topico.getIRI().getShortForm());
+        TopicoDto topicoDto;
 
         OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
+
+        // Identificar la propiedad de datos (nombre)
+        OWLDataProperty nombrePropiedad = dataFactory.getOWLDataProperty(IRI.create("http://www.semanticweb.org/valer/ontologies/OntoU#nombre"));
+
+        Optional<OWLLiteral> nombreTopico = ontologyOntoU.getDataPropertyAssertionAxioms(topico)
+                        .stream()
+                        .filter(axiom -> axiom.getProperty().equals(nombrePropiedad))
+                        .map(OWLDataPropertyAssertionAxiom::getObject)
+                        .findFirst();
+
+        if (nombreTopico.isPresent()) {
+            System.out.println("El nombre actual es: " + nombreTopico.get().getLiteral());
+            topicoDto = new TopicoDto(nombreTopico.get().getLiteral(), topico.getIRI().getShortForm());
+        } else {
+            System.out.println("No se encontró ningún valor para el nombre.");
+            topicoDto = new TopicoDto("", topico.getIRI().getShortForm());
+        }
 
         // Procesar subcategorías: parte, tipo, soporte
         OWLObjectProperty topicoTieneParte = dataFactory.getOWLObjectProperty(IRI.create("http://www.semanticweb.org/valer/ontologies/OntoT#topicoTieneParte"));
@@ -465,7 +561,7 @@ public class OntologyController {
 
             //  Create individuals
             OWLNamedIndividual oa = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + "OA" + oaid));
-            OWLNamedIndividual ra = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + "RA" + oaid));
+            OWLNamedIndividual ra = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + "ResultadoAprendizajeOA" + oaid));
             OWLNamedIndividual evaluacion = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + "Evaluacion" + oaid));
             OWLNamedIndividual estructuraDeMetadato = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + "EstructuraDeMetadato" + oaid));
             OWLNamedIndividual contenido = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + "ContenidoDeInstruccion" + oaid));
@@ -509,7 +605,7 @@ public class OntologyController {
     }
 
     @PostMapping("/linkTopicToOA")
-    public String linkTopicToOA(@RequestParam String oaid, @RequestParam String idTopic) {
+    public String linkTopicToOA(@RequestParam String oaid, @RequestParam String idTopic, @RequestParam String nameTopic) {
         try {
             // INSERT DATA {
             //     oaca:Contenido{$oaid} oaca:contenidoDesarrollaTopico  oaca:{$idTopico}.
@@ -528,7 +624,9 @@ public class OntologyController {
             OWLClassAssertionAxiom classAssertion = dataFactory.getOWLClassAssertionAxiom(topicoOwlClass, topico);
 
             // Apply the change (Add the Axiom to the Ontology)
-            manager.addAxiom(ontologyConocimiento, classAssertion);            
+            manager.addAxiom(ontologyConocimiento, classAssertion);     
+            
+            //TODO Setear el nombre al Topico 
 
             //Hacer la relacion con el ContenidoDeIstruccion(OAID)
             OWLNamedIndividual contenido = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + "ContenidoDeInstruccion" + oaid));
@@ -589,6 +687,163 @@ public class OntologyController {
         } catch (Exception e) {
             e.printStackTrace();
             return "Failed to unlink Topic. Error: " + e.getMessage();
+        }
+    }
+
+    @PostMapping("/insertUnidad")
+    public String insertUnidad(@RequestParam String unidad) {
+        try {
+            //TODO remove any previous Unidad Individual
+
+            // Get OWL Data Factory and Ontology Manager
+            OWLOntologyManager manager = ontologyConocimiento.getOWLOntologyManager();
+            OWLDataFactory dataFactory = manager.getOWLDataFactory();
+
+            // Create the individual and the class
+            OWLNamedIndividual unidadIndividuo = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + unidad));
+            OWLClass unidadOwlClass = dataFactory.getOWLClass(IRI.create(baseIRI  + "Unidad"));
+
+            // Create a Class Assertion Axiom (individual is an instance of the class)
+            OWLClassAssertionAxiom classAssertion = dataFactory.getOWLClassAssertionAxiom(unidadOwlClass, unidadIndividuo);
+
+            // Apply the change (Add the Axiom to the Ontology)
+            manager.addAxiom(ontologyConocimiento, classAssertion);            
+
+            //TODO hacer relacion con Asignatura/Contenido Minimo
+
+            // Save ontology after modification if necessary
+            manager.saveOntology(ontologyConocimiento);
+
+
+            return "Unidad created successfully.";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Failed to create Unidad. Error: " + e.getMessage();
+        }
+    }
+
+    @PostMapping("/linkRAAsignaturaToOA")
+    public String linkRAAsignaturaToOA(@RequestParam String oaid, @RequestParam String idRAAsignatura) {
+        try {
+            // Get OWL Data Factory and Ontology Manager
+            OWLOntologyManager manager = ontologyConocimiento.getOWLOntologyManager();
+            OWLDataFactory dataFactory = manager.getOWLDataFactory();
+
+            //Crear individuo RAAsignatura primero
+            // Create the individual and the class
+            OWLNamedIndividual resultadoAprendizajeAsignatura = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + idRAAsignatura));
+            OWLClass resultadoAprendizajeAsignaturaOwlClass = dataFactory.getOWLClass(IRI.create(baseIRI  + "ResultadoAprendizajeAsignatura"));
+
+            // Create a Class Assertion Axiom (individual is an instance of the class)
+            OWLClassAssertionAxiom classAssertion = dataFactory.getOWLClassAssertionAxiom(resultadoAprendizajeAsignaturaOwlClass, resultadoAprendizajeAsignatura);
+
+            // Apply the change (Add the Axiom to the Ontology)
+            manager.addAxiom(ontologyConocimiento, classAssertion);            
+
+            //Hacer la relacion con el ResultadoAprendizajeOA(OAID)
+            OWLNamedIndividual raOA = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + "ResultadoAprendizajeOA" + oaid));
+
+            // Create Object Properties
+            OWLObjectProperty raOARefinaRAAsignatura = dataFactory.getOWLObjectProperty(IRI.create(baseIRI + "raOARefinaRAAsignatura"));
+
+            // Create relationships
+            manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(raOARefinaRAAsignatura, raOA, resultadoAprendizajeAsignatura));
+
+            // Save ontology after modification if necessary
+            manager.saveOntology(ontologyConocimiento);
+
+
+            return "Topic linked successfully.";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Failed to link Topic. Error: " + e.getMessage();
+        }
+    }
+
+    @PostMapping("/unlinkRAAsignaturaToOA")
+    public String unlinkRAAsignaturaToOA(@RequestParam String oaid, @RequestParam String idRAAsignatura) {
+        try {
+            
+            // Get OWL Data Factory and Ontology Manager
+            OWLOntologyManager manager = ontologyConocimiento.getOWLOntologyManager();
+            OWLDataFactory dataFactory = manager.getOWLDataFactory();
+
+            // Define individuals
+            OWLNamedIndividual resultadoAprendizajeAsignatura = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + idRAAsignatura));
+            OWLNamedIndividual raOA = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + "ResultadoAprendizajeOA" + oaid));
+
+            // Define the object property
+            OWLObjectProperty raOARefinaRAAsignatura = dataFactory.getOWLObjectProperty(IRI.create(baseIRI + "raOARefinaRAAsignatura"));
+
+            // Create the axiom to remove
+            OWLAxiom axiomToRemove = dataFactory.getOWLObjectPropertyAssertionAxiom(raOARefinaRAAsignatura, raOA, resultadoAprendizajeAsignatura);
+
+            // Remove the axiom
+            manager.removeAxiom(ontologyConocimiento, axiomToRemove);
+
+            //Eliminar individuo  
+            // Remove all axioms where the individual is involved
+            for (OWLAxiom axiom : ontologyConocimiento.getReferencingAxioms(resultadoAprendizajeAsignatura)) {
+                manager.applyChange(new RemoveAxiom(ontologyConocimiento, axiom));
+            }
+
+            // Save ontology after modification if necessary
+            manager.saveOntology(ontologyConocimiento);
+
+            return "Topic unlinked successfully.";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Failed to unlink Topic. Error: " + e.getMessage();
+        }
+    }
+
+
+    @PostMapping("/createTopicsRelations")
+    public String createTopicsRelations(@RequestBody List<NodeDto> nodes) {
+        // Aquí puedes procesar el array de nodos
+        for (NodeDto node : nodes) {
+            processNode(node, 0, null);  // Nivel inicial 0
+            // Procesa los datos de cada nodo
+        }
+
+        return "Nodes processed successfully";
+    }
+
+    // Método recursivo para procesar nodos y sus hijos
+    private void processNode(NodeDto node, int level, String parent) {
+        // Procesar el nodo actual
+        System.out.println("Node Name: " + node.getName() + ", Level: " + level+", Node Parent: " + parent+", Node relation: " + node.getRelation());
+
+        if (level == 0) {//es un Tema
+            System.out.println("Crear Tema: "+ node.getName());
+
+            System.out.println("Eliminar relaciones que tenia Tema");
+        }
+        else{//Es un Topico
+            System.out.println("Eliminar relaciones que tenia Topico");
+            if (level-1==0) {
+                System.out.println("El padre es un Tema");
+            }
+            if (node.getRelation().equals("soporte")) {
+                System.out.println("Crear Topico Soporte: "+ node.getName() +" de "+parent);
+                
+            }
+            else if (node.getRelation().equals("parte")) {
+                System.out.println("Crear Topico parte: "+ node.getName() +" de "+parent);
+            }
+            else{
+                System.out.println("Crear Topico Tipo: "+ node.getName() +" de "+parent);
+
+            }
+
+        }
+
+        // Procesar los children (si existen)
+        if (node.getChildren() != null && !node.getChildren().isEmpty()) {
+            for (NodeDto child : node.getChildren()) {
+                // Llamada recursiva para procesar cada child
+                processNode(child, level + 1, node.getName());
+            }
         }
     }
 

@@ -5,11 +5,13 @@ import java.util.List;
 
 public class TemaDto {
     private String nombre;
+    private String id;
     private List<TopicoDto> topicos;
     private List<TopicoDto> topicosSoporte;
 
-    public TemaDto(String nombre) {
+    public TemaDto(String nombre, String id) {
         this.nombre = nombre;
+        this.id = id;
         this.topicos = new ArrayList<>();
         this.topicosSoporte = new ArrayList<>();
     }
@@ -17,6 +19,11 @@ public class TemaDto {
     // Getters y setters
     public String getNombre() {
         return nombre;
+    }
+
+    // Getter for id
+    public String getId() {
+        return id;
     }
 
     public void setNombre(String nombre) {
