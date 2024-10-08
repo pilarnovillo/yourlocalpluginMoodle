@@ -3,6 +3,7 @@ package com.example;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.model.PrefixManager;
 import org.semanticweb.owlapi.model.RemoveAxiom;
 import org.semanticweb.owlapi.reasoner.InferenceType;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Stopwatch;
 
 import org.semanticweb.owlapi.model.EntityType;
@@ -42,6 +44,7 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 
@@ -52,6 +55,7 @@ import java.util.Optional;
 @RequestMapping("/ontology")
 public class OntologyController {
     private static final String baseOntoU = "http://www.semanticweb.org/valer/ontologies/OntoU#";
+    private static final String baseOntoT = "http://www.semanticweb.org/valer/ontologies/OntoT#";
     private OWLOntology ontologyConocimiento;
     private OWLOntology ontologyOntoU;
     private OWLOntologyManager manager;
@@ -605,7 +609,7 @@ public class OntologyController {
     }
 
     @PostMapping("/linkTopicToOA")
-    public String linkTopicToOA(@RequestParam String oaid, @RequestParam String idTopic, @RequestParam String nameTopic) {
+    public String linkTopicToOA(@RequestParam String oaid, @RequestParam String idTopic) {
         try {
             // INSERT DATA {
             //     oaca:Contenido{$oaid} oaca:contenidoDesarrollaTopico  oaca:{$idTopico}.
@@ -617,8 +621,8 @@ public class OntologyController {
 
             //Crear individuo Topico primero
             // Create the individual and the class
-            OWLNamedIndividual topico = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + idTopic));
-            OWLClass topicoOwlClass = dataFactory.getOWLClass(IRI.create(baseIRI  + "Topico"));
+            OWLNamedIndividual topico = dataFactory.getOWLNamedIndividual(IRI.create(baseOntoT + idTopic));
+            OWLClass topicoOwlClass = dataFactory.getOWLClass(IRI.create(baseOntoT  + "Topico"));
 
             // Create a Class Assertion Axiom (individual is an instance of the class)
             OWLClassAssertionAxiom classAssertion = dataFactory.getOWLClassAssertionAxiom(topicoOwlClass, topico);
@@ -662,7 +666,7 @@ public class OntologyController {
 
             // Create individuals
             OWLNamedIndividual contenido = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + "ContenidoDeInstruccion" + oaid));
-            OWLNamedIndividual topico = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + idTopic));
+            OWLNamedIndividual topico = dataFactory.getOWLNamedIndividual(IRI.create(baseOntoT + idTopic));
 
             // Define the object property
             OWLObjectProperty contenidoDesarrollaTopico = dataFactory.getOWLObjectProperty(IRI.create(baseIRI + "contenidoDeInstruccionDesarrollaTopico"));
@@ -680,6 +684,9 @@ public class OntologyController {
                 manager.applyChange(new RemoveAxiom(ontologyConocimiento, axiom));
             }
 
+            //Eliminar el Episodio del Topico
+            eliminarIndividuosPorCadena("_"+idTopic);
+
             // Save ontology after modification if necessary
             manager.saveOntology(ontologyConocimiento);
 
@@ -687,6 +694,41 @@ public class OntologyController {
         } catch (Exception e) {
             e.printStackTrace();
             return "Failed to unlink Topic. Error: " + e.getMessage();
+        }
+    }
+
+    public String eliminarIndividuosPorCadena(String cadenaBusqueda) {
+        try {
+            // Obtener todos los individuos en la ontología
+            Set<OWLNamedIndividual> individuos = ontologyConocimiento.getIndividualsInSignature();
+    
+            // Contador para los individuos eliminados
+            int contadorEliminados = 0;
+    
+            // Filtrar los individuos cuyo IRI contenga la cadena de búsqueda
+            for (OWLNamedIndividual individuo : individuos) {
+                String iriIndividuo = individuo.getIRI().toString();
+    
+                // Verificar si el nombre del individuo (IRI) contiene la cadena de búsqueda
+                if (iriIndividuo.endsWith(cadenaBusqueda)) {
+                    // Obtener todos los axiomas relacionados con el individuo
+                    Set<OWLAxiom> axiomasReferentes = ontologyConocimiento.getReferencingAxioms(individuo);
+    
+                    // Eliminar todos los axiomas relacionados con el individuo
+                    for (OWLAxiom axiom : axiomasReferentes) {
+                        manager.applyChange(new RemoveAxiom(ontologyConocimiento, axiom));
+                    }
+    
+                    // Aumentar el contador de individuos eliminados
+                    contadorEliminados++;
+                }
+            }
+    
+            // Retornar un mensaje indicando cuántos individuos fueron eliminados
+            return contadorEliminados + " individuos eliminados que contenían '" + cadenaBusqueda + "' en su nombre.";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error al eliminar individuos: " + e.getMessage();
         }
     }
 
@@ -799,10 +841,17 @@ public class OntologyController {
 
 
     @PostMapping("/createTopicsRelations")
-    public String createTopicsRelations(@RequestBody List<NodeDto> nodes) {
+    public String createTopicsRelations(@RequestBody List<NodeDto> nodes) throws OWLOntologyStorageException {
+        // Get OWL Data Factory and Ontology Manager
+        OWLOntologyManager manager = ontologyConocimiento.getOWLOntologyManager();
+        OWLDataFactory dataFactory = manager.getOWLDataFactory();
+        
+        //Eliminar todos los temas TODO?
+
         // Aquí puedes procesar el array de nodos
         for (NodeDto node : nodes) {
-            processNode(node, 0, null);  // Nivel inicial 0
+            String temaId = node.getName();
+            processNode(node, 0, null, manager, dataFactory, temaId);  // Nivel inicial 0
             // Procesa los datos de cada nodo
         }
 
@@ -810,31 +859,101 @@ public class OntologyController {
     }
 
     // Método recursivo para procesar nodos y sus hijos
-    private void processNode(NodeDto node, int level, String parent) {
+    private void processNode(NodeDto node, int level, String parent, OWLOntologyManager manager, OWLDataFactory dataFactory, String temaId) throws OWLOntologyStorageException {
         // Procesar el nodo actual
         System.out.println("Node Name: " + node.getName() + ", Level: " + level+", Node Parent: " + parent+", Node relation: " + node.getRelation());
 
-        if (level == 0) {//es un Tema
-            System.out.println("Crear Tema: "+ node.getName());
+        // Definir las propiedades de objeto de Tema
+        OWLObjectProperty temaContieneTopico = dataFactory.getOWLObjectProperty(IRI.create(baseIRI + "temaContieneTopico"));
+        OWLObjectProperty temaContieneTopicoSoporte = dataFactory.getOWLObjectProperty(IRI.create(baseIRI + "temaContieneTopicoSoporte"));
 
-            System.out.println("Eliminar relaciones que tenia Tema");
+
+        if (level == 0) {//es un Tema
+            
+            //Crear individuo Tema 
+            OWLNamedIndividual tema = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + node.getName()));
+            OWLClass temaOwlClass = dataFactory.getOWLClass(IRI.create(baseIRI  + "Tema"));
+
+            // Create a Class Assertion Axiom (individual is an instance of the class)
+            OWLClassAssertionAxiom classAssertion = dataFactory.getOWLClassAssertionAxiom(temaOwlClass, tema);
+
+            // Apply the change (Add the Axiom to the Ontology)
+            manager.addAxiom(ontologyConocimiento, classAssertion); 
+
+            System.out.println("Eliminar relaciones que tenia Tema");//TODO
+            
+            // Obtener las aserciones de propiedades de objeto que refieren al individuo "tema"
+            for (OWLObjectPropertyAssertionAxiom axiom : ontologyConocimiento.getObjectPropertyAssertionAxioms(tema)) {
+                // Verificar si la propiedad es "temaContieneTopico" o "temaContieneTopicoSoporte"
+                if (axiom.getProperty().equals(temaContieneTopico) || axiom.getProperty().equals(temaContieneTopicoSoporte)) {
+                    // Aplicar el cambio para eliminar el axioma
+                    manager.applyChange(new RemoveAxiom(ontologyConocimiento, axiom));
+                }
+            }
+
+            // Save ontology after modification if necessary
+            manager.saveOntology(ontologyConocimiento);
         }
         else{//Es un Topico
-            System.out.println("Eliminar relaciones que tenia Topico");
-            if (level-1==0) {
-                System.out.println("El padre es un Tema");
-            }
-            if (node.getRelation().equals("soporte")) {
-                System.out.println("Crear Topico Soporte: "+ node.getName() +" de "+parent);
-                
-            }
-            else if (node.getRelation().equals("parte")) {
-                System.out.println("Crear Topico parte: "+ node.getName() +" de "+parent);
+            OWLNamedIndividual topico = dataFactory.getOWLNamedIndividual(IRI.create(baseOntoT + node.getName()));
+            OWLObjectProperty topicoPerteneceATema = dataFactory.getOWLObjectProperty(IRI.create(baseIRI + "topicoPerteneceATema"));
+
+            //Crear individuo EpisodioDeAprendizaje 
+            OWLNamedIndividual episodioDeAprendizaje = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI +"EpisodioDeAprendizaje_" + node.getName()));
+            OWLClass episodioDeAprendizajeOwlClass = dataFactory.getOWLClass(IRI.create(baseIRI  + "EpisodioDeAprendizaje"));
+            // Create a Class Assertion Axiom (individual is an instance of the class)
+            OWLClassAssertionAxiom classAssertionEpisodioDeAprendizaje = dataFactory.getOWLClassAssertionAxiom(episodioDeAprendizajeOwlClass, episodioDeAprendizaje);
+            OWLObjectProperty elementoFormaParteDeEpisodioDeAprendizaje = dataFactory.getOWLObjectProperty(IRI.create(baseIRI + "elementoFormaParteDeEpisodioDeAprendizaje"));
+            
+            if (level-1==0) {//El padre es un Tema
+                OWLNamedIndividual parentTemaIndividual = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + parent));
+                manager.addAxiom(ontologyConocimiento, classAssertionEpisodioDeAprendizaje);
+                manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(elementoFormaParteDeEpisodioDeAprendizaje, topico, episodioDeAprendizaje));
+                    
+                if (node.getRelation().equals("soporte")) {
+                    manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(temaContieneTopicoSoporte, parentTemaIndividual, topico));
+                }
+                else{
+                    manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(temaContieneTopico, parentTemaIndividual, topico));
+                    manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(topicoPerteneceATema, topico, parentTemaIndividual));
+                }
             }
             else{
-                System.out.println("Crear Topico Tipo: "+ node.getName() +" de "+parent);
+                OWLNamedIndividual parentTopicoIndividual = dataFactory.getOWLNamedIndividual(IRI.create(baseOntoT + parent));
+                OWLNamedIndividual temaIndividual = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + temaId));
 
+                if (node.getRelation().equals("soporte")) {
+                    OWLObjectProperty topicoEsSoporteDeTopico = dataFactory.getOWLObjectProperty(IRI.create(baseOntoT + "topicoEsSoporteDeTopico"));
+                    manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(topicoEsSoporteDeTopico, topico, parentTopicoIndividual));
+
+                    //Crear individuo EpisodioDeAprendizaje 
+                    OWLNamedIndividual episodioSoporte = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI +"EpisodioSoporte_" + node.getName()));
+                    OWLClass episodioSoportejeOwlClass = dataFactory.getOWLClass(IRI.create(baseIRI  + "EpisodioSoporte"));
+                    // Create a Class Assertion Axiom (individual is an instance of the class)
+                    OWLClassAssertionAxiom classAssertionEpisodioSoporte = dataFactory.getOWLClassAssertionAxiom(episodioSoportejeOwlClass, episodioSoporte);
+                    OWLObjectProperty elementoFormaParteDeSubEpisodioDeAprendizaje = dataFactory.getOWLObjectProperty(IRI.create(baseIRI + "elementoFormaParteDeSubEpisodioDeAprendizaje"));
+                    manager.addAxiom(ontologyConocimiento, classAssertionEpisodioSoporte);
+                    manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(elementoFormaParteDeSubEpisodioDeAprendizaje, topico, episodioSoporte));
+
+                }
+                else{
+                    manager.addAxiom(ontologyConocimiento, classAssertionEpisodioDeAprendizaje);
+                    manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(elementoFormaParteDeEpisodioDeAprendizaje, topico, episodioDeAprendizaje));
+
+                    if (node.getRelation().equals("parte")) { 
+                        OWLObjectProperty topicoEsParteDeTopico = dataFactory.getOWLObjectProperty(IRI.create(baseOntoT + "topicoEsParteDeTopico"));
+                        manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(topicoEsParteDeTopico, topico, parentTopicoIndividual));
+                        manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(topicoPerteneceATema, topico, temaIndividual));
+                    }
+                    else{
+                        OWLObjectProperty topicoEsUnTipoDeTopico = dataFactory.getOWLObjectProperty(IRI.create(baseOntoT + "topicoEsUnTipoDeTopico"));
+                        manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(topicoEsUnTipoDeTopico, topico, parentTopicoIndividual));
+                        manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(topicoPerteneceATema, topico, temaIndividual));
+                    }
+                }
+                 
             }
+            manager.saveOntology(ontologyConocimiento);
 
         }
 
@@ -842,9 +961,153 @@ public class OntologyController {
         if (node.getChildren() != null && !node.getChildren().isEmpty()) {
             for (NodeDto child : node.getChildren()) {
                 // Llamada recursiva para procesar cada child
-                processNode(child, level + 1, node.getName());
+                processNode(child, level + 1, node.getName(), manager, dataFactory, temaId);
             }
         }
+    }
+
+    @PostMapping("/setOrdenDeDesarrollo")
+    public String setOrdenDeDesarrollo(@RequestBody List<String> topicos) {
+        try {
+            // Get OWL Data Factory and Ontology Manager
+            OWLOntologyManager manager = ontologyConocimiento.getOWLOntologyManager();
+            OWLDataFactory dataFactory = manager.getOWLDataFactory();
+
+            // Iterar sobre los nombres de los tópicos en el array
+            for (int i = 0; i < topicos.size(); i++) {
+                String idTopico = topicos.get(i);
+                System.out.println("orden para:"+idTopico);
+                int ordenDeDesarrollo = i + 1;  // El índice empieza en 0, pero el orden en 1
+
+                // Lógica para encontrar el individuo del tópico
+                OWLNamedIndividual topicoIndividuo = dataFactory.getOWLNamedIndividual(IRI.create(baseOntoT + idTopico));
+
+                // Definir la propiedad de datos 'ordenDeDesarrollo'
+                OWLDataProperty ordenDeDesarrolloPropiedad = dataFactory.getOWLDataProperty(IRI.create(baseIRI + "ordenDeDesarrollo"));
+
+                // Eliminar la relación existente (si existe)
+                Set<OWLDataPropertyAssertionAxiom> axiomasExistentes = ontologyConocimiento.getDataPropertyAssertionAxioms(topicoIndividuo);
+                for (OWLDataPropertyAssertionAxiom axiom : axiomasExistentes) {
+                    if (axiom.getProperty().equals(ordenDeDesarrolloPropiedad)) {
+                        manager.applyChange(new RemoveAxiom(ontologyConocimiento, axiom));
+                    }
+                }
+
+                // Crear un axioma de aserción de la propiedad de datos
+                OWLDataPropertyAssertionAxiom axiom = dataFactory.getOWLDataPropertyAssertionAxiom(
+                    ordenDeDesarrolloPropiedad, topicoIndividuo, ordenDeDesarrollo
+                );
+
+                // Aplicar el cambio en la ontología
+                manager.addAxiom(ontologyConocimiento, axiom);
+            }
+            manager.saveOntology(ontologyConocimiento);
+            // Devolver una respuesta de éxito
+            return "Propiedad ordenDeDesarrollo asignada correctamente";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error al asignar la propiedad ordenDeDesarrollo";
+        }
+    }
+
+    @PostMapping("/analyzeMultiChoiceAnalyzer")
+    public List<Question> analyzeMultiChoiceAnalyzer(@RequestBody JsonNode jsonNode) throws Exception {
+        List<Question> questions = new ArrayList<>();
+
+        // Llamamos al método de análisis que ya tienes
+        MultiChoiceAnalyzer.analyze(jsonNode, questions);
+
+        return questions; // Retornamos la lista de preguntas procesadas
+    }
+
+    @PostMapping("/analyzeSingleChoiceAnalyzer")
+    public List<Question> analyzeSingleChoiceAnalyzer(@RequestBody JsonNode jsonNode) throws Exception {
+        List<Question> questions = new ArrayList<>();
+
+        // Llamamos al método de análisis que ya tienes
+        SingleChoiceAnalyzer.analyze(jsonNode, questions);
+
+        return questions; // Retornamos la lista de preguntas procesadas
+    }
+
+    @PostMapping("/analyzeCoursePresentation")
+    public List<Slide> analyzeCoursePresentation(@RequestBody JsonNode jsonNode) throws Exception {
+        JsonNode coursePresentationNode = jsonNode.get("params").get("presentation").get("slides");
+
+        List<Slide> slides = new ArrayList<>();
+        for (JsonNode slideNode : coursePresentationNode) {
+            Slide slide = new Slide();
+            List<Element> elements = new ArrayList<>();
+            
+            // Recorrer los elementos dentro de cada diapositiva
+            if(slideNode.has("elements")){
+                for (JsonNode elementNode : slideNode.get("elements")) {
+                    Element element = new Element();
+                    
+                    String library = elementNode.get("action").get("library").asText();
+                    JsonNode params = elementNode.get("action").get("params");
+                    
+                    // Procesar según el tipo de elemento
+                    switch (library) {
+                        case "H5P.AdvancedText 1.1":
+                            element.setType("Text");
+                            element.setText(params.get("text").asText());
+                            break;
+                            
+                        case "H5P.Image 1.1":
+                            element.setType("Image");
+                            element.setImagePath(params.get("file").get("path").asText());
+                            break;
+                            
+                        case "H5P.MultiChoice 1.16":
+                            element.setType("MultiChoice");
+                            List<Question> questions = new ArrayList<>();
+    
+                            // Llamamos al método de análisis que ya tienes
+                            MultiChoiceAnalyzer.analyze(elementNode.get("action"), questions);
+                            element.setParams(questions);
+                            break;
+                            
+                        // case "H5P.TrueFalse 1.8":
+                        //     element.setType("TrueFalse");
+                        //     element.setQuestion(params.get("question").asText());
+                        //     element.setCorrect(params.get("correct").asBoolean());
+                        //     break;
+                            
+                        // Puedes agregar más casos según los tipos que necesites procesar
+                    }
+                    
+                    elements.add(element);
+                }
+            }
+            
+            
+            slide.setElements(elements);
+            slides.add(slide);
+        }
+        
+
+        return slides; // Retornamos la lista de preguntas procesadas
+    }
+
+    @PostMapping("/insertSubactividad")
+    public String insertSubactividad(@RequestParam String idSubact, @RequestParam String oaid,  @RequestParam String idTopico,
+     @RequestBody List<String> tipoDeActividades) {
+        
+        
+        return oaid;
+
+
+    }
+
+    @PostMapping("/insertEjemplo")
+    public String insertEjemplo(@RequestParam String idEjemplo, @RequestParam String oaid,  @RequestParam String idTopico,
+     @RequestBody List<String> tipoDeActividades) {
+        
+        
+        return oaid;
+
+
     }
 
     @PostMapping("/insertIndividual")
