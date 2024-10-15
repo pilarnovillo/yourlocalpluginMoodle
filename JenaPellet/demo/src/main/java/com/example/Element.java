@@ -4,6 +4,7 @@ public class Element {
 
     private String library;
     private String type;
+    private int id;
     
     private Object params; // Puede ser un objeto que se especialice según el tipo de acción (AdvancedText, Image, MultiChoice, etc.)
     private String text;
@@ -27,6 +28,14 @@ public class Element {
 
     public void setLibrary(String library) {
         this.library = library;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Object getParams() {

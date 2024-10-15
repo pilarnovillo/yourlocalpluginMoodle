@@ -3,19 +3,28 @@ package com.example;
 import java.util.List;
 
 public class NodeDto {
-    private String name;
+    private String nombre;
+    private String id;
     private String fullPath;
     private int level;
     private String relation;
     private List<NodeDto> children;
 
     // Getters y Setters
-    public String getName() {
-        return name;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNombre(String name) {
+        this.nombre = name;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getFullPath() {

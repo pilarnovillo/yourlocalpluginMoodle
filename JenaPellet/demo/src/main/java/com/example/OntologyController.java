@@ -72,6 +72,7 @@ public class OntologyController {
         
     }
 
+    @CrossOrigin(origins = "http://localhost")
     @GetMapping("/startService")
     public String startService(@RequestParam String oaidParam) throws Exception{
         // Procesa los parámetros recibidos
@@ -116,7 +117,7 @@ public class OntologyController {
 
         IRI ontoOAIRI = IRI.create("http://www.semanticweb.org/valer/ontologies/OntoOA");
         // Map the IRI of the imported ontology to a local file path
-        File ontoOA = new File("C:\\Users\\piluc\\Downloads\\OntoOA vacia.owl");
+        File ontoOA = new File("C:\\Users\\piluc\\Downloads\\BASE 2 OntoOA y OntoT.owl");
         SimpleIRIMapper iriMapperOntoOA = new SimpleIRIMapper(ontoOAIRI, IRI.create(ontoOA));
         // Add the IRIMapper to the ontology manager
         manager.getIRIMappers().add(iriMapperOntoOA);
@@ -144,6 +145,7 @@ public class OntologyController {
         return "Se recibieron los parámetros: " + oaid;
     }
 
+    @CrossOrigin(origins = "http://localhost")
     @GetMapping("/razonar")
     public String razonar(@RequestParam String ontologia) throws Exception {
         Stopwatch stopwatch = Stopwatch.createStarted();
@@ -212,6 +214,7 @@ public class OntologyController {
         return individualsList;
     }
 
+    @CrossOrigin(origins = "http://localhost")
     @GetMapping("/getOATopics")
     public List<String> getOATopics(@RequestParam String oaid) {
         // SELECT * WHERE { 
@@ -240,6 +243,34 @@ public class OntologyController {
 
     }
 
+    @CrossOrigin(origins = "http://localhost")
+    @GetMapping("/getOAUnidad")
+    public String getOAUnidad(@RequestParam String oaid) {
+        String unidad="";
+        OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
+
+        // Obtén la referencia a la clase Unidad (sustituye con el IRI adecuado de la clase Unidad)
+        OWLClass unidadClass = dataFactory.getOWLClass(IRI.create(baseIRI+"Unidad"));
+
+        // Obtener los individuos de la clase Unidad
+        NodeSet<OWLNamedIndividual> individualsNodeSet = reasonerConocimiento.getInstances(unidadClass, false);
+
+        // Extraer los individuos de la clase
+        Set<OWLNamedIndividual> individuals = individualsNodeSet.getFlattened();
+
+        // Verificar si hay individuos y obtener el primero
+        if (!individuals.isEmpty()) {
+            OWLNamedIndividual firstIndividual = individuals.iterator().next();
+            unidad = firstIndividual.getIRI().getShortForm();
+            System.out.println("Primer individuo de la clase Unidad: " + firstIndividual);
+        } else {
+            System.out.println("No hay individuos de la clase Unidad.");
+        }
+        return unidad;
+
+    }
+
+    @CrossOrigin(origins = "http://localhost")
     @GetMapping("/getOARAAsignatura")
     public List<String> getOARAAsignatura(@RequestParam String oaid) {
         // SELECT * WHERE { 
@@ -253,12 +284,12 @@ public class OntologyController {
         OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
         OWLClass oaClass = dataFactory.getOWLClass(IRI.create(baseIRI + "OA"));
 
-        for (OWLNamedIndividual oaIndividual : reasonerOntoU.getInstances(oaClass, false).getFlattened()) {
+        for (OWLNamedIndividual oaIndividual : reasonerConocimiento.getInstances(oaClass, false).getFlattened()) {
             if (oaIndividual.getIRI().getShortForm().equals(oaid)) {
                 OWLObjectProperty oaTieneComponente = dataFactory.getOWLObjectProperty(IRI.create(baseIRI + "oaTieneComponente"));
-                for (OWLNamedIndividual ra : reasonerOntoU.getObjectPropertyValues(oaIndividual, oaTieneComponente).getFlattened()) {
+                for (OWLNamedIndividual ra : reasonerConocimiento.getObjectPropertyValues(oaIndividual, oaTieneComponente).getFlattened()) {
                     OWLObjectProperty raOARefinaRAAsignatura = dataFactory.getOWLObjectProperty(IRI.create(baseIRI + "raOARefinaRAAsignatura"));
-                    for (OWLNamedIndividual raasig : reasonerOntoU.getObjectPropertyValues(ra, raOARefinaRAAsignatura).getFlattened()) {
+                    for (OWLNamedIndividual raasig : reasonerConocimiento.getObjectPropertyValues(ra, raOARefinaRAAsignatura).getFlattened()) {
                         raasigDeOA.add(raasig.getIRI().getShortForm());
                     }
                 }
@@ -302,9 +333,10 @@ public class OntologyController {
                 asignaturaDto = new AsignaturaDto(asignatura, asignaturaIRI);
 
                 List<UnidadDto> unidadesDto = getUnidadesDeAsignatura(asignaturaIRI);
-                List<String> raAsignaturaList = getRAAsignaturaList(asignaturaIRI);
+                List<RAAsignaturaDto> raAsignaturaList = getRAAsignaturaList(asignaturaIRI);
                 asignaturaDto.setUnidades(unidadesDto);
                 asignaturaDto.setRAAsignaturaList(raAsignaturaList);
+                asignaturaDto.setVerbosList(getVerbos());
                 return new ResponseEntity<>(asignaturaDto, HttpStatus.OK); // Retorna la lista en formato JSON
             } else {
                 System.out.println("No se encontró ninguna asignatura con el nombre " + asignatura);
@@ -318,19 +350,62 @@ public class OntologyController {
 
     
     
-    private List<String> getRAAsignaturaList(String asignatura) {
+    private List<RAAsignaturaDto> getRAAsignaturaList(String asignatura) {
         OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
         OWLClass asignaturaClass = dataFactory.getOWLClass(IRI.create(baseOntoU+"Asignatura"));
 
-        List<String> raAsignaturaList = new ArrayList<>();
+        List<RAAsignaturaDto> raAsignaturaList = new ArrayList<>();
 
         for (OWLNamedIndividual asignaturaIndividual : reasonerOntoU.getInstances(asignaturaClass, false).getFlattened()) {
             if (asignaturaIndividual.getIRI().getShortForm().equals(asignatura)) {
                 OWLObjectProperty asignaturaTieneRAAsignatura = dataFactory.getOWLObjectProperty(IRI.create(baseOntoU+"asignaturaTieneRAAsignatura"));
-                for (OWLNamedIndividual raAsignatura : reasonerOntoU.getObjectPropertyValues(asignaturaIndividual, asignaturaTieneRAAsignatura).getFlattened()) {
-                    System.out.println("raAsignatura");
-                    System.out.println(raAsignatura.getIRI().getShortForm());
-                    raAsignaturaList.add(raAsignatura.getIRI().getShortForm());
+                for (OWLNamedIndividual raAsignaturaIndividual : reasonerOntoU.getObjectPropertyValues(asignaturaIndividual, asignaturaTieneRAAsignatura).getFlattened()) {
+                    RAAsignaturaDto raAsignaturaDto = new RAAsignaturaDto();
+                    raAsignaturaDto.setId(raAsignaturaIndividual.getIRI().getShortForm());
+
+                    // Identificar la propiedad de datos (nombre)
+                    OWLDataProperty nombrePropiedad = dataFactory.getOWLDataProperty(IRI.create(baseOntoU + "nombre"));
+
+                    Optional<OWLLiteral> nombreRAAsignatura = ontologyOntoU.getDataPropertyAssertionAxioms(raAsignaturaIndividual)
+                                    .stream()
+                                    .filter(axiom -> axiom.getProperty().equals(nombrePropiedad))
+                                    .map(OWLDataPropertyAssertionAxiom::getObject)
+                                    .findFirst();
+
+                    if (nombreRAAsignatura.isPresent()) {
+                        System.out.println("El nombre actual es: " + nombreRAAsignatura.get().getLiteral());
+                        raAsignaturaDto.setNombre(nombreRAAsignatura.get().getLiteral());
+                    } else {
+                        System.out.println("No se encontró ningún valor para el nombre.");
+                        raAsignaturaDto.setNombre(raAsignaturaIndividual.getIRI().getShortForm()+"sin nombre");
+                    }
+                    
+                    // :raTieneVerbo
+                    OWLObjectProperty raTieneVerbo = dataFactory.getOWLObjectProperty(IRI.create(baseOntoU+"raTieneVerbo"));
+                    for (OWLNamedIndividual verboIndividual : reasonerOntoU.getObjectPropertyValues(raAsignaturaIndividual, raTieneVerbo).getFlattened()) {
+                        VerboDto verboDto = new VerboDto();
+                        verboDto.setId(verboIndividual.getIRI().getShortForm());
+                        Optional<OWLLiteral> nombreVerbo = ontologyOntoU.getDataPropertyAssertionAxioms(verboIndividual)
+                                    .stream()
+                                    .filter(axiom -> axiom.getProperty().equals(nombrePropiedad))
+                                    .map(OWLDataPropertyAssertionAxiom::getObject)
+                                    .findFirst();
+                        if (nombreVerbo.isPresent()) {
+                            verboDto.setNombre(nombreVerbo.get().getLiteral());
+                        } else {
+                            verboDto.setNombre(verboIndividual.getIRI().getShortForm()+"sin nombre");
+                        }
+
+                        // :verboPerteneceANivel
+                        OWLObjectProperty verboPerteneceANivel = dataFactory.getOWLObjectProperty(IRI.create(baseOntoU+"verboPerteneceANivel"));
+                        for (OWLNamedIndividual nivelIndividual : reasonerOntoU.getObjectPropertyValues(verboIndividual, verboPerteneceANivel).getFlattened()) {
+                            verboDto.setNivel(nivelIndividual.getIRI().getShortForm());
+                        }
+                        raAsignaturaDto.setVerbo(verboDto);
+                    }
+
+                    raAsignaturaList.add(raAsignaturaDto);
+                    
                 }
                 break;
             }
@@ -504,6 +579,52 @@ public class OntologyController {
         return topicoDto;  // Devuelve el tópico con las subcategorías procesadas
     }
 
+    @CrossOrigin(origins = "http://localhost")
+    @GetMapping("/getVerbos")
+    public List<VerboDto> getVerbos() {
+        List<VerboDto> listaVerboDtos = new ArrayList<>();
+        OWLDataFactory dataFactory = OWLManager.getOWLDataFactory();
+
+        // Obtén la referencia a la clase 
+        OWLClass verboClass = dataFactory.getOWLClass(IRI.create(baseOntoU+"Verbo"));
+
+        // Obtener los individuos de la clase Unidad
+        NodeSet<OWLNamedIndividual> individualsNodeSet = reasonerOntoU.getInstances(verboClass, false);
+
+        // Extraer los individuos de la clase
+        // Set<OWLNamedIndividual> individuals = individualsNodeSet.getFlattened();
+        
+        // Recorrer los nodos e individuos
+        for (Node<OWLNamedIndividual> node : individualsNodeSet) {
+            for (OWLNamedIndividual verboIndividual : node.getEntities()) {
+                VerboDto verboDto = new VerboDto();
+                verboDto.setId(verboIndividual.getIRI().getShortForm());
+                
+                // Identificar la propiedad de datos (nombre)
+                OWLDataProperty nombrePropiedad = dataFactory.getOWLDataProperty(IRI.create(baseOntoU + "nombre"));
+
+                Optional<OWLLiteral> nombreVerbo = ontologyOntoU.getDataPropertyAssertionAxioms(verboIndividual)
+                                .stream()
+                                .filter(axiom -> axiom.getProperty().equals(nombrePropiedad))
+                                .map(OWLDataPropertyAssertionAxiom::getObject)
+                                .findFirst();
+
+                if (nombreVerbo.isPresent()) {
+                    verboDto.setNombre(nombreVerbo.get().getLiteral());
+                } 
+
+                // :verboPerteneceANivel
+                OWLObjectProperty verboPerteneceANivel = dataFactory.getOWLObjectProperty(IRI.create(baseOntoU+"verboPerteneceANivel"));
+                for (OWLNamedIndividual nivelIndividual : reasonerOntoU.getObjectPropertyValues(verboIndividual, verboPerteneceANivel).getFlattened()) {
+                    verboDto.setNivel(nivelIndividual.getIRI().getShortForm());
+                }
+                listaVerboDtos.add(verboDto);
+            }
+        }
+
+        return listaVerboDtos;
+
+    }
 
     // Method to insert an axiom into the ontology
     @PostMapping("/insertAxiom")
@@ -732,6 +853,7 @@ public class OntologyController {
         }
     }
 
+    @CrossOrigin(origins = "http://localhost")
     @PostMapping("/insertUnidad")
     public String insertUnidad(@RequestParam String unidad) {
         try {
@@ -764,6 +886,7 @@ public class OntologyController {
         }
     }
 
+    @CrossOrigin(origins = "http://localhost")
     @PostMapping("/linkRAAsignaturaToOA")
     public String linkRAAsignaturaToOA(@RequestParam String oaid, @RequestParam String idRAAsignatura) {
         try {
@@ -791,17 +914,56 @@ public class OntologyController {
             // Create relationships
             manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(raOARefinaRAAsignatura, raOA, resultadoAprendizajeAsignatura));
 
+
+            // OntoU
+            OWLOntologyManager managerOntologyOntoU = ontologyOntoU.getOWLOntologyManager();
+            OWLDataFactory dataFactoryOntologyOntoU = managerOntologyOntoU.getOWLDataFactory();
+
+            OWLNamedIndividual raAsignaturaIndividualOntoU = dataFactoryOntologyOntoU.getOWLNamedIndividual(IRI.create(baseOntoU + idRAAsignatura));
+            
+            // :raTieneVerbo
+            OWLObjectProperty raTieneVerboOntoU = dataFactoryOntologyOntoU.getOWLObjectProperty(IRI.create(baseOntoU+"raTieneVerbo"));
+            for (OWLNamedIndividual verboIndividualOntoU : reasonerOntoU.getObjectPropertyValues(raAsignaturaIndividualOntoU, raTieneVerboOntoU).getFlattened()) {
+                //Crear Verbo
+                OWLNamedIndividual verboIndividual = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + verboIndividualOntoU.getIRI().getShortForm()));
+                OWLClass verboOwlClass = dataFactory.getOWLClass(IRI.create(baseIRI  + "Verbo"));
+
+                // Create a Class Assertion Axiom (individual is an instance of the class)
+                OWLClassAssertionAxiom classAssertionVerbo = dataFactory.getOWLClassAssertionAxiom(verboOwlClass, verboIndividual);
+                // Apply the change (Add the Axiom to the Ontology)
+                manager.addAxiom(ontologyConocimiento, classAssertionVerbo);
+
+                // Create relationships verbo y ra
+                OWLObjectProperty raTieneVerbo = dataFactory.getOWLObjectProperty(IRI.create(baseIRI+"raTieneVerbo"));
+                manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(raTieneVerbo, resultadoAprendizajeAsignatura, verboIndividual));
+
+
+                // :verboPerteneceANivel
+                OWLObjectProperty verboPerteneceANivelOntoU = dataFactoryOntologyOntoU.getOWLObjectProperty(IRI.create(baseOntoU+"verboPerteneceANivel"));
+                for (OWLNamedIndividual nivelIndividualOntoU : reasonerOntoU.getObjectPropertyValues(verboIndividualOntoU, verboPerteneceANivelOntoU).getFlattened()) {
+                    // Create relationships verbo y nivel
+                    OWLObjectProperty verboPerteneceANivel = dataFactory.getOWLObjectProperty(IRI.create(baseIRI+"verboPerteneceANivel"));
+                    OWLNamedIndividual nivelIndividual = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + nivelIndividualOntoU.getIRI().getShortForm()));
+                    manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(verboPerteneceANivel, verboIndividual, nivelIndividual));
+
+                }
+                
+            }
+
+
             // Save ontology after modification if necessary
             manager.saveOntology(ontologyConocimiento);
 
 
-            return "Topic linked successfully.";
+            return "RA linked successfully.";
         } catch (Exception e) {
             e.printStackTrace();
             return "Failed to link Topic. Error: " + e.getMessage();
         }
     }
 
+    //TODO eliminar verbo y relaciones
+    @CrossOrigin(origins = "http://localhost")
     @PostMapping("/unlinkRAAsignaturaToOA")
     public String unlinkRAAsignaturaToOA(@RequestParam String oaid, @RequestParam String idRAAsignatura) {
         try {
@@ -832,14 +994,50 @@ public class OntologyController {
             // Save ontology after modification if necessary
             manager.saveOntology(ontologyConocimiento);
 
-            return "Topic unlinked successfully.";
+            return "RA unlinked successfully.";
         } catch (Exception e) {
             e.printStackTrace();
             return "Failed to unlink Topic. Error: " + e.getMessage();
         }
     }
 
+    @CrossOrigin(origins = "http://localhost")
+    @PostMapping("/createVerbo")
+    public String createVerbo(@RequestParam String verboId, @RequestParam String nivel) throws OWLOntologyStorageException {
 
+        // Get OWL Data Factory and Ontology Manager
+        OWLOntologyManager manager = ontologyConocimiento.getOWLOntologyManager();
+        OWLDataFactory dataFactory = manager.getOWLDataFactory();
+
+        //Crear individuo Tema 
+        OWLNamedIndividual verboIndividual = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + verboId));
+        OWLClass verboOwlClass = dataFactory.getOWLClass(IRI.create(baseIRI  + "Verbo"));
+
+        // Create a Class Assertion Axiom (individual is an instance of the class)
+        OWLClassAssertionAxiom classAssertion = dataFactory.getOWLClassAssertionAxiom(verboOwlClass, verboIndividual);
+
+        // Apply the change (Add the Axiom to the Ontology)
+        manager.addAxiom(ontologyConocimiento, classAssertion);
+
+        // Create relationships verbo y nivel
+        OWLObjectProperty verboPerteneceANivel = dataFactory.getOWLObjectProperty(IRI.create(baseIRI+"verboPerteneceANivel"));
+        OWLNamedIndividual nivelIndividual = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + nivel));
+        manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(verboPerteneceANivel, verboIndividual, nivelIndividual));
+
+        // Create relationships verbo y raOA
+        OWLObjectProperty raTieneVerbo = dataFactory.getOWLObjectProperty(IRI.create(baseIRI+"raTieneVerbo"));
+        OWLNamedIndividual raOAIndividual = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + "ResultadoAprendizajeOA" + oaid));
+        manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(raTieneVerbo, raOAIndividual, verboIndividual));
+
+
+        manager.saveOntology(ontologyConocimiento);
+
+
+        return "Successfully created Verb";
+
+    }
+
+    @CrossOrigin(origins = "http://localhost")
     @PostMapping("/createTopicsRelations")
     public String createTopicsRelations(@RequestBody List<NodeDto> nodes) throws OWLOntologyStorageException {
         // Get OWL Data Factory and Ontology Manager
@@ -850,7 +1048,7 @@ public class OntologyController {
 
         // Aquí puedes procesar el array de nodos
         for (NodeDto node : nodes) {
-            String temaId = node.getName();
+            String temaId = node.getId();
             processNode(node, 0, null, manager, dataFactory, temaId);  // Nivel inicial 0
             // Procesa los datos de cada nodo
         }
@@ -861,7 +1059,7 @@ public class OntologyController {
     // Método recursivo para procesar nodos y sus hijos
     private void processNode(NodeDto node, int level, String parent, OWLOntologyManager manager, OWLDataFactory dataFactory, String temaId) throws OWLOntologyStorageException {
         // Procesar el nodo actual
-        System.out.println("Node Name: " + node.getName() + ", Level: " + level+", Node Parent: " + parent+", Node relation: " + node.getRelation());
+        System.out.println("Node Name: " + node.getNombre() + ", Level: " + level+", Node Parent: " + parent+", Node relation: " + node.getRelation());
 
         // Definir las propiedades de objeto de Tema
         OWLObjectProperty temaContieneTopico = dataFactory.getOWLObjectProperty(IRI.create(baseIRI + "temaContieneTopico"));
@@ -871,7 +1069,7 @@ public class OntologyController {
         if (level == 0) {//es un Tema
             
             //Crear individuo Tema 
-            OWLNamedIndividual tema = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + node.getName()));
+            OWLNamedIndividual tema = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + node.getId()));
             OWLClass temaOwlClass = dataFactory.getOWLClass(IRI.create(baseIRI  + "Tema"));
 
             // Create a Class Assertion Axiom (individual is an instance of the class)
@@ -895,11 +1093,11 @@ public class OntologyController {
             manager.saveOntology(ontologyConocimiento);
         }
         else{//Es un Topico
-            OWLNamedIndividual topico = dataFactory.getOWLNamedIndividual(IRI.create(baseOntoT + node.getName()));
+            OWLNamedIndividual topico = dataFactory.getOWLNamedIndividual(IRI.create(baseOntoT + node.getId()));
             OWLObjectProperty topicoPerteneceATema = dataFactory.getOWLObjectProperty(IRI.create(baseIRI + "topicoPerteneceATema"));
 
             //Crear individuo EpisodioDeAprendizaje 
-            OWLNamedIndividual episodioDeAprendizaje = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI +"EpisodioDeAprendizaje_" + node.getName()));
+            OWLNamedIndividual episodioDeAprendizaje = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI +"EpisodioDeAprendizaje_" + node.getId()));
             OWLClass episodioDeAprendizajeOwlClass = dataFactory.getOWLClass(IRI.create(baseIRI  + "EpisodioDeAprendizaje"));
             // Create a Class Assertion Axiom (individual is an instance of the class)
             OWLClassAssertionAxiom classAssertionEpisodioDeAprendizaje = dataFactory.getOWLClassAssertionAxiom(episodioDeAprendizajeOwlClass, episodioDeAprendizaje);
@@ -927,7 +1125,7 @@ public class OntologyController {
                     manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(topicoEsSoporteDeTopico, topico, parentTopicoIndividual));
 
                     //Crear individuo EpisodioDeAprendizaje 
-                    OWLNamedIndividual episodioSoporte = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI +"EpisodioSoporte_" + node.getName()));
+                    OWLNamedIndividual episodioSoporte = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI +"EpisodioSoporte_" + node.getId()));
                     OWLClass episodioSoportejeOwlClass = dataFactory.getOWLClass(IRI.create(baseIRI  + "EpisodioSoporte"));
                     // Create a Class Assertion Axiom (individual is an instance of the class)
                     OWLClassAssertionAxiom classAssertionEpisodioSoporte = dataFactory.getOWLClassAssertionAxiom(episodioSoportejeOwlClass, episodioSoporte);
@@ -961,11 +1159,12 @@ public class OntologyController {
         if (node.getChildren() != null && !node.getChildren().isEmpty()) {
             for (NodeDto child : node.getChildren()) {
                 // Llamada recursiva para procesar cada child
-                processNode(child, level + 1, node.getName(), manager, dataFactory, temaId);
+                processNode(child, level + 1, node.getId(), manager, dataFactory, temaId);
             }
         }
     }
 
+    @CrossOrigin(origins = "http://localhost")
     @PostMapping("/setOrdenDeDesarrollo")
     public String setOrdenDeDesarrollo(@RequestBody List<String> topicos) {
         try {
@@ -1029,12 +1228,18 @@ public class OntologyController {
 
         return questions; // Retornamos la lista de preguntas procesadas
     }
+//CrossWord Video guardar Tipo Directo (sin analiis)
+//Accordion tomar como solo lectura
+//Column puede tener de todo adentro incluso Accordion y CoursePresentation
+//Questionarie pueden ser para acts de desarrollo Essey para Tesis?
+//Caso de Estudio Tormenta de Ideas, Busqueda en la Web? cual podria representarlas? buscar si en el texto aparecen esas palabras?
 
     @PostMapping("/analyzeCoursePresentation")
     public List<Slide> analyzeCoursePresentation(@RequestBody JsonNode jsonNode) throws Exception {
         JsonNode coursePresentationNode = jsonNode.get("params").get("presentation").get("slides");
 
         List<Slide> slides = new ArrayList<>();
+        var elementId = 1;
         for (JsonNode slideNode : coursePresentationNode) {
             Slide slide = new Slide();
             List<Element> elements = new ArrayList<>();
@@ -1043,13 +1248,17 @@ public class OntologyController {
             if(slideNode.has("elements")){
                 for (JsonNode elementNode : slideNode.get("elements")) {
                     Element element = new Element();
-                    
+                    element.setId(elementId);
+                    elementId++;
                     String library = elementNode.get("action").get("library").asText();
                     JsonNode params = elementNode.get("action").get("params");
                     
+                    element.setLibrary(library);
+
                     // Procesar según el tipo de elemento
                     switch (library) {
                         case "H5P.AdvancedText 1.1":
+                            
                             element.setType("Text");
                             element.setText(params.get("text").asText());
                             break;
@@ -1066,6 +1275,10 @@ public class OntologyController {
                             // Llamamos al método de análisis que ya tienes
                             MultiChoiceAnalyzer.analyze(elementNode.get("action"), questions);
                             element.setParams(questions);
+                            break;
+
+                        case "H5P.Video 1.6":
+                            element.setType("Video");
                             break;
                             
                         // case "H5P.TrueFalse 1.8":
@@ -1092,20 +1305,198 @@ public class OntologyController {
 
     @PostMapping("/insertSubactividad")
     public String insertSubactividad(@RequestParam String idSubact, @RequestParam String oaid,  @RequestParam String idTopico,
-     @RequestBody List<String> tipoDeActividades) {
+     @RequestBody JsonNode jsonNode, @RequestParam String library) throws Exception {
+        // Decodificar la cadena codificada en URL
+        // library = URLDecoder.decode(library, "UTF-8");
+        System.out.println("library:");
+        System.out.println(library);
+
+        OWLOntologyManager manager = ontologyConocimiento.getOWLOntologyManager();
+        OWLDataFactory dataFactory = manager.getOWLDataFactory();
+
+        // Create the individual and the class
+        OWLNamedIndividual subactividad = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + "Subactividad_"+idSubact));
+        OWLClass subactividadOwlClass = dataFactory.getOWLClass(IRI.create(baseIRI  + "Subactividad"));
         
-        
-        return oaid;
+        // Create a Class Assertion Axiom (individual is an instance of the class)
+        OWLClassAssertionAxiom classAssertion = dataFactory.getOWLClassAssertionAxiom(subactividadOwlClass, subactividad);
+
+        // Apply the change (Add the Axiom to the Ontology)
+        manager.addAxiom(ontologyConocimiento, classAssertion);
+
+        OWLNamedIndividual topico = dataFactory.getOWLNamedIndividual(IRI.create(baseOntoT + idTopico));
+
+        // Create Object Properties
+        OWLObjectProperty subactividadAyudaAComprenderTopico = dataFactory.getOWLObjectProperty(IRI.create(baseIRI + "subactividadAyudaAComprenderTopico"));
+
+        // Create relationships
+        manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(subactividadAyudaAComprenderTopico, subactividad, topico));
+
+
+        //:actividadSeComponeDeSubactividad
+        OWLNamedIndividual actividad = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + "Actividad"+ oaid));
+
+        // Create Object Properties
+        OWLObjectProperty actividadSeComponeDeSubactividad = dataFactory.getOWLObjectProperty(IRI.create(baseIRI + "actividadSeComponeDeSubactividad"));
+
+        // Create relationships
+        manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(actividadSeComponeDeSubactividad, actividad, subactividad));
+
+
+        switch (library) {
+            case "H5P.AdvancedText 1.1":
+                Element elementText = new Element();
+                elementText.setId(1);
+                elementText.setType("Text");
+                crearTipoActividad(elementText, idSubact);
+                break;
+                
+            case "H5P.Image 1.1":
+                
+                break;
+                
+            case "H5P.MultiChoice 1.16":
+                List<Question> questions = new ArrayList<>();
+                // Llamamos al método de análisis que ya tienes
+                MultiChoiceAnalyzer.analyze(jsonNode, questions);
+                Element elementMC = new Element();
+                elementMC.setId(1);
+                elementMC.setType("MultiChoice");
+                elementMC.setParams(questions);
+                crearTipoActividad(elementMC, idSubact);
+                break;
+
+            case "H5P.Video 1.6":
+                Element elementVideo = new Element();
+                elementVideo.setId(1);
+                elementVideo.setType("Video");
+                crearTipoActividad(elementVideo, idSubact);
+                break;
+
+            case "H5P.CoursePresentation 1.25":
+                System.out.println("insideeee");
+                List<Slide> slides = analyzeCoursePresentation(jsonNode);
+                
+                for(Slide slide: slides){
+                    for(Element elementCP: slide.getElements()){
+                        System.out.println("Crear TipoActividad:");
+                        System.out.println(elementCP.getType());
+                        crearTipoActividad(elementCP, idSubact);
+                    }
+                }
+                
+                break;  
+            
+                
+        }
+
+        // Save ontology after modification if necessary
+        manager.saveOntology(ontologyConocimiento);
+        return "Created Actividad con Exito";
 
 
     }
 
+    private void crearTipoActividad(Element element, String idSubact) {
+        OWLOntologyManager manager = ontologyConocimiento.getOWLOntologyManager();
+        OWLDataFactory dataFactory = manager.getOWLDataFactory();
+        OWLNamedIndividual subactividad = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + "Subactividad_"+idSubact));
+
+        // Create Object Properties
+        OWLObjectProperty subactividadUtilizaTipoActividad = dataFactory.getOWLObjectProperty(IRI.create(baseIRI + "subactividadUtilizaTipoActividad"));
+
+        
+        OWLClassAssertionAxiom classAssertion;
+        int elementId = element.getId();
+        switch (element.getType()) {
+            case "MultiChoice":
+                // Create the individual and the class
+                OWLNamedIndividual multipleOpcionActividad = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + "MultipleOpcionActividad_"+idSubact+"_"+elementId));
+                OWLClass multipleOpcionActividadOwlClass = dataFactory.getOWLClass(IRI.create(baseIRI  + "MultipleOpcionActividad"));
+                
+                // Create a Class Assertion Axiom (individual is an instance of the class)
+                classAssertion = dataFactory.getOWLClassAssertionAxiom(multipleOpcionActividadOwlClass, multipleOpcionActividad);
+
+                // Apply the change (Add the Axiom to the Ontology)
+                manager.addAxiom(ontologyConocimiento, classAssertion);
+
+                // Create relationships
+                manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(subactividadUtilizaTipoActividad, subactividad, multipleOpcionActividad));
+
+                
+                break;
+            
+            case "Video":
+                // Create the individual and the class
+                OWLNamedIndividual verVideoActividad = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + "VerVideoActividad_"+idSubact+"_"+elementId));
+                OWLClass verVideoActividadOwlClass = dataFactory.getOWLClass(IRI.create(baseIRI  + "VerVideoActividad"));
+                
+                // Create a Class Assertion Axiom (individual is an instance of the class)
+                classAssertion = dataFactory.getOWLClassAssertionAxiom(verVideoActividadOwlClass, verVideoActividad);
+
+                // Apply the change (Add the Axiom to the Ontology)
+                manager.addAxiom(ontologyConocimiento, classAssertion);
+
+                // Create relationships
+                manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(subactividadUtilizaTipoActividad, subactividad, verVideoActividad));
+
+
+                break;
+            
+            case "Text":
+                // Create the individual and the class
+                OWLNamedIndividual lecturaActividad = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + "LecturaActividad_"+idSubact+"_"+elementId));
+                OWLClass lecturaActividadOwlClass = dataFactory.getOWLClass(IRI.create(baseIRI  + "LecturaActividad"));
+                
+                // Create a Class Assertion Axiom (individual is an instance of the class)
+                classAssertion = dataFactory.getOWLClassAssertionAxiom(lecturaActividadOwlClass, lecturaActividad);
+
+                // Apply the change (Add the Axiom to the Ontology)
+                manager.addAxiom(ontologyConocimiento, classAssertion);
+
+                // Create relationships
+                manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(subactividadUtilizaTipoActividad, subactividad, lecturaActividad));
+
+
+                break;
+        
+            default:
+                break;
+            
+            
+        }
+    }
+
+    
+
     @PostMapping("/insertEjemplo")
-    public String insertEjemplo(@RequestParam String idEjemplo, @RequestParam String oaid,  @RequestParam String idTopico,
-     @RequestBody List<String> tipoDeActividades) {
+    public String insertEjemplo(@RequestParam String idEjemplo, @RequestParam String idTopico) throws OWLOntologyStorageException {
+        OWLOntologyManager manager = ontologyConocimiento.getOWLOntologyManager();
+        OWLDataFactory dataFactory = manager.getOWLDataFactory();
+
+        // Create the individual and the class
+        OWLNamedIndividual ejemplo = dataFactory.getOWLNamedIndividual(IRI.create(baseOntoT + "Ejemplo_"+idEjemplo+"_"+idTopico));
+        OWLClass ejemploOwlClass = dataFactory.getOWLClass(IRI.create(baseOntoT  + "Ejemplo"));
         
-        
-        return oaid;
+        // Create a Class Assertion Axiom (individual is an instance of the class)
+        OWLClassAssertionAxiom classAssertion = dataFactory.getOWLClassAssertionAxiom(ejemploOwlClass, ejemplo);
+
+        // Apply the change (Add the Axiom to the Ontology)
+        manager.addAxiom(ontologyConocimiento, classAssertion);
+
+        //Hacer la relacion con el Topico
+        OWLNamedIndividual topico = dataFactory.getOWLNamedIndividual(IRI.create(baseOntoT + idTopico));
+
+        // Create Object Properties
+        OWLObjectProperty ejemploEsDeTopico = dataFactory.getOWLObjectProperty(IRI.create(baseOntoT + "ejemploEsDeTopico"));
+
+        // Create relationships
+        manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(ejemploEsDeTopico, ejemplo, topico));
+
+
+        // Save ontology after modification if necessary
+        manager.saveOntology(ontologyConocimiento);
+        return "inserted Ejemplo successfully";
 
 
     }
@@ -1138,7 +1529,7 @@ public class OntologyController {
         }
     }
 
-    
+    @CrossOrigin(origins = "http://localhost")
     @GetMapping("/synchronizeReasoner")
     public void synchronizeReasoner(@RequestParam String ontologia) throws Exception {
         System.out.println("synchronizeReasoner");

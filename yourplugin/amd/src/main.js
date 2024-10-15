@@ -15,6 +15,9 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                 // Hacer algo con los datos
                 log.debug(datos);
                 var rasAsignaturaArray = datos.raAsignaturaList;
+
+                var verbosList = datos.verbosList;
+                log.debug(verbosList);
                 log.debug("CHECK IF DRAFT SAVED");
                 // Get the query string portion of the URL.
                 var queryString = window.location.search;
@@ -39,24 +42,537 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                 // Now you can access the parameters and their values from the paramsObject.
                 var paramCourseid = paramsObject['courseid'];
 
+                //Get selected Topics (topicos que ya estan en la ontologiaConocimiento)
+                var selectedTopicsFromConocimiento = [];
+                var selectedRAAsignaturaFromConocimiento = [];
+
                 var resultadoAprendizajeOA = {"raasignatura":[],
                                                 "verbo":"",
                                                 "objeto":"",
                                                 "condicion":"",
                                                 "finalidad":""
                 };
+
+                var seleccionarUnidadTitulo = document.createElement('h3');
+                seleccionarUnidadTitulo.textContent = 'Seleccionar Unidad y Topicos:';
+
+                 // Crear la opción por defecto
+                var defaultOption = document.createElement('option');
+                defaultOption.text = 'Seleccione una opción';
+                defaultOption.value = '';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+
+                 // Crear el elemento select
+                var select = document.createElement('select');
+                select.setAttribute('id', 'id_unidadSelect');
+                select.appendChild(defaultOption);
+
+                var mainDiv = document.querySelector('div[role="main"]');
+                mainDiv.insertBefore(seleccionarUnidadTitulo, mainDiv.firstChild);
+
+                seleccionarUnidadTitulo.insertAdjacentElement('afterend', select);
+
+                // Crear el elemento ul para la lista de temas y tópicos
+                var ul = document.createElement('ul');
+                ul.setAttribute('id', 'listaTemasYTopicos');
+                ul.style.listStyleType = 'none'; // Eliminar los puntos de la lista
+
+                select.insertAdjacentElement('afterend', ul);
+
+                var seleccionarRAsTitulo = document.createElement('h3');
+                seleccionarRAsTitulo.textContent = 'Seleccionar Resultados de Aprendizaje de la Asignatura:';
+
+                var checkboxesContainer = document.createElement('div'); // Add multiple select element
+                checkboxesContainer.setAttribute('id', 'resultadoAprendizaje'); // Set attributes for multiple select element
+
+                ul.insertAdjacentElement('afterend',seleccionarRAsTitulo);
+                seleccionarRAsTitulo.insertAdjacentElement('afterend',checkboxesContainer);
+
+                    // RA para OA
+                var title = document.createElement('h3'); // Título para el resultado de aprendizaje
+                title.textContent = 'Definir el resultado de aprendizaje del Objeto de Aprendizaje';
+
+                    // Campos de entrada de texto
+                // var verboInput = createTextInput('Verbo:');
+                var objetoConocimientoInput = createTextInput('Objeto de Conocimiento:');
+                var condicionInput = createTextInput('Condición:');
+                var finalidadInput = createTextInput('Finalidad:');
+
+                checkboxesContainer.insertAdjacentElement('afterend', title);
+
+                // Crear el elemento select
+                var selectNivel1 = document.createElement('select');
+                selectNivel1.setAttribute('id', 'verbonivel1');
+                selectNivel1.addEventListener('change', function(event) {
+                    if (this.value === "") {
+                        // Si se selecciona la opción predeterminada, habilita todos los selects
+                        habilitarTodosLosSelects();
+                    } else {
+                        desactivarOtrosSelects('verbonivel1');
+                        log.debug(event.target.value);
+                        guardarVerboEnOntologia(event.target.value, "Nivel1");
+                    }
+                });
+
+                  // Crear el elemento select
+                var selectNivel2 = document.createElement('select');
+                selectNivel2.setAttribute('id', 'verbonivel2');
+                selectNivel2.addEventListener('change', function(event) {
+                    if (this.value === "") {
+                        // Si se selecciona la opción predeterminada, habilita todos los selects
+                        habilitarTodosLosSelects();
+                    } else {
+                        desactivarOtrosSelects('verbonivel2');
+                        log.debug(event.target.value);
+                        guardarVerboEnOntologia(event.target.value, "Nivel2");
+                    }
+                });
+
+                // Crear el elemento select
+                var selectNivel3 = document.createElement('select');
+                selectNivel3.setAttribute('id', 'verbonivel3');
+                selectNivel3.addEventListener('change', function(event) {
+                    if (this.value === "") {
+                        // Si se selecciona la opción predeterminada, habilita todos los selects
+                        habilitarTodosLosSelects();
+                    } else {
+                        desactivarOtrosSelects('verbonivel3');
+                        log.debug(event.target.value);
+                        guardarVerboEnOntologia(event.target.value, "Nivel3");
+                    }
+                });
+
+                title.insertAdjacentElement('afterend', selectNivel1);
+                selectNivel1.insertAdjacentElement('afterend', selectNivel2);
+                // verboInput.insertAdjacentElement('afterend', selectNivel2);
+                selectNivel2.insertAdjacentElement('afterend', selectNivel3);
+                // selectNivel3.insertAdjacentElement('afterend', verboInput);
+
+                // Función para crear las opciones de un select a partir de un nivel
+                const crearSelectPorNivel = (nivel, selectId) =>{
+                    const select = document.getElementById(selectId);
+                    log.debug(select);
+                    const verbosDelNivel = verbosList.filter(verb => verb.nivel === nivel);
+
+                    // Crear la opción por defecto
+                    var defaultOptionVerbo = document.createElement('option');
+                    defaultOptionVerbo.text = 'Seleccione un verbo del '+nivel;
+                    defaultOptionVerbo.value = '';
+                    defaultOptionVerbo.disabled = false;
+                    defaultOptionVerbo.selected = true;
+
+                    select.appendChild(defaultOptionVerbo);
+
+                    // Crear opciones
+                    verbosDelNivel.forEach(verb => {
+                        const option = document.createElement('option');
+                        option.value = verb.id;
+                        option.textContent = verb.nombre;
+                        option.setAttribute("nivel", verb.nivel);
+                        select.appendChild(option);
+                    });
+                };
+
+                // Función para desactivar otros selects
+                const desactivarOtrosSelects= (selectId) =>{
+                    const selects = ["verbonivel1", "verbonivel2", "verbonivel3"];
+                    selects.forEach(id => {
+                        if (id !== selectId) {
+                            document.getElementById(id).disabled = true; // Desactiva los otros
+                        }
+                    });
+                };
+
+                // Función para habilitar todos los selects
+                const habilitarTodosLosSelects = () =>{
+                    const selects = ["verbonivel1", "verbonivel2", "verbonivel3"];
+                    selects.forEach(selectid => {
+                        document.getElementById(selectid).disabled = false; // Habilita todos
+                    });
+                };
+
+                // Función para habilitar todos los selects
+                const guardarVerboEnOntologia = (verboId, nivel) =>{
+                    //enviar a la ontologia en el momento
+                    fetch("http://localhost:8080/ontology/createVerbo", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/x-www-form-urlencoded", // O "application/json" si es necesario
+                        },
+                        body: new URLSearchParams({
+                            verboId: verboId,
+                            nivel: nivel
+                        })
+                      })
+                      .then(response => {
+                        if (!response.ok) {
+                          throw new Error("Error en la solicitud");
+                        }
+                        return response.text(); // O .json() si esperas una respuesta JSON
+                      })
+                      .then(data => {
+                        log.debug("Respuesta del servidor CreateVerbo:", data);
+                      })
+                      .catch(error => {
+                        log.debug("Error:", error);
+                      });
+                };
+
+                // Crear selects por nivel
+                crearSelectPorNivel("Nivel1", "verbonivel1");
+                crearSelectPorNivel("Nivel2", "verbonivel2");
+                crearSelectPorNivel("Nivel3", "verbonivel3");
+
+                selectNivel3.insertAdjacentElement('afterend', objetoConocimientoInput);
+                //Check if the OA already has a value for the field
+
+                objetoConocimientoInput.insertAdjacentElement('afterend', condicionInput);
+                condicionInput.insertAdjacentElement('afterend', finalidadInput);
+
+                // Create table element
+                var tablaTitulo = document.createElement('h3');
+                tablaTitulo.textContent = 'Ordenar Topicos:';
+                finalidadInput.insertAdjacentElement('afterend', tablaTitulo);
+
+                const crearTemasyTopicosCheckboxes = (temas) => {
+                    const temasList = document.createElement('div');
+                    temas.forEach(tema => {
+                        const checkboxDiv = document.createElement('div');
+                        const label = document.createElement('label');
+                        label.htmlFor = tema.id;
+                        label.textContent = tema.nombre;
+                        label.id = tema.id;
+                        checkboxDiv.appendChild(label);
+
+                        // Botón para agregar subtemas
+                        const addSubtemaButton = document.createElement('button');
+                        addSubtemaButton.textContent = '+';
+                        addSubtemaButton.style.cssText = 'background-color: transparent; border: none;'+
+                        ' color: grey; font-size: 14px; cursor: pointer; margin-left: 10px;';
+                        checkboxDiv.appendChild(addSubtemaButton);
+
+                        temasList.appendChild(checkboxDiv);
+
+                        // Iniciar la función recursiva para el primer nivel
+                        agregarNuevoTopico(checkboxDiv,tema.id, addSubtemaButton, 1, tema.id);
+
+                        // Llamar a la función recursiva para agregar tópicos
+                        agregarTopicos(tema.topicos, tema.id, temasList, 1, tema.id, "parte");
+
+                        // Llamar a la función recursiva para agregar tópicos
+                        agregarTopicos(tema.topicosSoporte, tema.id, temasList, 1, tema.id, "soporte");
+                    });
+                    return temasList;
+                };
+
+                var resultadosAprendizaje = rasAsignaturaArray;
+                log.debug("resultadosAprendizaje: "+resultadosAprendizaje);
+                const crearRAAsignaturaCheckboxes = () => {
+                    resultadosAprendizaje.forEach(function(raAsignaturaDto) {
+                        // raAsignaturaDto = raAsignaturaDto.replace("http://www.semanticweb.org/valer/ontologies/OntoOA#","");
+                        var checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.value = raAsignaturaDto.id;//.toUpperCase().replace(/\s+/g, '_'); TODO ver si es necesario
+                        if(selectedRAAsignaturaFromConocimiento.includes(raAsignaturaDto.id)){
+                            checkbox.checked = true;
+                        }
+                        var label = document.createElement('label');
+                        label.textContent = raAsignaturaDto.nombre;
+                        label.appendChild(checkbox);
+                        checkboxesContainer.appendChild(label);
+
+                        // Crear y añadir un elemento <br> después del label
+                        var br = document.createElement('br');
+                        checkboxesContainer.appendChild(br);
+
+                        //enventlistener para armar los datos que van en la ontologia
+                        checkbox.addEventListener('change', function(event) {
+                            // Check the state of the checkbox
+                            if (event.target.checked) {
+                                //enviar a la ontologia en el momento
+                                fetch("http://localhost:8080/ontology/linkRAAsignaturaToOA", {
+                                    method: "POST",
+                                    headers: {
+                                      "Content-Type": "application/x-www-form-urlencoded", // O "application/json" si es necesario
+                                    },
+                                    body: new URLSearchParams({
+                                        oaid: paramsObject['oaid'],
+                                        idRAAsignatura: event.target.value
+                                    })
+                                  })
+                                  .then(response => {
+                                    if (!response.ok) {
+                                      throw new Error("Error en la solicitud");
+                                    }
+                                    return response.text(); // O .json() si esperas una respuesta JSON
+                                  })
+                                  .then(data => {
+                                    log.debug("Respuesta del servidor:", data);
+                                  })
+                                  .catch(error => {
+                                    log.debug("Error:", error);
+                                  });
+                                resultadoAprendizajeOA["raasignatura"].push(event.target.value);
+
+                            } else {
+                                //eliminar de la ontologia en el momento
+                                fetch("http://localhost:8080/ontology/unlinkRAAsignaturaToOA", {
+                                    method: "POST",
+                                    headers: {
+                                      "Content-Type": "application/x-www-form-urlencoded", // O "application/json" si es necesario
+                                    },
+                                    body: new URLSearchParams({
+                                        oaid: paramsObject['oaid'],
+                                        idRAAsignatura: event.target.value
+                                    })
+                                  })
+                                  .then(response => {
+                                    if (!response.ok) {
+                                      throw new Error("Error en la solicitud");
+                                    }
+                                    return response.text(); // O .json() si esperas una respuesta JSON
+                                  })
+                                  .then(data => {
+                                    log.debug("Respuesta del servidor:", data);
+                                  })
+                                  .catch(error => {
+                                    log.debug("Error:", error);
+                                  });
+                                //Eliminar ra del array
+                                for (let i = resultadoAprendizajeOA["raasignatura"].length - 1; i >= 0; i--) {
+                                    if (resultadoAprendizajeOA["raasignatura"][i] === event.target.value) {
+                                        resultadoAprendizajeOA["raasignatura"].splice(i, 1);
+                                    }
+                                }
+                            }
+                            // log.debug("resultadoAprendizajeOA: "+resultadoAprendizajeOA["raasignatura"]);
+                        });
+                    });
+
+                };
+
+                // Crear el checkbox ingnorar
+                var contenedorCheckboxIgnorarRecomendaciones = document.createElement("div");
+                const checkboxIgnorarRecomendaciones = document.createElement('input');
+                checkboxIgnorarRecomendaciones.type = 'checkbox';
+                checkboxIgnorarRecomendaciones.id = 'checkboxIgnorarRecomendaciones';
+
+                const labelIgnorarRecomendaciones = document.createElement('label');
+                labelIgnorarRecomendaciones.htmlFor = 'checkboxIgnorarRecomendaciones';
+                labelIgnorarRecomendaciones.textContent = 'Ignorar recomendaciones';
+
+                // Añadir el checkbox y su etiqueta al contenedor
+                contenedorCheckboxIgnorarRecomendaciones.appendChild(checkboxIgnorarRecomendaciones);
+                contenedorCheckboxIgnorarRecomendaciones.appendChild(labelIgnorarRecomendaciones);
+
+                var buttonCargarOrden = document.createElement('button');
+                buttonCargarOrden.setAttribute('id', 'cargarOrdenTopicos');
+                buttonCargarOrden.textContent = 'Cargar Orden';
+
+                // Add event listener to button
+                buttonCargarOrden.addEventListener('click', async function() {
+                    log.debug("CLICKED cargar");
+                    log.debug("treeData inside Cargar:");
+                    log.debug(treeData);
+
+                    var topicosSeleccionadosDiv = document.getElementById('topicosSeleccionados');
+                    // Seleccionamos todos los divs con la clase "topic" dentro del div principal
+                    const topicosSeleccionados = topicosSeleccionadosDiv.querySelectorAll('.topic');
+                    // Creamos una lista de strings con el contenido de cada tópico
+                    const listaTopicos = Array.from(topicosSeleccionados).map(topico => topico.id.trim());
+                    log.debug("listaTopicos: ");
+                    log.debug(listaTopicos);
+
+                     // Realizar la solicitud POST al endpoint
+                    fetch('http://localhost:8080/ontology/createTopicsRelations', {
+                        method: 'POST', // Método HTTP POST
+                        headers: {
+                            'Content-Type': 'application/json' // Indicar que el cuerpo es JSON
+                        },
+                        body: JSON.stringify(treeData) // Convertir el array de nodes a JSON y enviarlo en el cuerpo
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.text(); // Puedes ajustar según el tipo de respuesta que esperas (JSON, texto, etc.)
+                        } else {
+                            throw new Error('Error en la solicitud');
+                        }
+                    })
+                    .then(data => {
+                        log.debug('Respuesta del servidor createTopicsRelations:', data); // Manejar la respuesta del servidor
+                        return fetch('http://localhost:8080/ontology/setOrdenDeDesarrollo', {
+                            method: 'POST', // Método HTTP POST
+                            headers: {
+                                'Content-Type': 'application/json' // Indicar que el cuerpo es JSON
+                            },
+                            body: JSON.stringify(listaTopicos) // Convertir el array de nodes a JSON y enviarlo en el cuerpo
+                        });
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.text(); // Puedes ajustar según el tipo de respuesta que esperas (JSON, texto, etc.)
+                        } else {
+                            throw new Error('Error en la solicitud');
+                        }
+                    })
+                    .then(data => {
+                        log.debug('Respuesta del servidor setOrdenDeDesarrollo:', data); // Manejar la respuesta del servidor
+
+                        if(checkboxIgnorarRecomendaciones.checked){
+                            // Redirigir a la página de h5p
+                            // window.location.href = 'http://localhost/local/yourplugin/h5pEditor.php?courseid=' + paramCourseid
+                            // + '&oaid=' + paramsObject['oaid']+"&contextid=14";
+
+                            // Datos a enviar
+                            const dataArray = ['dato1', 'dato2', 'dato3'];
+                            // Crear un formulario
+                            const form = document.createElement('form');
+                            form.method = 'POST'; // Método POST
+                            form.action = 'h5pEditor.php'; // URL de destino
+
+                            // Crear un campo oculto con los datos
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'dataArray';
+                            input.value = JSON.stringify(dataArray); // Convertir el array a JSON
+
+                            // Añadir el campo al formulario
+                            form.appendChild(input);
+
+                            // Añadir el formulario al documento y enviarlo
+                            document.body.appendChild(form);
+                            form.submit(); // El formulario realiza la redirección automáticamente
+
+                        }
+                        else{
+                            //TODO syncronizar razonador y traer recomendaciones
+                            // Crear un array de strings
+                            const mensajes = ["Error en el servidor", "No se pudo cargar el archivo",
+                                 "El usuario no está autorizado"];
+                            if(mensajes.length === 0){
+                                // Redirigir a la página de h5p
+                                window.location.href = 'http://localhost/local/yourplugin/h5pEditor.php?courseid='
+                                + paramCourseid
+                                + '&oaid=' + paramsObject['oaid']+"&contextid=14";
+                            }
+                            var contenedorMensajes = document.createElement("div");
+                            contenedorMensajes.setAttribute("id","contenedorMensajes");
+                            // Recorrer el array de mensajes
+                            mensajes.forEach((mensaje) => {
+                                // Crear un nuevo elemento p (parrafo) para cada mensaje
+                                const p = document.createElement('p');
+
+                                // Asignar el contenido del mensaje al párrafo
+                                p.textContent = mensaje;
+
+                                // Asignar el contenido del mensaje al párrafo
+                                p.textContent = mensaje;
+
+                                // Aplicar estilo en línea directamente
+                                p.style.color = "red"; // Color rojo
+                                p.style.fontWeight = "bold"; // Negrita
+
+                                // Insertar el párrafo en el div contenedor
+                                contenedorMensajes.appendChild(p);
+                            });
+                            buttonCargarOrden.insertAdjacentElement('afterend', contenedorMensajes);
+
+                        }
+
+                    })
+                    .catch(error => {
+                        log.debug('Hubo un problema con la solicitud:', error); // Manejar errores
+                    });
+
+                    // Creamos un array de objetos con el id y el textContent de cada tópico
+                    const listaTopicosIdyNombre = Array.from(topicosSeleccionados).map(topico => ({
+                        id: topico.id.trim(),
+                        nombre: topico.textContent.trim()
+                    }));
+
+                    log.debug("listaTopicosIdyNombre: ");
+                    log.debug(listaTopicosIdyNombre);
+
+                    // var selectMenutopic = document.getElementById('menutopic');
+                    // // Elimina todas las opciones del select
+                    // selectMenutopic.options.length = 0;
+                    // listaTopicosIdyNombre.forEach(topico => {
+                    //     var option = document.createElement('option');
+                    //     option.textContent = topico.nombre;
+                    //     option.value = topico.id;
+                    //     selectMenutopic.appendChild(option);
+                    // });
+
+                });
+
                 let selectedTopics = [];
                 var treeData = [];
                 const sortableTreeDiv = document.createElement('div');
+
+                const reloadSortableTreeDiv = () => {
+                    // Elimina todas las opciones del select para que las vuelva a cargar con el boton
+                    // var selectMenutopic = document.getElementById('menutopic');
+                    // selectMenutopic.options.length = 0;
+
+                    // Actualizar la vista
+                    // Inicializar el árbol y renderizar
+                    treeData = buildTreeJSON(selectedTopics);
+                    log.debug("treeData:");
+                    log.debug(treeData);
+
+                    // Llamar a la función y agregar el árbol al DOM
+                    while (sortableTreeDiv.firstChild) {
+                        sortableTreeDiv.removeChild(sortableTreeDiv.firstChild);
+                    }
+                    // const tree = document.createElement('ul');
+                    // tree.setAttribute("class","sortable");
+                    // sortableTreeDiv.appendChild(tree);
+                    const container = document.createElement('div');
+                    container.textContent = "Unidad";
+                    container.className = 'unidad';
+                    container.id = 'topicosSeleccionados';
+                    treeData.forEach(item => {
+                        const temaDiv = createDivTema(item); //createTree(item, item.name, container);
+                        createDivTopico(item, item.id, temaDiv);
+                        container.appendChild(temaDiv);
+                        new Sortable(temaDiv, {
+                            // group: {
+                            //     name: item.name,
+                            //     put: false // Asegúrate de que no puedan anidarse
+                            // },
+                            // animation: 150,
+                            // fallbackOnBody: true,
+                            // swapThreshold: 0.65,
+                            // nested: false,
+                            animation: 150,
+                            ghostClass: 'blue-background-class'
+                        });
+                    });
+                    sortableTreeDiv.appendChild(container);
+                    Sortable.create(container, {
+                        group: 'topics',
+                        animation: 150,
+                        onEnd: function(evt) {
+                            log.debug('Nuevo orden de temas/tópicos:', evt);
+                        },
+                        draggable: '.topic', // Selector para los temas
+                        handle: '.topic', // Permite arrastrar solo desde el tema
+                        swap: true, // Permite el intercambio
+                        nested: false, // Habilitar soporte para elementos anidados,
+                    });
+                    tablaTitulo.insertAdjacentElement('afterend', sortableTreeDiv);
+                    sortableTreeDiv.insertAdjacentElement('afterend', buttonCargarOrden);
+                    buttonCargarOrden.insertAdjacentElement('afterend', contenedorCheckboxIgnorarRecomendaciones);
+
+                };
+
 
                 //Variable para almacenar los topicos id seleccionados y luego mandar a la Ontologia
                 // var selectedTopics = [];
 
                 // Create form elements
                     // var selectTopicosH5P = [];
-                    var seleccionarUnidadTitulo = document.createElement('h3');
-                    seleccionarUnidadTitulo.textContent = 'Seleccionar Unidad y Topicos:';
-
                     // /**
                     //  * Obtiene todas las unidades de los contenidos mínimos en el objeto de datos.
                     //  *
@@ -131,27 +647,56 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                     //     return unidadesConTemasYTopicos;
                     // }
 
-                     // Crear la opción por defecto
-                    var defaultOption = document.createElement('option');
-                    defaultOption.text = 'Seleccione una opción';
-                    defaultOption.value = '';
-                    defaultOption.disabled = true;
-                    defaultOption.selected = true;
 
-                    // Crear el elemento select
-                    var select = document.createElement('select');
-                    select.setAttribute('id', 'id_unidadSelect');
-                    select.appendChild(defaultOption);
+                    //Get Unidad de Conocimiento si no es "" entonces ya fue definida
+                    var selectedUnidad ="";
+                    fetch(`http://localhost:8080/ontology/getOAUnidad?oaid=${encodeURIComponent("OA"+paramsObject['oaid'])}`)
+                    .then(response => response.text())
+                    .then(data => {
+                        log.debug('Success selectedUnidad:', data);
+                        selectedUnidad=data;
+                        // Cargar unidades en la lista desplegable
+                        // const unidadSelect = document.getElementById('unidadSelect');
+                        datos.unidades.forEach((unidad, index) => {
+                            const option = document.createElement('option');
+                            option.value = index; // Guardar el índice para referencia
+                            option.textContent = unidad.nombre;
+                            option.id = unidad.id;
+                            if(selectedUnidad === unidad.id){
+                                fetch(`http://localhost:8080/ontology/getOATopics?oaid=${encodeURIComponent("OA"+
+                                    paramsObject['oaid'])}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    log.debug('Success selectedTopicsFromConocimiento:', data);
+                                    selectedTopicsFromConocimiento = data;
+                                    const temasList = crearTemasyTopicosCheckboxes(datos.unidades[index].temas);
+                                    ul.appendChild(temasList);
+                                    reloadSortableTreeDiv();
+                                    log.debug(selectedTopicsFromConocimiento);
+                                })
+                                .catch(error => {
+                                    log.debug('Error:', error);
+                                });
+                                option.selected=true;
 
-                    // Cargar unidades en la lista desplegable
-                    // const unidadSelect = document.getElementById('unidadSelect');
-                    datos.unidades.forEach((unidad, index) => {
-                        const option = document.createElement('option');
-                        option.value = index; // Guardar el índice para referencia
-                        option.textContent = unidad.nombre;
-                        option.id = unidad.id;
-                        select.appendChild(option);
+                            }
+                            select.appendChild(option);
+                        });
+                        //Get OA RAAsignatura (los que ya estan en la ontologia Conocimiento)
+                        return fetch(`http://localhost:8080/ontology/getOARAAsignatura?oaid=${encodeURIComponent("OA"+
+                            paramsObject['oaid'])}`);
+                    })
+                    .then(response => response.json())
+                                .then(data => {
+                                        log.debug('Success selectedRAAsignatura:', data);
+                                        selectedRAAsignaturaFromConocimiento = data;
+
+                                        crearRAAsignaturaCheckboxes();
+                                })
+                    .catch(error => {
+                        log.debug('Error:', error);
                     });
+
 
                     // Obtener las unidades con sus temas y tópicos y añadirlas al select como opciones
                     // var unidadesConTemasYTopicos = obtenerUnidadesConTemasYTopicos(datos);
@@ -186,18 +731,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                     // });
                     // log.debug("temasTopicosDic: "+JSON.stringify(temasTopicosDic));
                     // Append form to container
-                    var mainDiv = document.querySelector('div[role="main"]');
-                    // var mform = document.getElementsByClassName("mform")[0];
-                    // // log.debug(mform);
-                    mainDiv.insertBefore(seleccionarUnidadTitulo, mainDiv.firstChild);
-                    seleccionarUnidadTitulo.insertAdjacentElement('afterend', select);
 
-                    // Crear el elemento ul para la lista de temas y tópicos
-                    var ul = document.createElement('ul');
-                    ul.setAttribute('id', 'listaTemasYTopicos');
-                    ul.style.listStyleType = 'none'; // Eliminar los puntos de la lista
-
-                    select.insertAdjacentElement('afterend', ul);
                     var selectedIndex = null;
                     // Manejar el cambio de selección de unidad
                     select.addEventListener('change', (event) => {
@@ -207,38 +741,31 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                         selectedTopics = [];
 
                         if (selectedIndex !== '') {
-                            //TODO guardar unidad en la ontologia
-                            //implement new service to store de unidad
+                            //guardar unidad en la ontologia
+                            fetch("http://localhost:8080/ontology/insertUnidad", {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/x-www-form-urlencoded", // O "application/json" si es necesario
+                                },
+                                body: new URLSearchParams({
+                                  unidad: datos.unidades[selectedIndex].id
+                                })
+                              })
+                              .then(response => {
+                                if (!response.ok) {
+                                  throw new Error("Error en la solicitud");
+                                }
+                                return response.text(); // O .json() si esperas una respuesta JSON
+                              })
+                              .then(data => {
+                                log.debug("Respuesta del servidor:", data);
+                              })
+                              .catch(error => {
+                                log.debug("Error:", error);
+                              });
 
                             const temas = datos.unidades[selectedIndex].temas;
-                            const temasList = document.createElement('div');
-
-                            temas.forEach(tema => {
-                                const checkboxDiv = document.createElement('div');
-                                const label = document.createElement('label');
-                                label.htmlFor = tema.id;
-                                label.textContent = tema.nombre;
-                                label.id = tema.id;
-                                checkboxDiv.appendChild(label);
-
-                                // Botón para agregar subtemas
-                                const addSubtemaButton = document.createElement('button');
-                                addSubtemaButton.textContent = '+';
-                                addSubtemaButton.style.cssText = 'background-color: transparent; border: none;'+
-                                ' color: grey; font-size: 14px; cursor: pointer; margin-left: 10px;';
-                                checkboxDiv.appendChild(addSubtemaButton);
-
-                                temasList.appendChild(checkboxDiv);
-
-                                // Iniciar la función recursiva para el primer nivel
-                                agregarNuevoTopico(checkboxDiv,tema.id, addSubtemaButton, 1, tema.id);
-
-                                // Llamar a la función recursiva para agregar tópicos
-                                agregarTopicos(tema.topicos, tema.id, temasList, 1, tema.id, "parte");
-
-                                // Llamar a la función recursiva para agregar tópicos
-                                agregarTopicos(tema.topicosSoporte, tema.id, temasList, 1, tema.id, "soporte");
-                            });
+                            const temasList = crearTemasyTopicosCheckboxes(temas);
 
                             ul.appendChild(temasList);
                         }
@@ -415,10 +942,14 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                                         newSubtopicDiv.style.marginLeft = `${nivel * 20}px`;
                                         const newSubtopicCheckbox = document.createElement('input');
                                         newSubtopicCheckbox.type = 'checkbox';
-                                        newSubtopicCheckbox.id = topicName;
+                                        const topicNameNormalized = topicName.trim()
+                                        .replace(/\s+/g, '_')
+                                        .replace(/[^a-zA-Z0-9_]/g, '');
+                                        newSubtopicCheckbox.id = topicNameNormalized;
+                                        newSubtopicCheckbox.setAttribute('data-name', topicName);
                                         newSubtopicCheckbox.setAttribute('data-parent', parentName);
                                         newSubtopicCheckbox.setAttribute('data-level', nivel);
-                                        newSubtopicCheckbox.setAttribute('data-tema', tema+'-'+topicName);
+                                        newSubtopicCheckbox.setAttribute('data-tema', tema+'-'+topicNameNormalized);
                                         newSubtopicCheckbox.setAttribute('data-relation', topicRelation);
                                         addEventListenerToCheckbox(newSubtopicCheckbox);
                                         newSubtopicDiv.appendChild(newSubtopicCheckbox);
@@ -445,7 +976,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                                         // Agregar el subtema al contenedor padre
                                         parentElement.appendChild(newSubtopicDiv);
 
-                                        // modalVar.hide(); // Ocultar el modal después de agregar el subtema
+                                        // TODO insertar topico en OntoU
                                     } else {
                                         log.debug('Formulario inválido');
                                     }
@@ -485,6 +1016,11 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                             const checkbox = document.createElement('input');
                             checkbox.type = 'checkbox';
                             checkbox.id = topico.id;
+                            if (selectedTopicsFromConocimiento.includes(topico.id)) {
+                                checkbox.checked=true;
+                                addTopicToJSON(topico.id, topicRelation, parentName, level, tema+'-'+topico.id, topico.nombre);
+                            }
+                            checkbox.setAttribute('data-name', topico.nombre);
                             checkbox.setAttribute('data-parent', parentName);
                             checkbox.setAttribute('data-level', level);
                             checkbox.setAttribute('data-tema', tema+'-'+topico.id);
@@ -538,6 +1074,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                             const level = e.target.getAttribute('data-level');
                             const tema = e.target.getAttribute('data-tema');
                             const topicRelation = e.target.getAttribute('data-relation');
+                            const topicName = e.target.getAttribute('data-name');
 
                             const guardarTopicoOA = (idTopico,
                                                     oaid,
@@ -555,77 +1092,28 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                                 const response = await guardarTopicoOA(topicId, paramsObject['oaid'], true);
                                 log.debug(response);
 
-                                addTopicToJSON(topicId, topicRelation, parentName, level, tema);
+                                addTopicToJSON(topicId, topicRelation, parentName, level, tema, topicName);
                                 log.debug(`Added ${topicId}-${parentName} al JSON`);
                             } else {
                                 const response = await guardarTopicoOA(topicId, paramsObject['oaid'], false);
                                 log.debug(response);
 
                                 // Lógica para eliminar del JSON si el checkbox se desmarca
-                                selectedTopics = selectedTopics.filter(topic => topic.name !== topicId);
+                                selectedTopics = selectedTopics.filter(topic => topic.id !== topicId);
                                 log.debug(`Eliminar ${topicId} del JSON`);
                             }
 
-                            // Elimina todas las opciones del select para que las vuelva a cargar con el boton
-                            var selectMenutopic = document.getElementById('menutopic');
-                            selectMenutopic.options.length = 0;
-
-                            // Actualizar la vista
-                            // Inicializar el árbol y renderizar
-                            treeData = buildTreeJSON(selectedTopics);
-                            log.debug("treeData:");
-                            log.debug(treeData);
-
-                            // Llamar a la función y agregar el árbol al DOM
-                            while (sortableTreeDiv.firstChild) {
-                                sortableTreeDiv.removeChild(sortableTreeDiv.firstChild);
-                            }
-                            // const tree = document.createElement('ul');
-                            // tree.setAttribute("class","sortable");
-                            // sortableTreeDiv.appendChild(tree);
-                            const container = document.createElement('div');
-                            container.textContent = "Unidad";
-                            container.className = 'unidad';
-                            container.id = 'topicosSeleccionados';
-                            treeData.forEach(item => {
-                                const temaDiv = createDivTema(item); //createTree(item, item.name, container);
-                                createDivTopico(item, item.name, temaDiv);
-                                container.appendChild(temaDiv);
-                                new Sortable(temaDiv, {
-                                    // group: {
-                                    //     name: item.name,
-                                    //     put: false // Asegúrate de que no puedan anidarse
-                                    // },
-                                    // animation: 150,
-                                    // fallbackOnBody: true,
-                                    // swapThreshold: 0.65,
-                                    // nested: false,
-                                    animation: 150,
-                                    ghostClass: 'blue-background-class'
-                                });
-                            });
-                            sortableTreeDiv.appendChild(container);
-                            Sortable.create(container, {
-                                group: 'topics',
-                                animation: 150,
-                                onEnd: function(evt) {
-                                    log.debug('Nuevo orden de temas/tópicos:', evt);
-                                },
-                                draggable: '.topic', // Selector para los temas
-                                handle: '.topic', // Permite arrastrar solo desde el tema
-                                swap: true, // Permite el intercambio
-                                nested: false, // Habilitar soporte para elementos anidados,
-                            });
-                            tablaTitulo.insertAdjacentElement('afterend', sortableTreeDiv);
+                            reloadSortableTreeDiv();
 
                         });
                     };
 
                     const createDivTema = (item) => {
                         const itemDiv = document.createElement('div');
-                        itemDiv.textContent = '-'.repeat(item.level * 5) + item.name;
+                        itemDiv.textContent = '-'.repeat(item.level * 5) + item.nombre;
                         itemDiv.className = 'tema'; // Clase para aplicar estilos
                         itemDiv.draggable = true; // Habilitar draggable
+                        itemDiv.id = item.id;
                         // itemDiv.style.marginLeft = `${item.level * 20}px`;
                         // new Sortable(itemDiv, {
                         //     group: groupNameTema,
@@ -646,9 +1134,10 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                         if (item.children && item.children.length > 0) {
                             item.children.forEach(kid=> {
                                 const itemDiv = document.createElement('div');
-                                itemDiv.textContent = '-'.repeat(kid.level * 5) + kid.name;
+                                itemDiv.textContent = '-'.repeat(kid.level * 5) + kid.nombre;
                                 itemDiv.className = 'topic'; // Clase para aplicar estilos
                                 itemDiv.draggable = true; // Habilitar draggable
+                                itemDiv.id = kid.id;
                                 // itemDiv.style.marginLeft = `${item.level * 20}px`;
 
                                 new Sortable(itemDiv, {
@@ -670,21 +1159,22 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
 
 
                     // Función para agregar tópicos al JSON
-                    const addTopicToJSON = (topicId, topicRelation, parentName, level, tema) => {
-                        const newTopic = { name: topicId, parentName: parentName, relation: topicRelation, level: level,
-                             tema: tema};
+                    const addTopicToJSON = (topicId, topicRelation, parentName, level, tema, topicName) => {
+                        const newTopic = { id: topicId, parentName: parentName, relation: topicRelation, level: level,
+                             tema: tema, nombre: topicName};
 
                         selectedTopics.push(newTopic);
 
                     };
 
 
-                    const createNode=(name, fullPath, level, topicRelation)=> {
+                    const createNode=(idTopic, fullPath, level, topicRelation, nombre)=> {
                         return {
-                            name: name,
+                            id: idTopic,
                             fullPath: fullPath,
                             level: level,
                             relation: topicRelation,
+                            nombre: nombre,
                             children: []
                         };
                     };
@@ -692,7 +1182,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                     const findParentNodeRecursive=(node, fullPath)=> {
 
                         for (let child of node.children) {
-                            if(fullPath.includes('-'+child.name+'-')){
+                            if(fullPath.includes('-'+child.id+'-')){
                                 const foundNode = findParentNodeRecursive(child, fullPath);
                                 if (foundNode) {
                                     return foundNode; // Devolver el nodo encontrado
@@ -711,29 +1201,37 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                         selectedTopics.sort((a, b) => a.level - b.level);
 
                         // Inicializamos los nodos en el diccionario
-                        selectedTopics.forEach(({ tema, level, relation }) => {
+                        selectedTopics.forEach(({ tema, level, relation, nombre }) => {
                             const fullPath = tema;
-                            const name = fullPath.split('-').pop(); // Obtener el nombre del tópico (última parte del fullPath)
+                            const idTopic = fullPath.split('-').pop(); // Obtener el nombre del tópico (última parte del fullPath)
                             const rootName = fullPath.split('-')[0]; // El primer elemento es el "raíz" o tema
 
                             // Asegúrate de crear un nodo raíz para cada tema único
                             if (!topicDict[rootName]) {
-                                topicDict[rootName] = createNode(rootName, null, 0, null);
+                                // Buscar el label por su ID
+                                const temaNombreLabel = document.getElementById(rootName);
+
+                                // Imprimir el textContent en la consola
+                                var nombreTema="";
+                                if (temaNombreLabel) {
+                                    nombreTema=temaNombreLabel.textContent;
+                                }
+                                topicDict[rootName] = createNode(rootName, null, 0, null, nombreTema);
                             }
 
                             // Si hay un guion pero no más, se trata de un tópico de nivel 1
                             if (fullPath.split('-').length === 2) {
                                 const rootNode = topicDict[rootName];
-                                rootNode.children.push(createNode(name, fullPath, level, relation));
+                                rootNode.children.push(createNode(idTopic, fullPath, level, relation, nombre));
                             } else {
                                 // Intentar encontrar el padre en el fullPath
                                 const parentNode = findParentNodeRecursive(topicDict[rootName], fullPath);
                                 if (parentNode) {
-                                    parentNode.children.push(createNode(name, fullPath, level, relation));
+                                    parentNode.children.push(createNode(idTopic, fullPath, level, relation, nombre));
                                 } else {
                                     // Si no se encuentra un padre seleccionado, añadir a la raíz
                                     const rootNode = topicDict[rootName];
-                                    rootNode.children.push(createNode(name, fullPath, level, relation));
+                                    rootNode.children.push(createNode(idTopic, fullPath, level, relation, nombre));
                                 }
                             }
 
@@ -747,109 +1245,48 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                         return finalTree;
                     };
 
-                    var seleccionarRAsTitulo = document.createElement('h3');
-                    seleccionarRAsTitulo.textContent = 'Seleccionar Resultados de Aprendizaje de la Asignatura:';
-
-                    var checkboxesContainer = document.createElement('div'); // Add multiple select element
-                    checkboxesContainer.setAttribute('id', 'resultadoAprendizaje'); // Set attributes for multiple select element
-                    var resultadosAprendizaje = rasAsignaturaArray;
-                    log.debug("resultadosAprendizaje: "+resultadosAprendizaje);
-
-                    resultadosAprendizaje.forEach(function(raText) {
-                        raText = raText.replace("http://www.semanticweb.org/valer/ontologies/OntoOA#","");
-                        var checkbox = document.createElement('input');
-                        checkbox.type = 'checkbox';
-                        checkbox.value = raText;//.toUpperCase().replace(/\s+/g, '_'); TODO ver si es necesario
-                        var label = document.createElement('label');
-                        label.textContent = raText;
-                        label.appendChild(checkbox);
-                        checkboxesContainer.appendChild(label);
-
-                        // Crear y añadir un elemento <br> después del label
-                        var br = document.createElement('br');
-                        checkboxesContainer.appendChild(br);
-
-                        //enventlistener para armar los datos que van en la ontologia
-                        checkbox.addEventListener('change', function(event) {
-                            // Check the state of the checkbox
-                            if (event.target.checked) {
-                                //TODO enviar a la ontologia en el momento?
-                                resultadoAprendizajeOA["raasignatura"].push(event.target.value);
-
-                            } else {
-                                //Eliminar ra del array
-                                for (let i = resultadoAprendizajeOA["raasignatura"].length - 1; i >= 0; i--) {
-                                    if (resultadoAprendizajeOA["raasignatura"][i] === event.target.value) {
-                                        resultadoAprendizajeOA["raasignatura"].splice(i, 1);
-                                    }
-                                }
-                            }
-                            // log.debug("resultadoAprendizajeOA: "+resultadoAprendizajeOA["raasignatura"]);
-                        });
-                    });
-
-                    ul.insertAdjacentElement('afterend',seleccionarRAsTitulo);
-                    seleccionarRAsTitulo.insertAdjacentElement('afterend',checkboxesContainer);
-
-                    // RA para OA
-                    var title = document.createElement('h3'); // Título para el resultado de aprendizaje
-                    title.textContent = 'Definir el resultado de aprendizaje del Objeto de Aprendizaje';
-
-                    // Campos de entrada de texto
-                    var verboInput = createTextInput('Verbo:');
-                    var objetoConocimientoInput = createTextInput('Objeto de Conocimiento:');
-                    var condicionInput = createTextInput('Condición:');
-                    var finalidadInput = createTextInput('Finalidad:');
-
-                    checkboxesContainer.insertAdjacentElement('afterend', title);
-                    title.insertAdjacentElement('afterend', verboInput);
-                    verboInput.insertAdjacentElement('afterend', objetoConocimientoInput);
-                    //Check if the OA already has a value for the field
-
-                    objetoConocimientoInput.insertAdjacentElement('afterend', condicionInput);
-                    condicionInput.insertAdjacentElement('afterend', finalidadInput);
 
                     //TEST AJAX
 
-                    const updateVerboOA = (
-                        id,
-                        name,
-                    ) => ajax.call([{
-                        methodname: 'local_yourplugin_store_oa_fields',
-                        args: {
-                            id,
-                            name,
-                        },
-                    }])[0];
+                    // const updateVerboOA = (
+                    //     id,
+                    //     name,
+                    // ) => ajax.call([{
+                    //     methodname: 'local_yourplugin_store_oa_fields',
+                    //     args: {
+                    //         id,
+                    //         name,
+                    //     },
+                    // }])[0];
 
-                    const verifyVerbLevel = (
-                        raasignatura,
-                        verbo,
-                    ) => ajax.call([{
-                        methodname: 'local_yourplugin_verify_verb_level',
-                        args: {
-                            raasignatura,
-                            verbo,
-                        },
-                    }])[0];
+                    // const verifyVerbLevel = (
+                    //     raasignatura,
+                    //     verbo,
+                    // ) => ajax.call([{
+                    //     methodname: 'local_yourplugin_verify_verb_level',
+                    //     args: {
+                    //         raasignatura,
+                    //         verbo,
+                    //     },
+                    // }])[0];
 
-                    verboInput.addEventListener('change', async function(event) {
-                        // Your event handling code here
-                        log.debug('Input VERBO value changed:', event.target.value);
+                    // verboInput.addEventListener('change', async function(event) {
+                    //     // Your event handling code here
+                    //     log.debug('Input VERBO value changed:', event.target.value);
 
-                        resultadoAprendizajeOA["verbo"] = event.target.value;
-                        // log.debug(resultadoAprendizajeOA["verbo"]);
+                    //     resultadoAprendizajeOA["verbo"] = event.target.value;
+                    //     // log.debug(resultadoAprendizajeOA["verbo"]);
 
-                        const id = paramsObject['oaid'];
-                        const name = event.target.value;
+                    //     const id = paramsObject['oaid'];
+                    //     const name = event.target.value;
 
-                        const response = await updateVerboOA(id, name);
-                        log.debug(response);
+                    //     const response = await updateVerboOA(id, name);
+                    //     log.debug(response);
 
-                        const responseVerbLevel = await verifyVerbLevel("RAAsignatura", name);
-                        log.debug(responseVerbLevel);
+                    //     const responseVerbLevel = await verifyVerbLevel("RAAsignatura", name);
+                    //     log.debug(responseVerbLevel);
 
-                      });
+                    //   });
 
 
 
@@ -1063,38 +1500,8 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                 }
 
 
-                // Create table element
-                var tablaTitulo = document.createElement('h3');
-                tablaTitulo.textContent = 'Ordenar Topicos:';
-                finalidadInput.insertAdjacentElement('afterend', tablaTitulo);
 
-                var buttonCargarOrden = document.createElement('button');
-                buttonCargarOrden.setAttribute('id', 'cargarOrdenTopicos');
-                buttonCargarOrden.textContent = 'Cargar Orden';
-                // Add event listener to button
-                buttonCargarOrden.addEventListener('click', async function() {
-                    log.debug("CLICKED cargar");
-                    log.debug("treeData inside Cargar:");
-                    log.debug(treeData);
-                    var topicosSeleccionadosDiv = document.getElementById('topicosSeleccionados');
-                    // Seleccionamos todos los divs con la clase "topic" dentro del div principal
-                    const topicosSeleccionados = topicosSeleccionadosDiv.querySelectorAll('.topic');
-                    // Creamos una lista de strings con el contenido de cada tópico
-                    const listaTopicos = Array.from(topicosSeleccionados).map(topico => topico.textContent.trim());
-                    log.debug(listaTopicos);
-
-                    var selectMenutopic = document.getElementById('menutopic');
-                    // Elimina todas las opciones del select
-                    selectMenutopic.options.length = 0;
-                    listaTopicos.forEach(topico => {
-                        var option = document.createElement('option');
-                        option.textContent = topico;
-                        option.value = topico;
-                        selectMenutopic.appendChild(option);
-                    });
-
-                });
-                tablaTitulo.insertAdjacentElement('beforeend', buttonCargarOrden);
+                // tablaTitulo.insertAdjacentElement('beforeend', buttonCargarOrden);
 
                 // // var table = document.createElement('table');
                 // var table = document.getElementsByClassName("generaltable")[0];
@@ -1286,31 +1693,31 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                 // // Append the table to the container
                 // tablaTitulo.insertAdjacentElement('afterend', table);
 
-                var editarcrearTitulo = document.createElement('h3');
-                editarcrearTitulo.textContent = 'Crear o editar H5P:';
-                tablaTitulo.insertAdjacentElement('afterend', editarcrearTitulo);
+                // var editarcrearTitulo = document.createElement('h3');
+                // editarcrearTitulo.textContent = 'Crear o editar H5P:';
+                // tablaTitulo.insertAdjacentElement('afterend', editarcrearTitulo);
 
-                var formElements = document.getElementsByTagName("form");
-                var h5pform = formElements[1];
-                log.debug(h5pform);
+                // var formElements = document.getElementsByTagName("form");
+                // var h5pform = formElements[1];
+                // log.debug(h5pform);
                 // var metadatosTitulo = document.createElement('h3');
                 // metadatosTitulo.textContent = 'Completar Metadatos:';
                 // h5pform.insertAdjacentElement('afterend', metadatosTitulo);
-                var buttonFin = document.createElement('button');
+                // var buttonFin = document.createElement('button');
 
-                buttonFin.setAttribute('id', 'finBtn');
-                buttonFin.textContent = 'Finalizar OA';
+                // buttonFin.setAttribute('id', 'finBtn');
+                // buttonFin.textContent = 'Finalizar OA';
 
-                // Add event listener to button
-                buttonFin.addEventListener('click', async function() {
-                    log.debug("CLICKED");
+                // // Add event listener to button
+                // buttonFin.addEventListener('click', async function() {
+                //     log.debug("CLICKED");
 
-                    // Redirigir a la página de tu plugin local
-                    window.location.href = 'http://localhost/local/yourplugin/metadatos.php?courseid=' + paramCourseid
-                    + '&oaid=' + paramsObject['oaid'];
-                });
+                //     // Redirigir a la página de tu plugin local
+                //     window.location.href = 'http://localhost/local/yourplugin/metadatos.php?courseid=' + paramCourseid
+                //     + '&oaid=' + paramsObject['oaid'];
+                // });
 
-                h5pform.insertAdjacentElement('afterend', buttonFin);
+                // h5pform.insertAdjacentElement('afterend', buttonFin);
 
                 // let draggedElement = null;
 
@@ -1346,7 +1753,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                      * saveChanges
                      *
                 */
-                async function saveChanges() {
+                // async function saveChanges() {
                     // fetch('/save_changes.php', {
                     //     method: 'POST',
                     //     headers: {
@@ -1361,44 +1768,44 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                     // .catch((error) => {
                     //     console.error('Error:', error);
                     // });
-                    const saveChangesOnOntology = (
-                        oaid,
-                        raoa,
-                        contenidos,
-                        actividades,
-                        metadatos,
-                    ) => ajax.call([{
-                        methodname: 'local_yourplugin_save_changes_automatically',
-                        args: {
-                            oaid,
-                            raoa,
-                            contenidos,
-                            actividades,
-                            metadatos,
-                        },
-                    }])[0];
+                    // const saveChangesOnOntology = (
+                    //     oaid,
+                    //     raoa,
+                    //     contenidos,
+                    //     actividades,
+                    //     metadatos,
+                    // ) => ajax.call([{
+                    //     methodname: 'local_yourplugin_save_changes_automatically',
+                    //     args: {
+                    //         oaid,
+                    //         raoa,
+                    //         contenidos,
+                    //         actividades,
+                    //         metadatos,
+                    //     },
+                    // }])[0];
 
-                    var input = verboInput.querySelector('input');
-                    resultadoAprendizajeOA["verbo"] = input.value;
-                    log.debug("resultadoAprendizajeOA:",resultadoAprendizajeOA["verbo"]);
-                    const saveChangesOnOntologyResponse =
-                     await saveChangesOnOntology(paramsObject['oaid'], resultadoAprendizajeOA, selectedTopics,[],[]);
-                    log.debug(saveChangesOnOntologyResponse);
-                    log.debug("RUN saveChanges");
-                }
-                var input = verboInput.querySelector('input');
-                log.debug("verbo: ", input.value);
-                setInterval(saveChanges, 150000); // Cada 5 minutos
+                    // var input = verboInput.querySelector('input');
+                    // resultadoAprendizajeOA["verbo"] = input.value;
+                    // log.debug("resultadoAprendizajeOA:",resultadoAprendizajeOA["verbo"]);
+                    // const saveChangesOnOntologyResponse =
+                    //  await saveChangesOnOntology(paramsObject['oaid'], resultadoAprendizajeOA, selectedTopics,[],[]);
+                    // log.debug(saveChangesOnOntologyResponse);
+                    // log.debug("RUN saveChanges");
+                // }
+                // var input = verboInput.querySelector('input');
+                // log.debug("verbo: ", input.value);
+                // setInterval(saveChanges, 150000); // Cada 5 minutos
 
-                var saveChangesButtonH5P = document.getElementById('id_submitbutton');
-                log.debug("saveChangesButton:" + saveChangesButtonH5P);
-                log.debug(saveChangesButtonH5P);
+                // var saveChangesButtonH5P = document.getElementById('id_submitbutton');
+                // log.debug("saveChangesButton:" + saveChangesButtonH5P);
+                // log.debug(saveChangesButtonH5P);
 
-                //move error message to correct place
-                var errorMessage = document.getElementById("error-message");
-                if (errorMessage){
-                    saveChangesButtonH5P.insertAdjacentElement('afterend', errorMessage);
-                }
+                // //move error message to correct place
+                // var errorMessage = document.getElementById("error-message");
+                // if (errorMessage){
+                //     saveChangesButtonH5P.insertAdjacentElement('afterend', errorMessage);
+                // }
                 // if(saveChangesButtonH5P){
                     // saveChangesButtonH5P.addEventListener('click', function(event) {
                         // event.preventDefault();

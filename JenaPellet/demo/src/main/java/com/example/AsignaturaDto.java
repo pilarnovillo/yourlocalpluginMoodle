@@ -6,8 +6,9 @@ import java.util.List;
 public class AsignaturaDto {
     private String nombre;              // Name of the Asignatura
     private String id;
-    private List<String> raAsignaturaList;
+    private List<RAAsignaturaDto> raAsignaturaList;
     private List<UnidadDto> unidades;   // List of UnidadDto
+    private List<VerboDto> verbosList;
 
     // Constructor
     public AsignaturaDto(String nombre, String id) {
@@ -32,7 +33,7 @@ public class AsignaturaDto {
     }
 
     // Getter for unidades
-    public List<String> getRaAsignaturaList() {
+    public List<RAAsignaturaDto> getRaAsignaturaList() {
         return raAsignaturaList;
     }
 
@@ -47,12 +48,22 @@ public class AsignaturaDto {
     }
 
     // Method to add a UnidadDto to the list
-    public void setRAAsignaturaList(List<String> raAsignaturaList) {
+    public void setRAAsignaturaList(List<RAAsignaturaDto> raAsignaturaList) {
         this.raAsignaturaList = raAsignaturaList;
     }
 
     // Method to add a UnidadDto to the list
-    public void addRAAsignatura(String raAsignatura) {
+    public void addRAAsignatura(RAAsignaturaDto raAsignatura) {
         this.raAsignaturaList.add(raAsignatura);
+    }
+
+    // Getter for unidades
+    public List<VerboDto> getVerbosList() {
+        return verbosList;
+    }
+
+    // Method to add a UnidadDto to the list
+    public void setVerbosList(List<VerboDto> verbosList) {
+        this.verbosList = verbosList;
     }
 }
