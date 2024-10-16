@@ -4,6 +4,24 @@ define(['jquery','core/log'], function($, log){
     return {
         init: function() {
             $(document).ready(function(){
+                // Estilos que se aplicarán a cada botón
+                const estilosBoton = {
+                    backgroundColor: '#4CAF50', // Color verde del botón en la imagen
+                    color: 'white', // Texto blanco
+                    border: 'none',
+                    padding: '10px 20px',
+                    textAlign: 'center',
+                    textDecoration: 'none',
+                    display: 'inline-block',
+                    fontSize: '16px',
+                    margin: '4px 2px',
+                    cursor: 'pointer',
+                    borderRadius: '5px',
+                    transition: 'background-color 0.3s ease',
+                    position : 'absolute',
+                    left : '50%',
+                    transform : 'translateX(-50%)'// Para centrar el botón
+                };
 
                 log.debug("CHECK METADATOS");
                 // Function to create and append elements dynamically
@@ -21,19 +39,43 @@ define(['jquery','core/log'], function($, log){
                     const label = document.createElement('label');
                     label.setAttribute('for', inputId);
                     label.textContent = labelText;
+                    label.style.marginRight="5px" ;
 
                     const input = document.createElement('input');
                     input.type = type;
                     input.id = inputId;
                     input.placeholder = placeholder;
 
+                    // Aplicar estilos en línea
+                    input.style.padding = '10px';
+                    input.style.border = '1px solid #A0C4FF';
+                    input.style.borderRadius = '5px';
+                    input.style.backgroundColor = '#fff';
+                    input.style.color = '#333';
+                    input.style.fontSize = '16px';
+                    input.style.margin = '10px 0'; // Margen arriba y abajo
+
                     container.appendChild(label);
-                    container.appendChild(document.createElement('br'));
+                    // container.appendChild(document.createElement('br'));
                     container.appendChild(input);
                     container.appendChild(document.createElement('br'));
 
                     return container;
                 }
+
+                // Lista de atributos a aplicar al select
+                const atributosSelect = {
+                    border: '1px solid #A0C4FF',
+                    borderRadius: '5px',
+                    padding: '10px',
+                    fontSize: '16px',
+                    backgroundColor: '#fff',
+                    color: '#333',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'right 10px center',
+                    backgroundSize: '12px',
+                    margin : '10px 0' // Margen arriba y abajo
+                };
 
                 /**
                  * Crea un campo de selección (select) y lo enlaza a la página.
@@ -48,9 +90,14 @@ define(['jquery','core/log'], function($, log){
                     const label = document.createElement('label');
                     label.setAttribute('for', selectId);
                     label.textContent = labelText;
+                    label.style.marginRight="5px" ;
 
                     const select = document.createElement('select');
                     select.id = selectId;
+                    // Aplicar cada atributo usando un bucle for
+                    for (const [key, value] of Object.entries(atributosSelect)) {
+                        select.style[key] = value;
+                    }
 
                     options.forEach(optionValue => {
                         const option = document.createElement('option');
@@ -60,7 +107,7 @@ define(['jquery','core/log'], function($, log){
                     });
 
                     container.appendChild(label);
-                    container.appendChild(document.createElement('br'));
+                    // container.appendChild(document.createElement('br'));
                     container.appendChild(select);
                     container.appendChild(document.createElement('br'));
 
@@ -152,6 +199,9 @@ define(['jquery','core/log'], function($, log){
 
                     buttonGuardar.setAttribute('id', 'buttonGuardar');
                     buttonGuardar.textContent = 'Guardar Metadatos';
+                    for (const propiedad in estilosBoton) {
+                        buttonGuardar.style[propiedad] = estilosBoton[propiedad];
+                    }
 
                     // Add event listener to button
                     buttonGuardar.addEventListener('click', async function() {

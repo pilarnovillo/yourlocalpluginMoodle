@@ -808,7 +808,7 @@ if (curl_errno($ch)) {
                 echo 'Error al decodificar la respuesta JSON.';
             } else {
                 // Muestra los datos obtenidos
-                echo 'Respuesta del servicio: ';
+                // echo 'Respuesta del servicio: ';
                 // print_r($unidadesTemasTopicos);
         }
     }

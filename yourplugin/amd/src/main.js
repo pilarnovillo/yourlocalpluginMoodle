@@ -42,6 +42,41 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                 // Now you can access the parameters and their values from the paramsObject.
                 var paramCourseid = paramsObject['courseid'];
 
+                // Estilos que se aplicarán a cada botón
+                const estilosBoton = {
+                    backgroundColor: '#4CAF50', // Color verde del botón en la imagen
+                    color: 'white', // Texto blanco
+                    border: 'none',
+                    padding: '10px 20px',
+                    textAlign: 'center',
+                    textDecoration: 'none',
+                    display: 'inline-block',
+                    fontSize: '16px',
+                    margin: '4px 2px',
+                    cursor: 'pointer',
+                    borderRadius: '5px',
+                    transition: 'background-color 0.3s ease',
+                    position : 'absolute',
+                    left : '50%',
+                    transform : 'translateX(-50%)'// Para centrar el botón
+
+                };
+
+                // Lista de atributos a aplicar al select
+                const atributosSelect = {
+                    border: '1px solid #A0C4FF',
+                    borderRadius: '5px',
+                    padding: '10px',
+                    fontSize: '16px',
+                    backgroundColor: '#fff',
+                    color: '#333',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'right 10px center',
+                    backgroundSize: '12px',
+                    margin : '10px 0' // Margen arriba y abajo
+                };
+
+
                 //Get selected Topics (topicos que ya estan en la ontologiaConocimiento)
                 var selectedTopicsFromConocimiento = [];
                 var selectedRAAsignaturaFromConocimiento = [];
@@ -55,6 +90,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
 
                 var seleccionarUnidadTitulo = document.createElement('h3');
                 seleccionarUnidadTitulo.textContent = 'Seleccionar Unidad y Topicos:';
+                seleccionarUnidadTitulo.style.marginTop="10px";
 
                  // Crear la opción por defecto
                 var defaultOption = document.createElement('option');
@@ -67,6 +103,10 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                 var select = document.createElement('select');
                 select.setAttribute('id', 'id_unidadSelect');
                 select.appendChild(defaultOption);
+                // Aplicar cada atributo usando un bucle for
+                for (const [key, value] of Object.entries(atributosSelect)) {
+                    select.style[key] = value;
+                }
 
                 var mainDiv = document.querySelector('div[role="main"]');
                 mainDiv.insertBefore(seleccionarUnidadTitulo, mainDiv.firstChild);
@@ -82,6 +122,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
 
                 var seleccionarRAsTitulo = document.createElement('h3');
                 seleccionarRAsTitulo.textContent = 'Seleccionar Resultados de Aprendizaje de la Asignatura:';
+                seleccionarRAsTitulo.style.marginTop="10px";
 
                 var checkboxesContainer = document.createElement('div'); // Add multiple select element
                 checkboxesContainer.setAttribute('id', 'resultadoAprendizaje'); // Set attributes for multiple select element
@@ -92,12 +133,16 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                     // RA para OA
                 var title = document.createElement('h3'); // Título para el resultado de aprendizaje
                 title.textContent = 'Definir el resultado de aprendizaje del Objeto de Aprendizaje';
+                title.style.marginTop="10px";
 
                     // Campos de entrada de texto
                 // var verboInput = createTextInput('Verbo:');
                 var objetoConocimientoInput = createTextInput('Objeto de Conocimiento:');
+
                 var condicionInput = createTextInput('Condición:');
+
                 var finalidadInput = createTextInput('Finalidad:');
+
 
                 checkboxesContainer.insertAdjacentElement('afterend', title);
 
@@ -114,6 +159,10 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                         guardarVerboEnOntologia(event.target.value, "Nivel1");
                     }
                 });
+                // Aplicar cada atributo usando un bucle for
+                for (const [key, value] of Object.entries(atributosSelect)) {
+                    selectNivel1.style[key] = value;
+                }
 
                   // Crear el elemento select
                 var selectNivel2 = document.createElement('select');
@@ -128,6 +177,10 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                         guardarVerboEnOntologia(event.target.value, "Nivel2");
                     }
                 });
+                // Aplicar cada atributo usando un bucle for
+                for (const [key, value] of Object.entries(atributosSelect)) {
+                    selectNivel2.style[key] = value;
+                }
 
                 // Crear el elemento select
                 var selectNivel3 = document.createElement('select');
@@ -142,6 +195,10 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                         guardarVerboEnOntologia(event.target.value, "Nivel3");
                     }
                 });
+                // Aplicar cada atributo usando un bucle for
+                for (const [key, value] of Object.entries(atributosSelect)) {
+                    selectNivel3.style[key] = value;
+                }
 
                 title.insertAdjacentElement('afterend', selectNivel1);
                 selectNivel1.insertAdjacentElement('afterend', selectNivel2);
@@ -233,6 +290,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                 // Create table element
                 var tablaTitulo = document.createElement('h3');
                 tablaTitulo.textContent = 'Ordenar Topicos:';
+                tablaTitulo.style.marginTop="10px";
                 finalidadInput.insertAdjacentElement('afterend', tablaTitulo);
 
                 const crearTemasyTopicosCheckboxes = (temas) => {
@@ -243,6 +301,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                         label.htmlFor = tema.id;
                         label.textContent = tema.nombre;
                         label.id = tema.id;
+                        label.style.marginRight="5px" ;
                         checkboxDiv.appendChild(label);
 
                         // Botón para agregar subtemas
@@ -279,6 +338,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                         }
                         var label = document.createElement('label');
                         label.textContent = raAsignaturaDto.nombre;
+                        label.style.marginRight="5px" ;
                         label.appendChild(checkbox);
                         checkboxesContainer.appendChild(label);
 
@@ -352,6 +412,36 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
 
                 };
 
+                const redirectToH5pEditor = (listaTopicosIdyNombre)=>{
+                    // Redirigir a la página de h5p
+                            // window.location.href = 'http://localhost/local/yourplugin/h5pEditor.php?courseid=' + paramCourseid
+                            // + '&oaid=' + paramsObject['oaid']+"&contextid=14";
+
+                    // Datos a enviar
+                    const dataArray = {oaid:paramsObject['oaid'],
+                        courseid:paramCourseid, contextid:paramsObject['contextid'],
+                        listaTopicosIdyNombre:listaTopicosIdyNombre
+                    };
+                    // Crear un formulario
+                    const form = document.createElement('form');
+                    form.method = 'POST'; // Método POST
+                    form.action = 'h5pEditor.php?courseid='+ paramCourseid
+                    + '&oaid=' + paramsObject['oaid']+"&contextid=14"; // URL de destino
+
+                    // Crear un campo oculto con los datos
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'dataArray';
+                    input.value = JSON.stringify(dataArray); // Convertir el array a JSON
+
+                    // Añadir el campo al formulario
+                    form.appendChild(input);
+
+                    // Añadir el formulario al documento y enviarlo
+                    document.body.appendChild(form);
+                    form.submit(); // El formulario realiza la redirección automáticamente
+
+                };
                 // Crear el checkbox ingnorar
                 var contenedorCheckboxIgnorarRecomendaciones = document.createElement("div");
                 const checkboxIgnorarRecomendaciones = document.createElement('input');
@@ -361,6 +451,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                 const labelIgnorarRecomendaciones = document.createElement('label');
                 labelIgnorarRecomendaciones.htmlFor = 'checkboxIgnorarRecomendaciones';
                 labelIgnorarRecomendaciones.textContent = 'Ignorar recomendaciones';
+                labelIgnorarRecomendaciones.style.marginRight="5px" ;
 
                 // Añadir el checkbox y su etiqueta al contenedor
                 contenedorCheckboxIgnorarRecomendaciones.appendChild(checkboxIgnorarRecomendaciones);
@@ -369,7 +460,14 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                 var buttonCargarOrden = document.createElement('button');
                 buttonCargarOrden.setAttribute('id', 'cargarOrdenTopicos');
                 buttonCargarOrden.textContent = 'Cargar Orden';
+                for (const propiedad in estilosBoton) {
+                    buttonCargarOrden.style[propiedad] = estilosBoton[propiedad];
+                }
 
+                var contenedorMensajes = document.createElement("div");
+                contenedorMensajes.setAttribute("id","contenedorMensajes");
+                contenedorMensajes.style.marginTop="80px";
+                contenedorMensajes.style.textAlign="center";
                 // Add event listener to button
                 buttonCargarOrden.addEventListener('click', async function() {
                     log.debug("CLICKED cargar");
@@ -383,6 +481,15 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                     const listaTopicos = Array.from(topicosSeleccionados).map(topico => topico.id.trim());
                     log.debug("listaTopicos: ");
                     log.debug(listaTopicos);
+
+                    // Creamos un array de objetos con el id y el textContent de cada tópico
+                    const listaTopicosIdyNombre = Array.from(topicosSeleccionados).map(topico => ({
+                        id: topico.id.trim(),
+                        nombre: topico.textContent.trim()
+                    }));
+
+                    log.debug("listaTopicosIdyNombre: ");
+                    log.debug(listaTopicosIdyNombre);
 
                      // Realizar la solicitud POST al endpoint
                     fetch('http://localhost:8080/ontology/createTopicsRelations', {
@@ -420,30 +527,8 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                         log.debug('Respuesta del servidor setOrdenDeDesarrollo:', data); // Manejar la respuesta del servidor
 
                         if(checkboxIgnorarRecomendaciones.checked){
-                            // Redirigir a la página de h5p
-                            // window.location.href = 'http://localhost/local/yourplugin/h5pEditor.php?courseid=' + paramCourseid
-                            // + '&oaid=' + paramsObject['oaid']+"&contextid=14";
 
-                            // Datos a enviar
-                            const dataArray = ['dato1', 'dato2', 'dato3'];
-                            // Crear un formulario
-                            const form = document.createElement('form');
-                            form.method = 'POST'; // Método POST
-                            form.action = 'h5pEditor.php'; // URL de destino
-
-                            // Crear un campo oculto con los datos
-                            const input = document.createElement('input');
-                            input.type = 'hidden';
-                            input.name = 'dataArray';
-                            input.value = JSON.stringify(dataArray); // Convertir el array a JSON
-
-                            // Añadir el campo al formulario
-                            form.appendChild(input);
-
-                            // Añadir el formulario al documento y enviarlo
-                            document.body.appendChild(form);
-                            form.submit(); // El formulario realiza la redirección automáticamente
-
+                            redirectToH5pEditor(listaTopicosIdyNombre);
                         }
                         else{
                             //TODO syncronizar razonador y traer recomendaciones
@@ -456,8 +541,8 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                                 + paramCourseid
                                 + '&oaid=' + paramsObject['oaid']+"&contextid=14";
                             }
-                            var contenedorMensajes = document.createElement("div");
-                            contenedorMensajes.setAttribute("id","contenedorMensajes");
+                            contenedorMensajes.innerHTML = '';
+
                             // Recorrer el array de mensajes
                             mensajes.forEach((mensaje) => {
                                 // Crear un nuevo elemento p (parrafo) para cada mensaje
@@ -485,24 +570,6 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                         log.debug('Hubo un problema con la solicitud:', error); // Manejar errores
                     });
 
-                    // Creamos un array de objetos con el id y el textContent de cada tópico
-                    const listaTopicosIdyNombre = Array.from(topicosSeleccionados).map(topico => ({
-                        id: topico.id.trim(),
-                        nombre: topico.textContent.trim()
-                    }));
-
-                    log.debug("listaTopicosIdyNombre: ");
-                    log.debug(listaTopicosIdyNombre);
-
-                    // var selectMenutopic = document.getElementById('menutopic');
-                    // // Elimina todas las opciones del select
-                    // selectMenutopic.options.length = 0;
-                    // listaTopicosIdyNombre.forEach(topico => {
-                    //     var option = document.createElement('option');
-                    //     option.textContent = topico.nombre;
-                    //     option.value = topico.id;
-                    //     selectMenutopic.appendChild(option);
-                    // });
 
                 });
 
@@ -529,9 +596,11 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                     // tree.setAttribute("class","sortable");
                     // sortableTreeDiv.appendChild(tree);
                     const container = document.createElement('div');
-                    container.textContent = "Unidad";
+                    // container.textContent = "Unidad";
                     container.className = 'unidad';
                     container.id = 'topicosSeleccionados';
+                    container.style.marginLeft="15px" ;
+                    container.style.margin="20px" ;
                     treeData.forEach(item => {
                         const temaDiv = createDivTema(item); //createTree(item, item.name, container);
                         createDivTopico(item, item.id, temaDiv);
@@ -660,6 +729,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                         datos.unidades.forEach((unidad, index) => {
                             const option = document.createElement('option');
                             option.value = index; // Guardar el índice para referencia
+                            selectedIndex = index;
                             option.textContent = unidad.nombre;
                             option.id = unidad.id;
                             if(selectedUnidad === unidad.id){
@@ -780,12 +850,12 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                                 title: 'Agregar subtema',
                                 body: `
                                     <form id="subtopicForm">
-                                        <div class="form-group">
-                                            <label for="topicoSoporte">Posibles Topico Soporte</label>
-                                            <select id="topicoSoporte" class="form-control" required>
-                                                <!-- Options will be added dynamically here -->
-                                            </select>
-                                        </div>
+                                        // <div class="form-group">
+                                        //     <label for="topicoSoporte">Posibles Topico Soporte</label>
+                                        //     <select id="topicoSoporte" class="form-control" required>
+                                        //         <!-- Options will be added dynamically here -->
+                                        //     </select>
+                                        // </div>
                                         <div class="form-group">
                                             <label for="subtopicName">Nombre</label>
                                             <input type="text" id="subtopicName" class="form-control" 
@@ -957,6 +1027,8 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                                         const newSubtopicLabel = document.createElement('label');
                                         newSubtopicLabel.htmlFor = topicName;
                                         newSubtopicLabel.textContent = `${topicName} (${topicRelation})`;
+                                        newSubtopicLabel.style.marginRight="5px" ;
+
                                         newSubtopicDiv.appendChild(newSubtopicLabel);
 
                                         var newAddSubtemaButton = null;
@@ -1032,6 +1104,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                             const label = document.createElement('label');
                             label.htmlFor = topico.id;
                             label.textContent = topico.nombre;
+                            label.style.marginRight="5px" ;
                             checkboxDiv.appendChild(label);
 
                             if(!(topicRelation ==="soporte")){
@@ -1114,6 +1187,8 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                         itemDiv.className = 'tema'; // Clase para aplicar estilos
                         itemDiv.draggable = true; // Habilitar draggable
                         itemDiv.id = item.id;
+                        itemDiv.style.fontFamily = 'Arial, sans-serif'; // Set font family
+                        itemDiv.style.fontSize = '24px'; // Set font size
                         // itemDiv.style.marginLeft = `${item.level * 20}px`;
                         // new Sortable(itemDiv, {
                         //     group: groupNameTema,
@@ -1138,6 +1213,8 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                                 itemDiv.className = 'topic'; // Clase para aplicar estilos
                                 itemDiv.draggable = true; // Habilitar draggable
                                 itemDiv.id = kid.id;
+                                itemDiv.style.fontFamily = 'Arial, sans-serif'; // Set font family
+                                itemDiv.style.fontSize = '18px'; // Set font size
                                 // itemDiv.style.marginLeft = `${item.level * 20}px`;
 
                                 new Sortable(itemDiv, {
@@ -1492,8 +1569,17 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                     var container = document.createElement('div');
                     var label = document.createElement('label');
                     label.textContent = labelText;
+                    label.style.marginRight="5px" ;
                     var input = document.createElement('input');
                     input.setAttribute('type', 'text');
+                    // Aplicar estilos en línea
+                    input.style.padding = '10px';
+                    input.style.border = '1px solid #A0C4FF';
+                    input.style.borderRadius = '5px';
+                    input.style.backgroundColor = '#fff';
+                    input.style.color = '#333';
+                    input.style.fontSize = '16px';
+                    input.style.margin = '10px 0'; // Margen arriba y abajo
                     container.appendChild(label);
                     container.appendChild(input);
                     return container;
@@ -1797,98 +1883,6 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                 // log.debug("verbo: ", input.value);
                 // setInterval(saveChanges, 150000); // Cada 5 minutos
 
-                // var saveChangesButtonH5P = document.getElementById('id_submitbutton');
-                // log.debug("saveChangesButton:" + saveChangesButtonH5P);
-                // log.debug(saveChangesButtonH5P);
-
-                // //move error message to correct place
-                // var errorMessage = document.getElementById("error-message");
-                // if (errorMessage){
-                //     saveChangesButtonH5P.insertAdjacentElement('afterend', errorMessage);
-                // }
-                // if(saveChangesButtonH5P){
-                    // saveChangesButtonH5P.addEventListener('click', function(event) {
-                        // event.preventDefault();
-                        // // Create the modal dialog
-                        // var modal = document.createElement('div');
-                        // modal.style.position = 'fixed';
-                        // modal.style.top = '50%';
-                        // modal.style.left = '50%';
-                        // modal.style.transform = 'translate(-50%, -50%)';
-                        // modal.style.zIndex = '1000';
-                        // modal.style.padding = '20px';
-                        // modal.style.backgroundColor = 'white';
-                        // modal.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.5)';
-
-                        // var question = document.createElement('p');
-                        // question.textContent = 'Are you sure you want to continue?';
-                        // modal.appendChild(question);
-
-                        // var cancelButton = document.createElement('button');
-                        // cancelButton.textContent = 'Cancel';
-                        // cancelButton.addEventListener('click', function() {
-                        //     // event.preventDefault();
-                        //     // Find the H5P editor container element
-                        //     // var h5pEditorContainer = $('.h5p-editor');
-
-                        //     // // Check if the container is found
-                        //     // if (h5pEditorContainer) {
-                        //     //     // Get the H5P editor instance from the container
-                        //     //     // var H5P;
-                        //     //     // Use H5P here
-                        //     //     var h5pEditorInstance = window.H5P.jQuery(h5pEditorContainer).data('h5peditor');
-                        //     //     // Check if the editor instance is found
-                        //     //     if (h5pEditorInstance) {
-                        //     //         log.debug('H5P Editor instance found:', h5pEditorInstance);
-
-                        //     //         // Get the current content of the H5P editor
-                        //     //         h5pEditorInstance.getContent(function(content) {
-                        //     //             log.debug('H5P Editor content:', content);
-                        //     //         });
-                        //     //     } else {
-                        //     //         log.debug('H5P editor instance not found');
-                        //     //     }
-                        //     // } else {
-                        //     //     log.debug('H5P editor container not found');
-                        //     // }
-                        //     // var h5peditor;
-                        //     // const editor = $('.h5p-editor');
-                        //     // const library = $('input[name="h5plibrary"]');
-                        //     // const params = $('input[name="h5pparams"]');
-                        //     // if (h5peditor === undefined) {
-                        //     //     h5peditor = new ns.Editor(library.val(), params.val(), editor[0]);
-                        //     // }
-                        //     // h5peditor.getContent(function(content) {
-                        //     //     log.debug('H5P Editor content:', content);
-                        //     // });
-                        //     log.debug('Logging form fields:');
-                        //     Array.from(document.getElementById('coolh5peditor').elements).forEach(element => {
-                        //         if (element.name) {
-                        //             log.debug(element.name + ': ' + element.value);
-                        //         }
-                        //     });
-                        //     // Get form data
-                        //     var formData = new FormData(document.getElementById('coolh5peditor'));
-                        //     formData.forEach(function(value, key){
-                        //         log.debug(key + ': ' + value);
-                        //     });
-                        //     document.body.removeChild(modal);
-                        // });
-                        // modal.appendChild(cancelButton);
-
-                        // var continueButton = document.createElement('button');
-                        // continueButton.textContent = 'Continue';
-                        // continueButton.style.marginLeft = '10px';
-                        // continueButton.addEventListener('click', function() {
-                        //     // Perform the new action here
-                        //     document.body.removeChild(modal);
-                        //     document.getElementById('coolh5peditor').submit();
-                        // });
-                        // modal.appendChild(continueButton);
-
-                        // document.body.appendChild(modal);
-                    // });
-                // }
             });
         }
     };

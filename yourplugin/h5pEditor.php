@@ -90,7 +90,7 @@ class test_editor_form extends moodleform {
         $this->add_action_buttons();
 
         // Add custom Delete button
-        $mform->addElement('submit', 'deletebutton', 'Delete', array('style' => 'background-color: red; color: white; padding: 10px 20px;'));
+        $mform->addElement('submit', 'deletebutton', 'Delete', array('style' => 'background-color: red; color: white; border: none; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 5px; transition: background-color 0.3s ease;'));
     }
 
     public function save_h5p(stdClass $data) {
@@ -380,6 +380,7 @@ class myform extends moodleform {
 }
 
 
+session_start(); // Iniciar la sesión
 
 //h5p config
 require_login(null, false);
@@ -413,11 +414,18 @@ $PAGE->set_context($context);
 if (isset($_POST['dataArray'])) {
     // Decodificar el array JSON enviado desde JavaScript
     $dataArray = json_decode($_POST['dataArray'], true);
+    
+    // Guardar el array en la sesión para futuras visitas
+    $_SESSION['dataArray'] = $dataArray;  
+}
 
-    // Mostrar el contenido del array
-    echo "<pre>";
-    print_r($dataArray);
-    echo "</pre>";
+// Recuperar el array de la sesión si no fue enviado por POST
+if (isset($_SESSION['dataArray'])) {
+    $dataArray = $_SESSION['dataArray'];
+    $dataArrayJSON = json_encode($dataArray);
+    
+} else {
+    echo "No hay datos disponibles.";
 }
 
 if (empty($contentid)) {
@@ -443,6 +451,7 @@ if ($mform->is_cancelled()) {
     // You can handle the cancel operation here.
     $contentid = null;
     $library = null;
+    $_SESSION['dataArray']=$dataArray;
 } else if ($data = $mform->get_data()) {
 
     if (isset($data->deletebutton)) {
@@ -588,12 +597,12 @@ if ($contentid === null && empty($library)) {
         }
     }
 
-    echo html_writer::label('Select a content to edit', 'id');
+    echo html_writer::label('Selecccionar un archivo para editar: ', 'id');
     echo html_writer::select($options, 'id');
 
     // Button to submit form.
     echo html_writer::start_div('', array('style' => 'margin-top: 20px'));
-    echo html_writer::tag('button', 'Edit');
+    echo html_writer::tag('button', 'Editar', array('id' => 'buttonEditarH5P', 'style' => 'background-color: #0073e6; color: white; border: none; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 5px; transition: background-color 0.3s ease;'));
     echo html_writer::end_div();
 
     $options2 = [];
@@ -614,14 +623,14 @@ if ($contentid === null && empty($library)) {
         'actividad' => 'Actividad',
         'evaluacion' => 'Evaluacion'
     );
-    echo html_writer::label('Select a content to create for specific topic', 'library');
+    echo html_writer::label('Seleccionar para crear nuevo archivo: ', 'library');
     echo html_writer::select($topics, 'topic');
     echo html_writer::select($tipos, 'tipo');
     echo html_writer::select($options2, 'library');
 
     // Button to submit form.
     echo html_writer::start_div('', array('style' => 'margin-top: 20px'));
-    echo html_writer::tag('button', 'Create1');
+    echo html_writer::tag('button', 'Crear', array('id' => 'buttonCrearNuevoH5P', 'style' => 'background-color: #0073e6; color: white; border: none; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 5px; transition: background-color 0.3s ease;'));
     echo html_writer::end_div();
 
     // Close form.
@@ -635,5 +644,5 @@ if ($contentid === null && empty($library)) {
 
 // echo $instanciasOAJSON;
 // $PAGE->requires->js_call_amd('local_yourplugin/main', 'init', array($instanciasOAJSON));
-
+$PAGE->requires->js_call_amd('local_yourplugin/h5pEditor', 'init', array($dataArrayJSON)); 
 echo $OUTPUT->footer();
