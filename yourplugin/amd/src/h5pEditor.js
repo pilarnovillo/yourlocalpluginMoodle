@@ -53,6 +53,8 @@ define(['jquery','core/log'], function($, log){
                     transform : 'translateX(-50%)'// Para centrar el botón
                 };
 
+                const selectMenuid= document.getElementById("menuid");
+                selectMenuid.options[0].text = "Seleccionar";
 
                 // Now you can access the parameters and their values from the paramsObject.
                 var paramCourseid = paramsObject['courseid'];
@@ -67,6 +69,49 @@ define(['jquery','core/log'], function($, log){
                         selectMenutopic.appendChild(option);
                     });
                 }
+
+                const selectMenulibrary= document.getElementById("menulibrary");
+                selectMenulibrary.options[0].text = "Seleccionar";
+
+
+                var selectMenutipo = document.getElementById('menutipo');
+                selectMenutipo.options[0].text = "Seleccionar";
+                selectMenutipo.addEventListener("change", function () {
+                    Array.from(selectMenulibrary.options).forEach(option => {
+                            option.hidden = false; // Hide the option
+                    });
+
+                    const menutipo = this.value; // Obtiene el valor seleccionado
+                    const menutopic = document.getElementById("menutopic");
+                    if (menutipo === "evaluacion") {
+                        menutopic.disabled = true; // Desactiva el select menutopic
+
+                        const optionsToDisable = ["H5P.Accordion 1.0",
+                                                    "H5P.CoursePresentation 1.25",
+                                                    "H5P.ArithmeticQuiz 1.1",
+                                                    "H5P.Audio 1.5",
+                                                    "H5P.AudioRecorder 1.0",
+                                                    "H5P.BranchingScenario 1.8",
+                                                    "H5P.Column 1.16",
+                                                    "H5P.Dialogcards 1.9",
+                                                    "H5P.DragQuestion 1.14",
+                                                    "H5P.DragText 1.10",
+                                                    "H5P.Blanks 1.14",
+                                                    "H5P.ImageHotspots 1.10",
+                                                    "H5P.InteractiveVideo 1.26",
+                                                    "H5P.MarkTheWords 1.11",
+                                                    "H5P.Summary 1.10",
+                                                    "H5P.TwitterUserFeed 1.0"];
+                        Array.from(selectMenulibrary.options).forEach(option => {
+                            if (optionsToDisable.includes(option.value)) {
+                                // option.disabled = true;
+                                option.hidden = true; // Hide the option
+                            }
+                        });
+                    } else {
+                        menutopic.disabled = false; // Activa el select menutopic
+                    }
+                });
 
                 var saveChangesButtonH5P = document.getElementById('id_submitbutton');
                 log.debug("saveChangesButton:" + saveChangesButtonH5P);

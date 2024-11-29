@@ -207,15 +207,110 @@ class test_editor_form extends moodleform {
             case 'ejemplo':
                 // Lógica para la opción 'Ejemplo'
                 echo "Esto es un Ejemplo.";
-                //call endpoint http://localhost:8080/ontology/insertEjemplo?idTopico=TOPICID&idEjemplo=IDH5P
+                $url = "http://localhost:8080/ontology/insertEjemplo";
+
+                // Construir la URL con los parámetros
+                $fullUrl = $url . "?idEjemplo=" . urlencode($idSubAct) .  "&idTopico=" . urlencode($topic);
+
+                // Inicializar cURL
+                $ch = curl_init($fullUrl);
+
+                // Configurar las opciones de cURL
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // Para recibir la respuesta como string
+                curl_setopt($ch, CURLOPT_POST, true); // Usar el método POST
+
+                // Ejecutar la solicitud
+                $response = curl_exec($ch);
+
+                // Manejar posibles errores de cURL
+                if(curl_errno($ch)) {
+                    echo 'Error en cURL: ' . curl_error($ch);
+                }
+
+                // Cerrar cURL
+                curl_close($ch);
+
+                // Imprimir la respuesta
+                echo $response;
                 break;
         
             case 'contenido':
                 // Lógica para la opción 'Contenido'
                 //Contar los elementos de interaccion?
+                // . "&library=" . urlencode($data['h5plibrary'])
                 echo "Esto es un Contenido.";
+
+                // URL del endpoint
+                $url = "http://localhost:8080/ontology/insertContenido";
+
+                // Convertir los datos a formato JSON
+                // $jsonDataString = json_encode();
+
+                // Construir la URL con los parámetros
+                $fullUrl = $url . "?idContenido=" . urlencode($idSubAct) . "&oaid=" . urlencode($oaid) . "&library=" . urlencode($data['h5plibrary']);
+
+                // Inicializar cURL
+                $ch = curl_init($fullUrl);
+
+                // Configurar las opciones de cURL
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // Para recibir la respuesta como string
+                curl_setopt($ch, CURLOPT_POST, true); // Usar el método POST
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                    'Content-Type: application/json', // Especificar que enviamos JSON
+                    'Content-Length: ' . strlen($data['h5pparams'])
+                ));
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $data['h5pparams']); // Cuerpo de la solicitud en JSON
+
+                // Ejecutar la solicitud
+                $response = curl_exec($ch);
+
+                // Manejar posibles errores de cURL
+                if(curl_errno($ch)) {
+                    echo 'Error en cURL: ' . curl_error($ch);
+                }
+
+                // Cerrar cURL
+                curl_close($ch);
+
+                // Imprimir la respuesta
+                echo $response;
                 break;
-        
+            case 'evaluacion':
+                // URL del endpoint
+                $url = "http://localhost:8080/ontology/insertEvaluacion";
+
+                // Convertir los datos a formato JSON
+                // $jsonDataString = json_encode();
+
+                // Construir la URL con los parámetros
+                $fullUrl = $url . "?idEvaluacion=" . urlencode($idSubAct) . "&oaid=" . urlencode($oaid) . "&library=" . urlencode($data['h5plibrary']);
+
+                // Inicializar cURL
+                $ch = curl_init($fullUrl);
+
+                // Configurar las opciones de cURL
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // Para recibir la respuesta como string
+                curl_setopt($ch, CURLOPT_POST, true); // Usar el método POST
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                    'Content-Type: application/json', // Especificar que enviamos JSON
+                    'Content-Length: ' . strlen($data['h5pparams'])
+                ));
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $data['h5pparams']); // Cuerpo de la solicitud en JSON
+
+                // Ejecutar la solicitud
+                $response = curl_exec($ch);
+
+                // Manejar posibles errores de cURL
+                if(curl_errno($ch)) {
+                    echo 'Error en cURL: ' . curl_error($ch);
+                }
+
+                // Cerrar cURL
+                curl_close($ch);
+
+                // Imprimir la respuesta
+                echo $response;
+                break;
             default:
                 // Lógica para cuando no coincide con ninguno de los casos anteriores
                 echo "Tipo no reconocido.";
@@ -624,8 +719,8 @@ if ($contentid === null && empty($library)) {
         'evaluacion' => 'Evaluacion'
     );
     echo html_writer::label('Seleccionar para crear nuevo archivo: ', 'library');
-    echo html_writer::select($topics, 'topic');
     echo html_writer::select($tipos, 'tipo');
+    echo html_writer::select($topics, 'topic');
     echo html_writer::select($options2, 'library');
 
     // Button to submit form.

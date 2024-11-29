@@ -12,13 +12,34 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                 // // Print the parameter to the console
                 log.debug(eventDataObject);
 
-                var button = document.createElement('button');
+                // Estilos que se aplicarán a cada botón
+                const estilosBoton = {
+                    backgroundColor: '#4CAF50', // Color verde del botón en la imagen
+                    color: 'white', // Texto blanco
+                    border: 'none',
+                    padding: '10px 20px',
+                    textAlign: 'center',
+                    textDecoration: 'none',
+                    display: 'inline-block',
+                    fontSize: '16px',
+                    margin: '4px 2px',
+                    cursor: 'pointer',
+                    borderRadius: '5px',
+                    transition: 'background-color 0.3s ease',
+                    position : 'absolute',
+                    left : '50%',
+                    transform : 'translateX(-50%)'// Para centrar el botón
+                };
 
-                button.setAttribute('id', 'seleccionarBtn');
-                button.textContent = 'Crear nuevo RA';
+                var buttonCrearNuevoOA = document.createElement('button');
 
+                buttonCrearNuevoOA.setAttribute('id', 'seleccionarBtn');
+                buttonCrearNuevoOA.textContent = 'Crear nuevo OA';
+                for (const propiedad in estilosBoton) {
+                    buttonCrearNuevoOA.style[propiedad] = estilosBoton[propiedad];
+                }
                 var mainDiv = document.querySelector('div[role="main"]');
-                mainDiv.appendChild(button);
+                mainDiv.appendChild(buttonCrearNuevoOA);
 
                 /**
                         * Function to create
@@ -51,11 +72,34 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
 
                             // Set the button's click event to navigate to the desired URL
                             buttonOA.addEventListener('click', function() {
-                                var url = 'http://localhost/local/yourplugin/index.php?courseid=' + courseid +
-                                        '&contextid=' + contextid + '&oaid=' + oaid;
-                                window.location.href = url;
+                                fetch(`http://localhost:8080/ontology/startService?oaidParam=${oaid}`)
+                                .then(response => response.text())
+                                .then(data => {
+                                    log.debug('Endpoint message:', data);
+                                    fetch(`http://localhost:8080/ontology/razonar?ontologia=CONOCIMIENTO`)
+                                    .then(response => response.text())
+                                    .then(data => {
+                                        log.debug('Endpoint message:', data);
+                                        fetch(`http://localhost:8080/ontology/razonar?ontologia=OntoU`)
+                                        .then(response => response.text())
+                                        .then(data => {
+                                            log.debug('Endpoint message:', data);
+                                            var url = 'http://localhost/local/yourplugin/index.php?courseid=' + courseid +
+                                                    '&contextid=' + contextid + '&oaid=' + oaid;
+                                            window.location.href = url;
+                                        })
+                                        .catch(error => {
+                                            log.debug('Error:', error);
+                                        });
+                                    })
+                                    .catch(error => {
+                                        log.debug('Error:', error);
+                                    });
+                                })
+                                .catch(error => {
+                                    log.debug('Error:', error);
+                                });
                             });
-
                             // Append the button to the container
                             mainDiv.appendChild(buttonOA);
 
@@ -81,7 +125,7 @@ define(['jquery','core/log','core/ajax'], function($, log, ajax){
                 }])[0];
 
                 // Add event listener to button
-                button.addEventListener('click', async function() {
+                buttonCrearNuevoOA.addEventListener('click', async function() {
                     log.debug("CLICKED");
 
                     const courseid = eventDataObject.courseid ;

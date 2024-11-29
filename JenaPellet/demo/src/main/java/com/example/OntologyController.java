@@ -1,5 +1,6 @@
 package com.example;
 
+import org.apache.jena.sparql.function.library.print;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -36,7 +37,9 @@ import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyAssertionAxiom;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -1280,7 +1283,10 @@ public class OntologyController {
                         case "H5P.Video 1.6":
                             element.setType("Video");
                             break;
-                            
+                        
+                        case "H5P.Link 1.3":
+                            element.setType("Link");
+                            break;
                         // case "H5P.TrueFalse 1.8":
                         //     element.setType("TrueFalse");
                         //     element.setQuestion(params.get("question").asText());
@@ -1501,6 +1507,136 @@ public class OntologyController {
 
     }
 
+    @PostMapping("/insertContenido")
+    public String insertContenido(@RequestParam String idContenido, @RequestParam String oaid, @RequestParam String library, @RequestBody JsonNode jsonNode) throws Exception {
+        OWLOntologyManager manager = ontologyConocimiento.getOWLOntologyManager();
+
+        switch (library) {
+            case "H5P.Video 1.6":
+            // 1 boton por el play
+                createBoton(oaid, idContenido, 1);
+                break;
+
+            case "H5P.CoursePresentation 1.25":
+                //2 botones mover diapositiva(<>)
+                createBoton(oaid, idContenido, 1);
+                createBoton(oaid, idContenido, 2);
+                List<Slide> slides = analyzeCoursePresentation(jsonNode);
+                int id_boton = 3;
+                for(Slide slide: slides){
+                    for(Element elementCP: slide.getElements()){
+                        switch (elementCP.getType()) {
+                            case "MultiChoice":
+                                break;
+                            case "Video":
+                                // 1 boton
+                                createBoton(oaid, idContenido, id_boton);
+                                id_boton++;
+                                break;
+                            case "Link":
+                                createBoton(oaid, idContenido, id_boton);
+                                id_boton++;
+                                break;
+                            default:
+                                break;
+                        }
+                        
+                    }
+                }
+                
+                break;  
+            
+                
+        }
+
+        // Save ontology after modification if necessary
+        manager.saveOntology(ontologyConocimiento);
+        return "inserted Contenido successfully";
+
+
+    }
+
+
+    @PostMapping("/insertEvaluacion")
+    public String insertEvaluacion(@RequestParam String idEvaluacion, @RequestParam String oaid, @RequestParam String library, @RequestBody JsonNode jsonNode) throws Exception {
+        OWLOntologyManager manager = ontologyConocimiento.getOWLOntologyManager();
+
+        switch (library) {
+            case "H5P.MultiChoice 1.16":
+            // OntoOA:MultipleOpcionInstrumento
+                createInstrumentoEvaluacion(idEvaluacion, oaid, "MultipleOpcionInstrumento");
+                break;
+
+            case "H5P.Crossword 0.5":
+            // OntoOA:CrucigramaInstrumento
+                createInstrumentoEvaluacion(idEvaluacion, oaid, "CrucigramaInstrumento");
+                break;  
+            
+            case "H5P.SingleChoiceSet 1.11":
+            // OntoOA:SimpleOpcionInstrumento
+                createInstrumentoEvaluacion(idEvaluacion, oaid, "SimpleOpcionInstrumento");
+                break; 
+
+            case "H5P.Questionnaire 1.3":
+                // OntoOA:GuiaDePreguntasInstrumento
+                createInstrumentoEvaluacion(idEvaluacion, oaid, "GuiaDePreguntasInstrumento");
+                break; 
+
+            case "H5P.Essay 1.5":
+                // OntoOA:EnsayoInstrumento
+                createInstrumentoEvaluacion(idEvaluacion, oaid, "EnsayoInstrumento");
+                break; 
+                
+        }
+
+        // Save ontology after modification if necessary
+        manager.saveOntology(ontologyConocimiento);
+        return "inserted Contenido successfully";
+
+
+    }
+
+    private void createInstrumentoEvaluacion(String idEvaluacion, String oaid, String classInstrumento) {
+        OWLOntologyManager manager = ontologyConocimiento.getOWLOntologyManager();
+        OWLDataFactory dataFactory = manager.getOWLDataFactory();
+
+        // Create the individual and the class
+        OWLNamedIndividual instrumentoIndividual = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI+classInstrumento+idEvaluacion));
+        OWLClass instrumentoOwlClass = dataFactory.getOWLClass(IRI.create(baseIRI  + classInstrumento));
+        // Create a Class Assertion Axiom (individual is an instance of the class)
+        OWLClassAssertionAxiom classAssertion = dataFactory.getOWLClassAssertionAxiom(instrumentoOwlClass, instrumentoIndividual);
+        manager.addAxiom(ontologyConocimiento, classAssertion);
+
+        // Create the individual and the class
+        OWLNamedIndividual evaluacionIndividual = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + "Evaluacion"+oaid));
+        // Create Object Properties
+        OWLObjectProperty evaluacionUtilizaInstrumento = dataFactory.getOWLObjectProperty(IRI.create(baseIRI + "evaluacionUtilizaInstrumento"));
+        // Create relationships
+        manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(evaluacionUtilizaInstrumento, evaluacionIndividual, instrumentoIndividual));
+        
+
+    }
+
+    private void createBoton(String oaid2, String idContenido, int id) {
+        OWLOntologyManager manager = ontologyConocimiento.getOWLOntologyManager();
+        OWLDataFactory dataFactory = manager.getOWLDataFactory();
+
+        // Create the individual and the class
+        OWLNamedIndividual botonIndividual = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI+ "Boton_OA"+oaid+"_Contenido"+idContenido+"ID_"+id));
+        OWLClass ejemploOwlClass = dataFactory.getOWLClass(IRI.create(baseIRI  + "Boton"));
+        // Create a Class Assertion Axiom (individual is an instance of the class)
+        OWLClassAssertionAxiom classAssertion = dataFactory.getOWLClassAssertionAxiom(ejemploOwlClass, botonIndividual);
+        manager.addAxiom(ontologyConocimiento, classAssertion);
+
+        // Create the individual and the class
+        OWLNamedIndividual contenidoDeInstruccionIndividual = dataFactory.getOWLNamedIndividual(IRI.create(baseIRI + "ContenidoDeInstruccion"+oaid));
+        // Create Object Properties
+        OWLObjectProperty contenidoTieneElementoDeInteraccion = dataFactory.getOWLObjectProperty(IRI.create(baseIRI + "contenidoTieneElementoDeInteraccion"));
+        // Create relationships
+        manager.addAxiom(ontologyConocimiento, dataFactory.getOWLObjectPropertyAssertionAxiom(contenidoTieneElementoDeInteraccion, contenidoDeInstruccionIndividual, botonIndividual));
+        
+    }
+
     @PostMapping("/insertIndividual")
     public String insertIndividual(@RequestParam String individualName, @RequestParam String className) {
         try {
@@ -1548,6 +1684,84 @@ public class OntologyController {
 
         System.out.println("synchronizeReasoner: finished Precopute");
 
+    }
+
+    @PostMapping("/procesarCSV")
+    public void procesarCSV(@RequestParam String  filePath) {
+        OWLOntologyManager managerOntologyOntoU = ontologyOntoU.getOWLOntologyManager();
+        // OWLDataFactory dataFactoryOntologyOntoU = managerOntologyOntoU.getOWLDataFactory();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] datos = line.split(";");
+                System.out.println(datos);
+                String individuo = datos[0].trim();
+                String clase = datos[1].trim();
+                String objectProperty = datos[2].trim();
+                String objeto = datos[3].trim();
+                String dataProperty = datos[4].trim();
+                String valor = datos[5].trim();
+
+                // Crear individuo y asignar clase si aún no existe
+                crearIndividuo(individuo, clase);
+
+                // Agregar cada Object Property encontrada
+                if (!objectProperty.isEmpty() && !objeto.isEmpty()) {
+                    agregarObjectProperty(individuo, objectProperty, objeto);
+                }
+
+                // // Agregar cada Data Property encontrada
+                if (!dataProperty.isEmpty() && !valor.isEmpty()) {
+                    agregarDataProperty(individuo, dataProperty, valor);
+                }
+
+                // Save the ontology after adding the axiom
+                managerOntologyOntoU.saveOntology(ontologyOntoU);
+            }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+    }
+
+    public void crearIndividuo(String individuoNombre, String claseNombre) {
+        OWLOntologyManager managerOntologyOntoU = ontologyOntoU.getOWLOntologyManager();
+        OWLDataFactory dataFactoryOntologyOntoU = managerOntologyOntoU.getOWLDataFactory();
+        // Crear OWLNamedIndividual
+        OWLNamedIndividual individuo = dataFactoryOntologyOntoU.getOWLNamedIndividual(IRI.create(baseOntoU  + individuoNombre));
+    
+        // Crear OWLClass
+        OWLClass clase = dataFactoryOntologyOntoU.getOWLClass(IRI.create(baseOntoU  + claseNombre));
+    
+        // Asociar el individuo a la clase
+        OWLClassAssertionAxiom axiom = dataFactoryOntologyOntoU.getOWLClassAssertionAxiom(clase, individuo);
+        manager.addAxiom(ontologyOntoU, axiom);
+    }
+
+    public void agregarObjectProperty(String sujeto, String propiedad, String objeto) {
+        OWLOntologyManager managerOntologyOntoU = ontologyOntoU.getOWLOntologyManager();
+        OWLDataFactory dataFactoryOntologyOntoU = managerOntologyOntoU.getOWLDataFactory();
+
+        OWLNamedIndividual sujetoInd = dataFactoryOntologyOntoU.getOWLNamedIndividual(IRI.create(baseOntoU+ sujeto));
+        OWLNamedIndividual objetoInd = dataFactoryOntologyOntoU.getOWLNamedIndividual(IRI.create(baseOntoU + objeto));
+        OWLObjectProperty objProp = dataFactoryOntologyOntoU.getOWLObjectProperty(IRI.create(baseOntoU + propiedad));
+    
+        // Crear la relación
+        OWLObjectPropertyAssertionAxiom axiom = dataFactoryOntologyOntoU.getOWLObjectPropertyAssertionAxiom(objProp, sujetoInd, objetoInd);
+        manager.addAxiom(ontologyOntoU, axiom);
+    }
+
+    public void agregarDataProperty(String sujeto, String propiedad, String valor) {
+        OWLOntologyManager managerOntologyOntoU = ontologyOntoU.getOWLOntologyManager();
+        OWLDataFactory dataFactoryOntologyOntoU = managerOntologyOntoU.getOWLDataFactory();
+        OWLNamedIndividual sujetoInd = dataFactoryOntologyOntoU.getOWLNamedIndividual(IRI.create(baseOntoU + sujeto));
+        OWLDataProperty dataProp = dataFactoryOntologyOntoU.getOWLDataProperty(IRI.create(baseOntoU + propiedad));
+    
+        // Crear valor literal
+        OWLLiteral literal = dataFactoryOntologyOntoU.getOWLLiteral(valor);
+    
+        // Crear la relación
+        OWLDataPropertyAssertionAxiom axiom = dataFactoryOntologyOntoU.getOWLDataPropertyAssertionAxiom(dataProp, sujetoInd, literal);
+        manager.addAxiom(ontologyOntoU, axiom);
     }
 
 }

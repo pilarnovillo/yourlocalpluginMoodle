@@ -850,12 +850,6 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                                 title: 'Agregar subtema',
                                 body: `
                                     <form id="subtopicForm">
-                                        // <div class="form-group">
-                                        //     <label for="topicoSoporte">Posibles Topico Soporte</label>
-                                        //     <select id="topicoSoporte" class="form-control" required>
-                                        //         <!-- Options will be added dynamically here -->
-                                        //     </select>
-                                        // </div>
                                         <div class="form-group">
                                             <label for="subtopicName">Nombre</label>
                                             <input type="text" id="subtopicName" class="form-control" 

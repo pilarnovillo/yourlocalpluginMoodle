@@ -786,7 +786,20 @@ if (curl_errno($ch)) {
             echo 'Error:' . curl_error($ch);
         }
 
-        $asignatura = 'Lógica y Estructuras Discretas';  // TODO Asignatura que deseas consultar 
+        $courseid = optional_param('courseid', null, PARAM_INT);
+
+        // Get the course object
+        $course = get_course($courseid);
+
+        // Access the course name
+        if ($course) {
+            $coursename = $course->fullname;
+            $asignatura = $coursename;
+        } else {
+            echo "Course not found.";
+            $asignatura = 'Lógica y Estructuras Discretas';  // TODO si no existe decir que primero debe ser procesado el plan
+        }
+        
         $apiUrl = 'http://localhost:8080/ontology/unidadesTemasTopicosOntoU?asignatura=' . urlencode($asignatura); // URL del endpoint con el parámetro 'asignatura'
 
         // Configura la URL y otras opciones
