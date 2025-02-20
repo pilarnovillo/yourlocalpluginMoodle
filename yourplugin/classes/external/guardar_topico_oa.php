@@ -59,6 +59,28 @@ class guardar_topico_oa extends external_api {
                 $resultInsert = $sparql1->update($insertQuery);
 
                 $record->message = "Result Status: ".$resultInsert->getStatus();
+
+                //OWLAPI Integration
+                // Define the URL of the Spring Boot endpoint
+                $url = "http://localhost:8080/ontology/linkTopicToOA?oaid=" . urlencode($oaid)."&idTopic=".urlencode($idTopico);
+
+                // Initialize cURL session
+                $ch = curl_init($url);
+
+                // Set the cURL options for a POST request
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_POST, true);
+
+                // Execute the POST request
+                $response = curl_exec($ch);
+
+                // Check for errors
+                if (curl_errno($ch)) {
+                    echo 'Error:' . curl_error($ch);
+                }
+
+                // Close the cURL session
+                curl_close($ch);
             }
             else{
                 $deleteQuery = "PREFIX oaca: <http://www.semanticweb.org/valer/ontologies/OntoOA#>
@@ -71,6 +93,28 @@ class guardar_topico_oa extends external_api {
                 $resultInsert = $sparql1->update($deleteQuery);
 
                 $record->message = "Result Status: ".$resultInsert->getStatus();
+
+                //OWLAPI Integration
+                // Define the URL of the Spring Boot endpoint
+                $url = "http://localhost:8080/ontology/unlinkTopicToOA?oaid=" . urlencode($oaid)."&idTopic=".urlencode($idTopico);
+
+                // Initialize cURL session
+                $ch = curl_init($url);
+
+                // Set the cURL options for a POST request
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_POST, true);
+
+                // Execute the POST request
+                $response = curl_exec($ch);
+
+                // Check for errors
+                if (curl_errno($ch)) {
+                    echo 'Error:' . curl_error($ch);
+                }
+
+                // Close the cURL session
+                curl_close($ch);
 
             }
             

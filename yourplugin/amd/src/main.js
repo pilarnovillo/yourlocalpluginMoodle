@@ -89,7 +89,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                 };
 
                 var seleccionarUnidadTitulo = document.createElement('h3');
-                seleccionarUnidadTitulo.textContent = 'Seleccionar Unidad y Topicos:';
+                seleccionarUnidadTitulo.textContent = 'Seleccionar Unidad y Tópicos:';
                 seleccionarUnidadTitulo.style.marginTop="10px";
 
                  // Crear la opción por defecto
@@ -132,7 +132,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
 
                     // RA para OA
                 var title = document.createElement('h3'); // Título para el resultado de aprendizaje
-                title.textContent = 'Definir el resultado de aprendizaje del Objeto de Aprendizaje';
+                title.textContent = 'Definir el Resultado de Aprendizaje del Objeto de Aprendizaje';
                 title.style.marginTop="10px";
 
                     // Campos de entrada de texto
@@ -156,7 +156,8 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                     } else {
                         desactivarOtrosSelects('verbonivel1');
                         log.debug(event.target.value);
-                        guardarVerboEnOntologia(event.target.value, "Nivel1");
+                        log.debug(event.target.options[event.target.selectedIndex].text);
+                        guardarVerboEnOntologia(event.target.value,event.target.options[event.target.selectedIndex].text, "Nivel1");
                     }
                 });
                 // Aplicar cada atributo usando un bucle for
@@ -174,7 +175,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                     } else {
                         desactivarOtrosSelects('verbonivel2');
                         log.debug(event.target.value);
-                        guardarVerboEnOntologia(event.target.value, "Nivel2");
+                        guardarVerboEnOntologia(event.target.value,event.target.options[event.target.selectedIndex].text, "Nivel2");
                     }
                 });
                 // Aplicar cada atributo usando un bucle for
@@ -192,7 +193,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                     } else {
                         desactivarOtrosSelects('verbonivel3');
                         log.debug(event.target.value);
-                        guardarVerboEnOntologia(event.target.value, "Nivel3");
+                        guardarVerboEnOntologia(event.target.value,event.target.options[event.target.selectedIndex].text, "Nivel3");
                     }
                 });
                 // Aplicar cada atributo usando un bucle for
@@ -250,7 +251,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                 };
 
                 // Función para habilitar todos los selects
-                const guardarVerboEnOntologia = (verboId, nivel) =>{
+                const guardarVerboEnOntologia = (verboId, verboNombre, nivel) =>{
                     //enviar a la ontologia en el momento
                     fetch("http://localhost:8080/ontology/createVerbo", {
                         method: "POST",
@@ -259,6 +260,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                         },
                         body: new URLSearchParams({
                             verboId: verboId,
+                            verboNombre: verboNombre,
                             nivel: nivel
                         })
                       })
@@ -289,7 +291,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
 
                 // Create table element
                 var tablaTitulo = document.createElement('h3');
-                tablaTitulo.textContent = 'Ordenar Topicos:';
+                tablaTitulo.textContent = 'Ordenar Tópicos:';
                 tablaTitulo.style.marginTop="10px";
                 finalidadInput.insertAdjacentElement('afterend', tablaTitulo);
 
@@ -332,6 +334,8 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                         // raAsignaturaDto = raAsignaturaDto.replace("http://www.semanticweb.org/valer/ontologies/OntoOA#","");
                         var checkbox = document.createElement('input');
                         checkbox.type = 'checkbox';
+                        checkbox.style.transform = "scale(1.5)"; // Escala el tamaño
+                        checkbox.style.margin = "10px"; // Ajusta el espaciado
                         checkbox.value = raAsignaturaDto.id;//.toUpperCase().replace(/\s+/g, '_'); TODO ver si es necesario
                         if(selectedRAAsignaturaFromConocimiento.includes(raAsignaturaDto.id)){
                             checkbox.checked = true;
@@ -412,7 +416,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
 
                 };
 
-                const redirectToH5pEditor = (listaTopicosIdyNombre)=>{
+                const redirectToH5pEditor = (listaTopicosIdyNombre, treeData)=>{
                     // Redirigir a la página de h5p
                             // window.location.href = 'http://localhost/local/yourplugin/h5pEditor.php?courseid=' + paramCourseid
                             // + '&oaid=' + paramsObject['oaid']+"&contextid=14";
@@ -420,7 +424,8 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                     // Datos a enviar
                     const dataArray = {oaid:paramsObject['oaid'],
                         courseid:paramCourseid, contextid:paramsObject['contextid'],
-                        listaTopicosIdyNombre:listaTopicosIdyNombre
+                        listaTopicosIdyNombre:listaTopicosIdyNombre,
+                        treeData:treeData
                     };
                     // Crear un formulario
                     const form = document.createElement('form');
@@ -446,6 +451,8 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                 var contenedorCheckboxIgnorarRecomendaciones = document.createElement("div");
                 const checkboxIgnorarRecomendaciones = document.createElement('input');
                 checkboxIgnorarRecomendaciones.type = 'checkbox';
+                checkboxIgnorarRecomendaciones.style.transform = "scale(2)"; // Escala el tamaño
+                checkboxIgnorarRecomendaciones.style.margin = "10px"; // Ajusta el espaciado
                 checkboxIgnorarRecomendaciones.id = 'checkboxIgnorarRecomendaciones';
 
                 const labelIgnorarRecomendaciones = document.createElement('label');
@@ -471,6 +478,63 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                 // Add event listener to button
                 buttonCargarOrden.addEventListener('click', async function() {
                     log.debug("CLICKED cargar");
+                    // Seleccionamos el input dentro del contenedor
+                    const inputElementObjeto = objetoConocimientoInput.querySelector("input");
+                    // Obtenemos el valor del input
+                    const objeto = inputElementObjeto.value;
+                    log.debug(objeto);
+
+                    //enviar a la ontologia en el momento
+                    fetch("http://localhost:8080/ontology/createObjeto", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/x-www-form-urlencoded", // O "application/json" si es necesario
+                        },
+                        body: new URLSearchParams({
+                            objeto: objeto
+                        })
+                      })
+                      .then(response => {
+                        if (!response.ok) {
+                          throw new Error("Error en la solicitud");
+                        }
+                        return response.text(); // O .json() si esperas una respuesta JSON
+                      })
+                      .then(data => {
+                        log.debug("Respuesta del servidor CreateObjeto:", data);
+                      })
+                      .catch(error => {
+                        log.debug("Error:", error);
+                      });
+
+                    // Seleccionamos el input dentro del contenedor
+                    const inputElementCondiciono = condicionInput.querySelector("input");
+                    // Obtenemos el valor del input
+                    const condicion = inputElementCondiciono.value;
+                    log.debug(condicion);
+
+                      //enviar a la ontologia en el momento
+                    fetch("http://localhost:8080/ontology/createCondicion", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/x-www-form-urlencoded", // O "application/json" si es necesario
+                        },
+                        body: new URLSearchParams({
+                            condicion: condicion
+                        })
+                      })
+                      .then(response => {
+                        if (!response.ok) {
+                          throw new Error("Error en la solicitud");
+                        }
+                        return response.text(); // O .json() si esperas una respuesta JSON
+                      })
+                      .then(data => {
+                        log.debug("Respuesta del servidor CreateCondicion:", data);
+                      })
+                      .catch(error => {
+                        log.debug("Error:", error);
+                      });
                     log.debug("treeData inside Cargar:");
                     log.debug(treeData);
 
@@ -526,42 +590,83 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                     .then(data => {
                         log.debug('Respuesta del servidor setOrdenDeDesarrollo:', data); // Manejar la respuesta del servidor
 
+                        return fetch('http://localhost:8080/ontology/razonar?ontologia=CONOCIMIENTO', {
+                            method: 'GET', // Método HTTP POST
+                            headers: {
+                                'Content-Type': 'application/json' // Indicar que el cuerpo es JSON
+                            }
+                        });
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.text(); // Puedes ajustar según el tipo de respuesta que esperas (JSON, texto, etc.)
+                        } else {
+                            throw new Error('Error en la solicitud');
+                        }
+                    })
+                    .then(data => {
+                        log.debug('Respuesta del servidor razonar:', data); // Manejar la respuesta del servidor
+
+                        return fetch('http://localhost:8080/ontology/individuals?className=RAOANoAlineado', {
+                            method: 'GET', // Método HTTP POST
+                            headers: {
+                                'Content-Type': 'application/json' // Indicar que el cuerpo es JSON
+                            }
+                        });
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.text(); // Puedes ajustar según el tipo de respuesta que esperas (JSON, texto, etc.)
+                        } else {
+                            throw new Error('Error en la solicitud');
+                        }
+                    })
+                    .then(data => {
+                        log.debug('Respuesta del servidor RA No Alineado:', data); // Manejar la respuesta del servidor
                         if(checkboxIgnorarRecomendaciones.checked){
 
-                            redirectToH5pEditor(listaTopicosIdyNombre);
+                            redirectToH5pEditor(listaTopicosIdyNombre, treeData);
                         }
                         else{
+
                             //TODO syncronizar razonador y traer recomendaciones
                             // Crear un array de strings
-                            const mensajes = ["Error en el servidor", "No se pudo cargar el archivo",
-                                 "El usuario no está autorizado"];
-                            if(mensajes.length === 0){
-                                // Redirigir a la página de h5p
-                                window.location.href = 'http://localhost/local/yourplugin/h5pEditor.php?courseid='
-                                + paramCourseid
-                                + '&oaid=' + paramsObject['oaid']+"&contextid=14";
+                            const mensajes = ["El verbo no pertenece a un nivel de dominio "+
+                                 "cognitivo menor o igual al que pertenecen los verbos de todos los resultados de aprendizaje "+
+                                 "de la asignatura que refina"];
+                            log.debug("data.length"+data.length);
+                            if(data.length === 2){
+                                    // Redirigir a la página de h5p
+                                    // window.location.href = 'http://localhost/local/yourplugin/h5pEditor.php?courseid='
+                                    // + paramCourseid
+                                    // + '&oaid=' + paramsObject['oaid']+"&contextid=14";
+                                    redirectToH5pEditor(listaTopicosIdyNombre, treeData);
                             }
-                            contenedorMensajes.innerHTML = '';
+                            else{
+                                contenedorMensajes.innerHTML = '';
 
-                            // Recorrer el array de mensajes
-                            mensajes.forEach((mensaje) => {
-                                // Crear un nuevo elemento p (parrafo) para cada mensaje
-                                const p = document.createElement('p');
+                                // Recorrer el array de mensajes
+                                mensajes.forEach((mensaje) => {
+                                    // Crear un nuevo elemento p (parrafo) para cada mensaje
+                                    const p = document.createElement('p');
 
-                                // Asignar el contenido del mensaje al párrafo
-                                p.textContent = mensaje;
+                                    // Asignar el contenido del mensaje al párrafo
+                                    p.textContent = mensaje;
 
-                                // Asignar el contenido del mensaje al párrafo
-                                p.textContent = mensaje;
+                                    // Asignar el contenido del mensaje al párrafo
+                                    p.textContent = mensaje;
 
-                                // Aplicar estilo en línea directamente
-                                p.style.color = "red"; // Color rojo
-                                p.style.fontWeight = "bold"; // Negrita
+                                    // Aplicar estilo en línea directamente
+                                    p.style.color = "#FFC107"; // Color rojo
+                                    p.style.fontWeight = "bold"; // Negrita
+                                    p.style.fontSize = "18px"; // Negrita
 
-                                // Insertar el párrafo en el div contenedor
-                                contenedorMensajes.appendChild(p);
-                            });
-                            buttonCargarOrden.insertAdjacentElement('afterend', contenedorMensajes);
+                                    // Insertar el párrafo en el div contenedor
+                                    contenedorMensajes.appendChild(p);
+                                });
+                                buttonCargarOrden.insertAdjacentElement('afterend', contenedorMensajes);
+
+                            }
 
                         }
 
@@ -847,7 +952,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                         addSubtemaButton.addEventListener('click', async () => {
                             await ModalFactory.create({
                                 type: ModalFactory.types.SAVE_CANCEL,
-                                title: 'Agregar subtema',
+                                title: 'Crear Nuevo Tópico',
                                 body: `
                                     <form id="subtopicForm">
                                         <div class="form-group">
@@ -1006,6 +1111,8 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                                         newSubtopicDiv.style.marginLeft = `${nivel * 20}px`;
                                         const newSubtopicCheckbox = document.createElement('input');
                                         newSubtopicCheckbox.type = 'checkbox';
+                                        newSubtopicCheckbox.style.transform = "scale(1.5)"; // Escala el tamaño
+                                        newSubtopicCheckbox.style.margin = "10px"; // Ajusta el espaciado
                                         const topicNameNormalized = topicName.trim()
                                         .replace(/\s+/g, '_')
                                         .replace(/[^a-zA-Z0-9_]/g, '');
@@ -1020,7 +1127,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
 
                                         const newSubtopicLabel = document.createElement('label');
                                         newSubtopicLabel.htmlFor = topicName;
-                                        newSubtopicLabel.textContent = `${topicName} (${topicRelation})`;
+                                        newSubtopicLabel.textContent = `${topicName}`;
                                         newSubtopicLabel.style.marginRight="5px" ;
 
                                         newSubtopicDiv.appendChild(newSubtopicLabel);
@@ -1081,6 +1188,8 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                             // Crear checkbox para cada tópico
                             const checkbox = document.createElement('input');
                             checkbox.type = 'checkbox';
+                            checkbox.style.transform = "scale(1.5)"; // Escala el tamaño
+                            checkbox.style.margin = "10px"; // Ajusta el espaciado
                             checkbox.id = topico.id;
                             if (selectedTopicsFromConocimiento.includes(topico.id)) {
                                 checkbox.checked=true;
@@ -1574,6 +1683,7 @@ define(['jquery','core/log','core/ajax','core/modal_factory','core/modal_events'
                     input.style.color = '#333';
                     input.style.fontSize = '16px';
                     input.style.margin = '10px 0'; // Margen arriba y abajo
+                    input.style.width = '500px'; // Ancho de 400 píxeles
                     container.appendChild(label);
                     container.appendChild(input);
                     return container;

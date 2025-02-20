@@ -33,6 +33,43 @@ define(['jquery','core/log'], function($, log){
                     paramsObject[key] = value;
                 });
 
+                // Función recursiva para crear el select con optgroups y opciones
+                const createOptionsRecursively = (parent, nodes) => {
+                    nodes.forEach(node => {
+                        if (node.children && node.children.length > 0) {
+                            if (node.level === 0){
+                                // Si tiene hijos, creamos un optgroup para representarlo
+                                const optgroup = document.createElement("optgroup");
+                                optgroup.label = node.nombre;
+
+                                // Recursión para procesar los hijos
+                                createOptionsRecursively(optgroup, node.children);
+
+                                // Agregamos el optgroup al padre
+                                parent.appendChild(optgroup);
+                            }
+                            else{
+                                // Agregamos una opción para que sea seleccionable
+                                const option = document.createElement("option");
+                                option.value = node.id;
+                                option.textContent = "-----".repeat(node.level) + node.nombre;
+                                parent.appendChild(option);
+
+                                // Recursión para procesar los hijos
+                                createOptionsRecursively(parent, node.children);
+
+                            }
+
+                        } else {
+                            // Si no tiene hijos, creamos una opción normal
+                            const option = document.createElement("option");
+                            option.value = node.id;
+                            option.textContent = "-----".repeat(node.level) + node.nombre;
+                            parent.appendChild(option);
+                        }
+                    });
+                };
+
 
                 // Estilos que se aplicarán a cada botón
                 const estilosBoton = {
@@ -62,12 +99,16 @@ define(['jquery','core/log'], function($, log){
                 if(selectMenutopic){
                     // Elimina todas las opciones del select
                     selectMenutopic.options.length = 0;
-                    datos.listaTopicosIdyNombre.forEach(topico => {
-                        var option = document.createElement('option');
-                        option.textContent = topico.nombre;
-                        option.value = topico.id;
-                        selectMenutopic.appendChild(option);
-                    });
+
+                    // Llenar el select con los datos recursivamente
+                    createOptionsRecursively(selectMenutopic, datos.treeData);
+
+                    // datos.listaTopicosIdyNombre.forEach(topico => {
+                    //     var option = document.createElement('option');
+                    //     option.textContent = topico.nombre;
+                    //     option.value = topico.id;
+                    //     selectMenutopic.appendChild(option);
+                    // });
                 }
 
                 const selectMenulibrary= document.getElementById("menulibrary");
@@ -129,6 +170,8 @@ define(['jquery','core/log'], function($, log){
                 var contenedorCheckboxIgnorarRecomendaciones = document.createElement("div");
                 const checkboxIgnorarRecomendaciones = document.createElement('input');
                 checkboxIgnorarRecomendaciones.type = 'checkbox';
+                checkboxIgnorarRecomendaciones.style.transform = "scale(1.5)"; // Escala el tamaño
+                checkboxIgnorarRecomendaciones.style.margin = "10px"; // Ajusta el espaciado
                 checkboxIgnorarRecomendaciones.id = 'checkboxIgnorarRecomendaciones';
 
                 const labelIgnorarRecomendaciones = document.createElement('label');
@@ -179,8 +222,13 @@ define(['jquery','core/log'], function($, log){
                 });
 
                 // var buttonCrearNuevoH5P = document.getElementById('buttonCrearNuevoH5P');
+                var definirComponentesTitulo = document.createElement('h3');
+                definirComponentesTitulo.textContent = 'Definir Componentes:';
+                definirComponentesTitulo.style.marginTop="10px";
+
                 var mainDiv = document.querySelector('div[role="main"]');
                 if(mainDiv){
+                    mainDiv.insertBefore(definirComponentesTitulo, mainDiv.firstChild);
                     contenedorButtonFin.appendChild(buttonFin);
                     mainDiv.insertAdjacentElement('afterend', contenedorButtonFin);
                     contenedorButtonFin.insertAdjacentElement('afterend', contenedorCheckboxIgnorarRecomendaciones);
