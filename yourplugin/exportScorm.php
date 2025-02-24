@@ -1,69 +1,35 @@
 <?php
 
-//TODO move this to another file
-
-use core_h5p\local\library\autoloader;
-use core_h5p\editor_ajax;
-use core_h5p\editor;
-use Moodle\H5PCore;
-
-// require_once(__DIR__ . '/config.php');
 require(__DIR__ . '/../../config.php');
 require_once($CFG->libdir.'/formslib.php');
 require_once("$CFG->libdir/filestorage/file_storage.php");
 require_once($CFG->libdir.'/adminlib.php');
-// echo $CFG->libdir;
-// echo __DIR__ .' /../../config.php';
-// require 'vendor/autoload.php'; // Importa la biblioteca EasyRDF
-require(__DIR__ . '/lib/easyrdf/vendor/autoload.php');
 
 global $PAGE, $CFG, $OUTPUT, $DB;
 
-
-
-//h5p config
+// Requiere que el usuario inicie sesión
 require_login(null, false);
 
 $contentid = optional_param('id', null, PARAM_INT);
-$library = optional_param('library', null, PARAM_TEXT);
-$contextid = optional_param('contextid', null, PARAM_INT);
-$topic = optional_param('topic', null, PARAM_TEXT);
 
 $context = context_system::instance();
 $fs = new file_storage();
 
 require_capability('moodle/h5p:updatelibraries', $context);
 
-// $pagetitle = 'H5P Editor manual testing';
-// $url = new \moodle_url("/h5p/index.php");
-// Get the current URL with all parameters
-// $current_url = new moodle_url('/local/yourplugin/' . basename($_SERVER['REQUEST_URI']));
+// Obtener URL
 $current_url=  basename($_SERVER['REQUEST_URI']);
-echo basename($_SERVER['REQUEST_URI']);
-
 
 $PAGE->set_context($context);
-// $PAGE->set_url($url);
-// $PAGE->set_title($pagetitle);
-// $PAGE->set_heading($pagetitle);
-
 
 if (empty($contentid)) {
     $contentid = null;
 }
 
-// Variables para el mensaje de carga
-$processing = true;
-
-
-
-
-
-
-// Get the current date and time as a string
+// Obtener la fecha y la hora actual como string
 $date_time = date('Ymd_His'); // Example format: 20230610_141501
 
-
+// Funcion para verificar como termina el titulo del recurso H5P
 function checkTitleEndsWith($title, $searchString) {
     // Get the length of the search string
     $searchStringLength = strlen($searchString);
@@ -153,8 +119,7 @@ XML;
 
     foreach ($h5pFiles as $file) {
         if ($file != '.' && $file != '..') {
-            $name = $file;//pathinfo($file, PATHINFO_FILENAME);  // Nombre de la carpeta
-            // echo "file xxxxxx:".$file;
+            $name = $file;
             $manifestItems .= <<<XML
                 <item identifier="item_$name" identifierref="resource_$name">
                     <title>$name</title>
@@ -200,40 +165,39 @@ XML;
 }
 
 
-// Function to recursively delete a folder and its contents
+// Funcion para eliminar carpeta y su contenido recusivamente
 function deleteFolder($folderName) {
     if (!is_dir($folderName)) {
         return;
     }
 
-    // Open the directory
+    // Abrir directorio
     $files = array_diff(scandir($folderName), ['.', '..']);
     foreach ($files as $file) {
         $filePath = $folderName . DIRECTORY_SEPARATOR . $file;
 
-        // If it's a directory, call deleteFolder recursively
+        // Si es directorio llamar a deleteFolder recursively
         if (is_dir($filePath)) {
             deleteFolder($filePath);
         } else {
-            // Otherwise, just delete the file
+            // sino solo eliminar el archivo
             unlink($filePath);
         }
     }
 
-    // Finally, remove the empty folder
+    // Finalmente, elmiminar la carpeta vacia
     rmdir($folderName);
 }
 
-// Function to create a folder, removing it first if it already exists
+// Funcion para crear una carpeta, eliminandola si ya existia
 function createFolder($folderName) {
-    // Check if the folder exists
+    // Ver si existe la carpeta
     if (file_exists($folderName)) {
-        // Remove the folder and its contents
+        // Eliminar carpeta y su contenido 
         deleteFolder($folderName);
-        // echo "Carpeta '$folderName' eliminada exitosamente.\n";
     }
 
-    // Create the folder with 0777 permissions and recursively
+    // Crear carpeta con permisos 0777
     if (mkdir($folderName, 0777, true)) {
         // echo "Carpeta '$folderName' creada exitosamente.\n";
     } else {
@@ -241,6 +205,7 @@ function createFolder($folderName) {
     }
 }
 
+// Funcion para agregar carpeta al ZIP
 function zipFolder($zip,$folderPath) {
     
         // Agregar la carpeta al ZIP
@@ -267,58 +232,51 @@ function zipFolder($zip,$folderPath) {
     
 }
 
+// Funcion para modificar el Src en el html
 function modifyImgSrc($htmlFilePath) {
 
     // Leer el contenido del archivo HTML como una cadena
     $htmlString = file_get_contents($htmlFilePath);
 
-    //Modify the h5p.js script on the html file so the path of the files is just the relative one
-    // Replace it with an empty string
+    // Modifica el script h5p.js en el archivo HTML para que la ruta de los archivos sea solo la relativa
+    // Reemplazar con una cadena vacía
     $replace = '"")';
 
-    // Regular expression to match the pattern (allowing for variations like spaces)
+    // Expresión regular para hacer coincidir el patrón (permitiendo variaciones como espacios).
     $pattern = '/window\.location\.protocol\s*\+\s*["\']\/\/["\']\s*\+\s*window\.location\.host\s*\+\s*n\s*\)\s*\+\s*["\']\/["\']/';
 
-    // Perform the replacement
+    // Realiza el reemplazo.
     $modifiedHtmlString = preg_replace($pattern, $replace, $htmlString);
 
-    // Define the regex pattern to find all paths
+    // Define el patrón de expresión regular para encontrar todas las paths
     $patternImages = '/\d+\/(images|videos)\/[^"]+/';
 
-    // Use preg_replace_callback to modify all paths dynamically
+    // Usar preg_replace_callback para modificar todas las paths dynamically
     $updatedHtml = preg_replace_callback($patternImages, function ($matches) {
-        // $matches[0] contains the path with numeric prefix
         $pathWithNumber = $matches[0];
-        // Remove the numeric prefix from the path
         $pathWithoutNumber = preg_replace('/^\d+\//', '', $pathWithNumber);
         
-        // Return the updated path
+        // Retornar path actualizada
         return  $pathWithoutNumber ;
     }, $modifiedHtmlString);
 
     file_put_contents($htmlFilePath, $updatedHtml);
 
-    //TODO implement for videos or audio files
-
-    
 }
 
 
-
+// Funcion para agregar todos los archivos al ZIP
 function add_files_to_zip($zip) {
     global $DB, $OUTPUT, $USER, $CFG;
     $date_time = date('Ymd_His');
     $fs = new file_storage();
-    // Archivos H5P a incluir
+    // Archivos H5P a incluir filtrando por OAID
     $oaid = optional_param('oaid', null, PARAM_INT);
     $h5pcontents = $DB->get_records('h5p', null, 'id', 'id, pathnamehash, jsoncontent');
-
-    // echo "HERE IS OAID:".$oaid;
 
     $oaFolderName =  $CFG->dataroot . '/OA'.$oaid;
     createFolder($oaFolderName);
 
-    
     foreach ($h5pcontents as $h5pcontent) {
         $file = $fs->get_file_by_hash($h5pcontent->pathnamehash);
         
@@ -340,34 +298,23 @@ function add_files_to_zip($zip) {
 
                 try {
 
-                    // Get the content of the stored_file object
-                    // $h5p_content = $file->get_content();
-
-                    // Create a temporary file for the H5P content
-                    // $tempFile = tempnam(sys_get_temp_dir(), 'h5p');
-                    // file_put_contents($tempFile, $h5p_content);
-
                     // Directorio donde se va a extraer el contenido del archivo H5P
                     $extractPath = $CFG->dataroot . '/'. str_replace(".h5p", "", $fileName) ."/";
 
                     // Crea un objeto ZipArchive
                     $unzipNew = new ZipArchive();
                 
-                    // Open the ZIP file from the temporary file
                     if ($unzipNew->open($file_path_h5p_server) === TRUE) {
-                        // Extract contents to output directory
                         $unzipNew->extractTo($extractPath);
                         $unzipNew->close();
 
-                        // echo "Successfully extracted contents to $extractPath";
-
                         $url = "http://localhost:3000/api/sendParameter";
                         $data = array(
-                            "parameter"=>$extractPath, //"C:/Users/piluc/Downloads/multiple-choice-713",//TODO path to unzip created new for h5p
-                            "parameter2"=>$file_path_h5p_server//"C:/Users/piluc/Downloads/arithmetic-quiz-22-57860.h5p"
+                            "parameter"=>$extractPath, 
+                            "parameter2"=>$file_path_h5p_server
                         );
 
-                        // Encode the data array into a JSON string
+                        // Transformar a JSON
                         $jsonData = json_encode($data);
 
                         // Iniciar cURL
@@ -391,16 +338,14 @@ function add_files_to_zip($zip) {
                             echo 'Error:' . curl_error($ch);
                         } 
 
-                        // Define the file paths
+                        // Definir el path del archivo
                         $htmlFilePath = $oaFileFolderName.'/index.html';
-                        // Save the HTML response to the file
+                        // Guardar la respuesta html en el archivo
                         file_put_contents($htmlFilePath, $response);
                         // Cerrar cURL
                         curl_close($ch);
 
                         createManifestFile($oaFileFolderName, 'index.html', str_replace(".h5p", "", $fileName));
-
-                        
 
                     } else {
                         echo "Failed to extract contents.";
@@ -416,27 +361,23 @@ function add_files_to_zip($zip) {
                     );
                 
                     foreach ($files as $name => $fileInsideFolder) {
-                        // Get the real and relative path for current file
                         $filePath = $fileInsideFolder->getRealPath();
                         $relativePath = substr($filePath, strlen($contentImagesFolder)-1);
 
-                        // Skip directories (they are added automatically)
                         if ($fileInsideFolder->isDir()) {
-                            // Add directory to the archive
                             if (mkdir($oaFileFolderName.'/'.$relativePath, 0777, true)) {
                                 // echo "Carpeta '$oaFileFolderName.'/'.$relativePath' creada exitosamente.\n";
                             } else {
                                 echo "Error al crear la carpeta '$oaFileFolderName.'/'.$relativePath'.\n";
                             }
                         }else{
-                            // Add current file to the archive
                             copy($filePath, $oaFileFolderName.'/'.$relativePath);
                         }
                     }
 
                 }
 
-                //Modify the html file so the path of the files is just the relative one
+                // Modifica el archivo HTML para que la ruta de los archivos sea solo la relativa.
                 $htmlFile = $oaFileFolderName.'/index.html';  // Ruta del archivo HTML
                 modifyImgSrc($htmlFile);
 
@@ -462,14 +403,9 @@ function add_files_to_zip($zip) {
         
     }
 
-    
-
-    // Agregar el archivo .txt al ZIP
-    // if (file_exists($txt_file)) {
-    //     $zip->addFile($txt_file, basename($txt_file));
-    // }
     $fs = get_file_storage();
 
+    // Configuraciones de moodle
     $fileinfo = [
         'contextid' => 14,   // ID of the context.
         'component' => 'contentbank', // Your component name.
@@ -479,7 +415,6 @@ function add_files_to_zip($zip) {
         'filename'  => 'metadatos' . $date_time . '.txt',   // Any filename.
     ];
 
-    // Create a new file containing the text 'hello world'.
     $fileMetadatos = $fs->create_file_from_string($fileinfo, 'Metadatos');
     $file_pathMetadatos = $fileMetadatos->get_filepath() . $fileMetadatos->get_filename();
     $zip->addFromString(basename($file_pathMetadatos), $fileMetadatos->get_content());
@@ -515,20 +450,16 @@ createParentManifest($oaFolderName, scandir($oaFolderName));
 
 zipFolder($zip,$oaFolderName);
 
-
-// var_dump($zip);
-
 // Cerrar el archivo ZIP
 $zip->close();
 
 // Enviar el archivo ZIP al navegador para su descarga
 if (file_exists($zip_filepath)) {
     // Almacenar el archivo ZIP en el área de archivos de Moodle
-    // Configura el contexto y el área de archivos según tu necesidad
-    $contextid = 14;//context_system::instance()->id;
-    $component = 'contentbank'; // Reemplaza con el componente correspondiente
-    $filearea = 'public'; // Reemplaza con el área de archivo correspondiente
-    $itemid = 0; // Ajusta según tu necesidad
+    $contextid = 14;
+    $component = 'contentbank'; 
+    $filearea = 'public'; 
+    $itemid = 0;
     $filepath = '/';
     
 
@@ -549,9 +480,6 @@ if (file_exists($zip_filepath)) {
         'userid' => $USER->id,
     );
 
-    // Eliminar cualquier archivo existente con el mismo nombre
-    // $fs->delete_area_files($contextid, $component, $filearea, $itemid);
-
     // Crear el archivo
     $file = $fs->create_file_from_pathname($filerecord, $zip_filepath);
 
@@ -565,9 +493,6 @@ if (file_exists($zip_filepath)) {
         false                     // Do not force download of the file.
     );
 
-    // Echo the HTML button with the file URL
-    // echo '<a href="' . $url . '" download>Exportar OA</a>';
-
      // Mensaje de éxito
      $message = '<a href="' . $url . '" download>Exportar OA</a>';
      $processing = false; // El proceso ha terminado
@@ -579,56 +504,4 @@ if (file_exists($zip_filepath)) {
 
 echo $OUTPUT->header();
 
-// echo $OUTPUT->footer();
-?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generación de Archivo ZIP</title>
-    <style>
-        #loading {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            font-family: Arial, sans-serif;
-            z-index: 1000;
-            top: 0;
-            left: 0;
-        }
-        #content {
-            display: none;
-        }
-    </style>
-</head>
-<body>
-    <div id="loading">Cargando, por favor espere...</div>
-    <div id="content">
-        <?php echo $message; ?>
-    </div>
-
-    <script>
-        // JavaScript para ocultar el mensaje de carga y mostrar el contenido
-        window.onload = function() {
-            const processing = <?php echo json_encode($processing); ?>;
-            if (!processing) {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
-            }
-        };
-    </script>
-
-    <?php
-    // Cargar el footer de Moodle
-    echo $OUTPUT->footer();
-    ?>
-</body>
-</html>
-
-
+echo $OUTPUT->footer();

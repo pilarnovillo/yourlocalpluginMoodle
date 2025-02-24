@@ -1,31 +1,43 @@
 /*eslint linebreak-style: ["error", "windows"]*/
-// define(['jquery','core/log', 'core_h5p/editor_display'], function($, log, Editor){
-// define(['jquery','core/log','editor_atto'], function($, log, editor_atto){
-// import call  from 'core/ajax';
 define(['jquery','core/log'], function($, log){
-    log.debug('Your module is h5pEdiotr.');
     return {
         init: function(datos_json) {
             $(document).ready(function(){
                 // Convertir los datos JSON de PHP a objetos JavaScript
                 var datos = JSON.parse(datos_json);
-                // Hacer algo con los datos
-                log.debug(datos);
 
+                // Estilos que se aplicarán a cada botón
+                const estilosBoton = {
+                    backgroundColor: '#4CAF50', // Color verde del botón en la imagen
+                    color: 'white', // Texto blanco
+                    border: 'none',
+                    padding: '10px 20px',
+                    textAlign: 'center',
+                    textDecoration: 'none',
+                    display: 'inline-block',
+                    fontSize: '16px',
+                    margin: '4px 2px',
+                    cursor: 'pointer',
+                    borderRadius: '5px',
+                    transition: 'background-color 0.3s ease',
+                    position : 'absolute',
+                    left : '50%',
+                    transform : 'translateX(-50%)'// Para centrar el botón
+                };
 
-                // Get the query string portion of the URL.
+                // Obtener el URL
                 var queryString = window.location.search;
 
-                // Remove the leading '?' character.
+                // Eliminar el '?' character.
                 queryString = queryString.substring(1);
 
-                // Split the query string into an array of key-value pairs.
+                // Dividir los parametros en un array
                 var params = queryString.split('&');
 
-                // Create an object to store the parameters and their values.
+                // Crear objeto para almacenar los parametros.
                 var paramsObject = {};
 
-                // Iterate over the key-value pairs and populate the paramsObject.
+                // Iterar y almacenar en paramsObject.
                 params.forEach(function(param) {
                     var keyValue = param.split('=');
                     var key = decodeURIComponent(keyValue[0]);
@@ -70,30 +82,10 @@ define(['jquery','core/log'], function($, log){
                     });
                 };
 
-
-                // Estilos que se aplicarán a cada botón
-                const estilosBoton = {
-                    backgroundColor: '#4CAF50', // Color verde del botón en la imagen
-                    color: 'white', // Texto blanco
-                    border: 'none',
-                    padding: '10px 20px',
-                    textAlign: 'center',
-                    textDecoration: 'none',
-                    display: 'inline-block',
-                    fontSize: '16px',
-                    margin: '4px 2px',
-                    cursor: 'pointer',
-                    borderRadius: '5px',
-                    transition: 'background-color 0.3s ease',
-                    position : 'absolute',
-                    left : '50%',
-                    transform : 'translateX(-50%)'// Para centrar el botón
-                };
-
                 const selectMenuid= document.getElementById("menuid");
                 selectMenuid.options[0].text = "Seleccionar";
 
-                // Now you can access the parameters and their values from the paramsObject.
+                // Obtener parametro courseid
                 var paramCourseid = paramsObject['courseid'];
                 var selectMenutopic = document.getElementById('menutopic');
                 if(selectMenutopic){
@@ -102,28 +94,23 @@ define(['jquery','core/log'], function($, log){
 
                     // Llenar el select con los datos recursivamente
                     createOptionsRecursively(selectMenutopic, datos.treeData);
-
-                    // datos.listaTopicosIdyNombre.forEach(topico => {
-                    //     var option = document.createElement('option');
-                    //     option.textContent = topico.nombre;
-                    //     option.value = topico.id;
-                    //     selectMenutopic.appendChild(option);
-                    // });
                 }
 
+                // Select del tipo de recurso
                 const selectMenulibrary= document.getElementById("menulibrary");
                 selectMenulibrary.options[0].text = "Seleccionar";
 
-
+                // Logica para el Select del tipo de componente
                 var selectMenutipo = document.getElementById('menutipo');
                 selectMenutipo.options[0].text = "Seleccionar";
                 selectMenutipo.addEventListener("change", function () {
                     Array.from(selectMenulibrary.options).forEach(option => {
-                            option.hidden = false; // Hide the option
+                            option.hidden = false; // Ocultar la opcion
                     });
 
                     const menutipo = this.value; // Obtiene el valor seleccionado
                     const menutopic = document.getElementById("menutopic");
+                    // Si el tipo de componente es evaluacion
                     if (menutipo === "evaluacion") {
                         menutopic.disabled = true; // Desactiva el select menutopic
 
@@ -145,8 +132,7 @@ define(['jquery','core/log'], function($, log){
                                                     "H5P.TwitterUserFeed 1.0"];
                         Array.from(selectMenulibrary.options).forEach(option => {
                             if (optionsToDisable.includes(option.value)) {
-                                // option.disabled = true;
-                                option.hidden = true; // Hide the option
+                                option.hidden = true; // Ocultar opcion en el select del tipo de recurso
                             }
                         });
                     } else {
@@ -154,14 +140,9 @@ define(['jquery','core/log'], function($, log){
                     }
                 });
 
+                // Mover el mensaje de error a donde corresponde
                 var saveChangesButtonH5P = document.getElementById('id_submitbutton');
-                log.debug("saveChangesButton:" + saveChangesButtonH5P);
-                log.debug(saveChangesButtonH5P);
-
-                //move error message to correct place
                 var errorMessage = document.getElementById("error-message");
-                log.debug("ERROR MESAGE");
-                log.debug(errorMessage);
                 if (errorMessage){
                     saveChangesButtonH5P.insertAdjacentElement('afterend', errorMessage);
                 }
@@ -189,39 +170,15 @@ define(['jquery','core/log'], function($, log){
                 for (const propiedad in estilosBoton) {
                     buttonFin.style[propiedad] = estilosBoton[propiedad];
                 }
-                // Add event listener to button
+                // Event listener to button
                 buttonFin.addEventListener('click', async function() {
-                    log.debug("CLICKED");
 
-                    // Redirigir a la página de tu plugin local
+                    // Redirigir a la proxima pantalla
                     window.location.href = 'http://localhost/local/yourplugin/metadatos.php?courseid=' + paramCourseid
                     + '&oaid=' + paramsObject['oaid'];
-
-                    // Datos a enviar
-                    // const dataArray = {oaid:paramsObject['oaid'],
-                    //     courseid:paramCourseid, contextid:paramsObject['contextid']
-                    // };
-                    // // Crear un formulario
-                    // const form = document.createElement('form');
-                    // form.method = 'POST'; // Método POST
-                    // form.action = 'metadatos.php?courseid='+ paramCourseid
-                    // + '&oaid=' + paramsObject['oaid']+"&contextid=14"; // URL de destino
-
-                    // // Crear un campo oculto con los datos
-                    // const input = document.createElement('input');
-                    // input.type = 'hidden';
-                    // input.name = 'dataArray';
-                    // input.value = JSON.stringify(dataArray); // Convertir el array a JSON
-
-                    // // Añadir el campo al formulario
-                    // form.appendChild(input);
-
-                    // // Añadir el formulario al documento y enviarlo
-                    // document.body.appendChild(form);
-                    // form.submit(); // El formulario realiza la redirección automáticamente
                 });
 
-                // var buttonCrearNuevoH5P = document.getElementById('buttonCrearNuevoH5P');
+                // Agregar titulo a la pagina
                 var definirComponentesTitulo = document.createElement('h3');
                 definirComponentesTitulo.textContent = 'Definir Componentes:';
                 definirComponentesTitulo.style.marginTop="10px";

@@ -1,40 +1,31 @@
 <?php
 
-//TODO move this to another file
-
 use core_h5p\local\library\autoloader;
 use core_h5p\editor_ajax;
 use core_h5p\editor;
 use Moodle\H5PCore;
 
-// require_once(__DIR__ . '/config.php');
 require(__DIR__ . '/../../config.php');
 require_once($CFG->libdir.'/formslib.php');
 require_once("$CFG->libdir/filestorage/file_storage.php");
 require_once($CFG->libdir.'/adminlib.php');
-// echo $CFG->libdir;
-// echo __DIR__ .' /../../config.php';
-// require 'vendor/autoload.php'; // Importa la biblioteca EasyRDF
-require(__DIR__ . '/lib/easyrdf/vendor/autoload.php');
 
 global $PAGE, $CFG, $OUTPUT;
 
 
-
 class test_editor_form extends moodleform {
     
-    // Add elements to form.
+    // Agregar elementos al formulario H5P
     /** @var editor H5P editor object */
     private $editor;
 
     /**
-     * The form definition.
+     * Definicion del Formulario
      */
     public function definition() {
         global $DB, $OUTPUT, $USER;
-        // A reference to the form is stored in $this->form.
-        // A common convention is to store it in a variable, such as `$mform`.
-        $mform = $this->_form; // Don't forget the underscore!
+
+        $mform = $this->_form; 
 
         //h5p form config
         $id = $this->_customdata['id'] ?? null;
@@ -70,47 +61,41 @@ class test_editor_form extends moodleform {
             $mform->setType('tipo', PARAM_RAW);
 
             $context = context_user::instance($USER->id);
-            // $editor->set_library($library, $context->id, 'user', 'private', 0);
+
             $editor->set_library($library, $contextid, 'contentbank', 'public');
         }
         $this->editor = $editor;
         $mformid = 'coolh5peditor';
         $mform->setAttributes(array('id' => $mformid) + $mform->getAttributes());
 
-        // $this->add_action_buttons();
-
         $mform->addElement('header', 'reportsettings', "Editing a H5P inside a quickform");
 
         $editor->add_editor_to_form($mform);
 
-        // Add a checkbox to ignore validation
-        $mform->addElement('advcheckbox', 'ignorevalidation', 'ignorevalidation');
+        // Agregar checkbox para ignorar recomendaciones
+        $mform->addElement('advcheckbox', 'ignorevalidation', 'Ignorar Recomendaciones');
         $mform->setDefault('ignorevalidation', 0);
 
         $this->add_action_buttons();
 
-        // Add custom Delete button
-        $mform->addElement('submit', 'deletebutton', 'Delete', array('style' => 'background-color: red; color: white; border: none; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 5px; transition: background-color 0.3s ease;'));
+        // Agregar boton Eliminar 
+        $mform->addElement('submit', 'deletebutton', 'Eliminar', array('style' => 'background-color: red; color: white; border: none; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 5px; transition: background-color 0.3s ease;'));
     }
 
     public function save_h5p(stdClass $data) {
         $this->editor->save_content($data);
     }
 
-    // Custom validation should be added here.
+    // Validaciones personalizadas
     function validation($data, $files) {
         //Si se quiere eliminar se saltea la validacion 
         if (isset($data['deletebutton'])) {
-            // Bypass validation when delete is pressed
             return array();
         }
 
         global $DB;
+        // Array para almacenar las recomendaciones correspondientes al recurso H5P
         $errors= array();
-        // TODO enviar info a la ontologia 
-        
-        
-        print_r($data);
 
         // Decodificar el valor de 'h5pparams' como un array asociativo
         $h5pparams = json_decode($data['h5pparams'], true);
@@ -123,11 +108,8 @@ class test_editor_form extends moodleform {
             $oaid = $parts[2];
             $oaid = str_replace(array("ID"), '', strip_tags($oaid));
         }
-        // Mostrar el resultado
-        echo "OAID:".$oaid;
 
         //Necesito saber a que subactividad pertenece--->ID del h5p puede ser el id(param) de la subactividad 
-        
         if (isset($data['id'])) {
             $idSubAct = $data['id'];
         } else {
@@ -138,9 +120,7 @@ class test_editor_form extends moodleform {
             $idSubAct = $last_id ? $last_id + 1 : 1;
 
         }
-        echo "ID h5p:".$idSubAct;
         
-
         //Necesito saber que tipo es el h5p si acti, evaluacion, contenido u ejemplo
         //Si es nuevo tengo el tipo como parametro sino lo saco del nombre
         if (isset($data['tipo'])) {
@@ -149,8 +129,6 @@ class test_editor_form extends moodleform {
             $parts = explode('-', $h5pparams['metadata']['extraTitle']);
             $tipo = $parts[3];
         }
-        // Mostrar el resultado
-        echo "TIPO:".$tipo;
 
         //TOPICO esta en el parametro si es un nuevo h5p o en el nombre si se esta Editando
         // Necesito saber a que topico satisface esta subActividad
@@ -160,8 +138,6 @@ class test_editor_form extends moodleform {
             $parts = explode('-', $h5pparams['metadata']['extraTitle']);
             $topic = $parts[0];
         }
-        // Mostrar el resultado
-        echo "TOPIC:".$topic;
 
         switch ($tipo) {
             case 'actividad':
@@ -169,13 +145,8 @@ class test_editor_form extends moodleform {
                 echo "Esto es una Actividad.";
                 // URL del endpoint
                 $url = "http://localhost:8080/ontology/insertSubactividad";
-
-                // Convertir los datos a formato JSON
-                // $jsonDataString = json_encode();
-
                 // Construir la URL con los parámetros
                 $fullUrl = $url . "?idSubact=" . urlencode($idSubAct) . "&oaid=" . urlencode($oaid) . "&idTopico=" . urlencode($topic) . "&library=" . urlencode($data['h5plibrary']);
-
                 // Inicializar cURL
                 $ch = curl_init($fullUrl);
 
@@ -198,9 +169,6 @@ class test_editor_form extends moodleform {
 
                 // Cerrar cURL
                 curl_close($ch);
-
-                // Imprimir la respuesta
-                echo $response;
                 
                 break;
             
@@ -230,21 +198,14 @@ class test_editor_form extends moodleform {
                 // Cerrar cURL
                 curl_close($ch);
 
-                // Imprimir la respuesta
-                echo $response;
                 break;
         
             case 'contenido':
                 // Lógica para la opción 'Contenido'
-                //Contar los elementos de interaccion?
-                // . "&library=" . urlencode($data['h5plibrary'])
-                echo "Esto es un Contenido.";
+                //TODO Contar los elementos de interaccion
 
                 // URL del endpoint
                 $url = "http://localhost:8080/ontology/insertContenido";
-
-                // Convertir los datos a formato JSON
-                // $jsonDataString = json_encode();
 
                 // Construir la URL con los parámetros
                 $fullUrl = $url . "?idContenido=" . urlencode($idSubAct) . "&oaid=" . urlencode($oaid) . "&library=" . urlencode($data['h5plibrary']);
@@ -272,15 +233,10 @@ class test_editor_form extends moodleform {
                 // Cerrar cURL
                 curl_close($ch);
 
-                // Imprimir la respuesta
-                echo $response;
                 break;
             case 'evaluacion':
                 // URL del endpoint
                 $url = "http://localhost:8080/ontology/insertEvaluacion";
-
-                // Convertir los datos a formato JSON
-                // $jsonDataString = json_encode();
 
                 // Construir la URL con los parámetros
                 $fullUrl = $url . "?idEvaluacion=" . urlencode($idSubAct) . "&oaid=" . urlencode($oaid) . "&library=" . urlencode($data['h5plibrary']);
@@ -308,8 +264,6 @@ class test_editor_form extends moodleform {
                 // Cerrar cURL
                 curl_close($ch);
 
-                // Imprimir la respuesta
-                echo $response;
                 break;
             default:
                 // Lógica para cuando no coincide con ninguno de los casos anteriores
@@ -317,29 +271,6 @@ class test_editor_form extends moodleform {
                 break;
         }
 
-
-        //Tipo de libreria para saber como recorrer el JSON
-        echo "LIB: ".$data['h5plibrary'];
-
-        // // Configura el endpoint SPARQL
-        // $endpoint1 = 'http://localhost:3030/OA'; // Cambia 'dataset' por el nombre de tu dataset
-        
-        // $sparql1 = new \EasyRdf\Sparql\Client($endpoint1);
-    
-        // //TODO que tipo es para crear en la ontologia ej Actividad
-        // $insertQuery = "PREFIX oaca: <http://www.semanticweb.org/valer/ontologies/OntoOA#>
-        // INSERT DATA {
-        //     oaca:Actividad{$oaid} a oaca:ActividadDeAprendizaje .
-    
-        //     oaca:Subactividad{$idSubAct}OA{$oaid} a oaca:Subactividad .
-    
-        //     oaca:Actividad{$oaid} oaca:actividadSeComponeDe oaca:Subactividad{$idSubAct}OA{$oaid}.
-    
-        // }";
-    
-        // $resultInsert = $sparql1->update($insertQuery);
-
-        // echo $resultInsert;
         
         // Función recursiva para buscar una cadena en un array o un objeto
         function searchInArray($array, $search) {
@@ -358,7 +289,7 @@ class test_editor_form extends moodleform {
         }    
 
 
-        // Function to recursively find all "text" fields que REPRESENTA LAS OPCIONES
+        // Funcion recursiva para buscar todos los campos "text" que representa las opciones.
         function findTextFields($array, &$textFields = []) {
             foreach ($array as $key => $value) {
                 if (is_array($value)) {
@@ -371,115 +302,68 @@ class test_editor_form extends moodleform {
             }
         }
 
-
-
-        //Hacer las consultas correspondientes ej Multiple choice
-        // Check if the user chose to ignore validation
+        // Verificar si el checkbos Ingnorar recomendaciones esta seleccionado
         if (!isset($data['ignorevalidation']) || !$data['ignorevalidation']) {
-            
+            // Hacer las consultas correspondientes para recomendaciones dentro del editor H5P
+            //Tipo de libreria para saber como recorrer el JSON
+            $h5plibrary = $data['h5plibrary'];
+            // TODO completar para todos los tipos de recurso
+
+            //MultiChoice
             // Buscar la cadena "H5P.MultiChoice"
-            // $searchString = "H5P.MultiChoice";
-            // $found = searchInArray($h5pparams, $searchString);
+            $searchString = "H5P.MultiChoice";
+            $found = searchInArray($h5pparams, $searchString);
 
-            // if ($found) {
-            //     echo "The string '$searchString' was found in the JSON.";
-            // } else {
-            //     echo "The string '$searchString' was not found in the JSON.";
-            // }
+            if ($found) {
+                // Buscar todos los campos text, que serian las opciones del MultiChoice
+                $textFields = [];
+                findTextFields($h5pparams, $textFields);
 
-            $question = $h5pparams['params']['question'];
-            $questionText = str_replace(array("\n", "\r"), '', strip_tags($question));
-            if ($questionText === 'Pregunta6') {
-                echo 'The question is Pregunta6';
-                return [];
-            } else {
-                echo '<div id="error-message" style="color: red;">HERE</div>';
-                echo 'The question is not Pregunta6';
-                echo "IM ON THE VALIDATION";
-                $errors['name'] = "FAKE ERROR";
+                // Verificar si "Ninguna de las anteriores" o "Todas las anteriores" existen
+                $foundNinguna = false;
+                $foundTodas = false;
+
+                foreach ($textFields as $text) {
+                    if (strpos($text, "Ninguna de las anteriores") !== false) {
+                        $foundNinguna = true;
+                    }
+                    if (strpos($text, "Todas las anteriores") !== false) {
+                        $foundTodas = true;
+                    }
+                }
+
+                if ($foundNinguna) {
+                    $errors['foundNinguna'] = "Se recomienda evitar opciones como 'Ninguna de las anteriores'";
+                }
+
+                if ($foundTodas) {
+                    $errors['foundTodas'] = "Se recomienda evitar opciones como 'Todas las anteriores'";
+                }
             }
 
-            // Initialize the array to store text fields
-            // $textFields = [];
-            // findTextFields($h5pparams, $textFields);
+        }
 
-            // // Output the text fields
-            // echo "\nNumber of 'text' fields found OPCIONES: " . count($textFields);
-
-            // // Check if "Ninguna de las anteriores" or "Todas las anteriores" exists
-            // $foundNinguna = false;
-            // $foundTodas = false;
-
-            // foreach ($textFields as $text) {
-            //     if (strpos($text, "Ninguna de las anteriores") !== false) {
-            //         $foundNinguna = true;
-            //     }
-            //     if (strpos($text, "Todas las anteriores") !== false) {
-            //         $foundTodas = true;
-            //     }
-            // }
-
-            // if ($foundNinguna) {
-            //     echo "'Ninguna de las anteriores' was found.\n";
-            // }
-
-            // if ($foundTodas) {
-            //     echo "'Todas las anteriores' was found.\n";
-            // }
-
+        if (!empty($errors)) {
+            // Con el id luego el javascript lo coloca en el lugar correspondiente
+            echo '<div id="error-message" style="color: red;">';
+            foreach ($errors as $error) {
+                echo "<p>$error</p>"; // Muestra cada mensaje en un <p>
+            }
+            echo '</div>';
         }
         
-
         return $errors;
         
     }
 }
 
-class myform extends moodleform {
-    
-
-    /**
-     * The form definition.
-     */
-    public function definition() {
-        global $DB, $OUTPUT, $USER;
-        // A reference to the form is stored in $this->form.
-        // A common convention is to store it in a variable, such as `$mform`.
-        $mform = $this->_form; // Don't forget the underscore!
-
-    
-        // Add elements to your form.
-        $mform->addElement('text', 'email', get_string('email'));
-
-        // Set type of element.
-        $mform->setType('email', PARAM_NOTAGS);
-
-        // Default value.
-        $mform->setDefault('email', 'Please enter email');
-
-        $mform->addElement('select', 'unidadSelect', 'Unidad', array(), null);
-
-
-        // $mform->addElement('checkbox', 'ratingtime',  'RA' ,'DERECHA');
-
-        // $mform->addElement('advcheckbox', 'ratingtime1', get_string('ratingtime1', 'forum'), 'Label displayed after checkbox', array('group' => 1), array(0, 1));
-
-
-    }
-
-    // Custom validation should be added here.
-    function validation($data, $files) {
-        return [];
-    }
-
-}
-
 
 session_start(); // Iniciar la sesión
 
-//h5p config
+// Requiere que el usuario inicie sesión
 require_login(null, false);
 
+// Definir parametros
 $contentid = optional_param('id', null, PARAM_INT);
 $library = optional_param('library', null, PARAM_TEXT);
 $contextid = optional_param('contextid', null, PARAM_INT);
@@ -487,23 +371,15 @@ $topic = optional_param('topic', null, PARAM_TEXT);
 $oaid = optional_param('oaid', null, PARAM_INT);
 $tipo = optional_param('tipo', null, PARAM_TEXT);
 
+// Configuraciones H5P
 $context = context_system::instance();
 $fs = new file_storage();
-
 require_capability('moodle/h5p:updatelibraries', $context);
 
-// $pagetitle = 'H5P Editor manual testing';
-// $url = new \moodle_url("/h5p/index.php");
-// Get the current URL with all parameters
-// $current_url = new moodle_url('/local/yourplugin/' . basename($_SERVER['REQUEST_URI']));
+// Obtener URL
 $current_url=  basename($_SERVER['REQUEST_URI']);
-echo basename($_SERVER['REQUEST_URI']);
-
 
 $PAGE->set_context($context);
-// $PAGE->set_url($url);
-// $PAGE->set_title($pagetitle);
-// $PAGE->set_heading($pagetitle);
 
 // Verificar si los datos fueron enviados
 if (isset($_POST['dataArray'])) {
@@ -527,6 +403,7 @@ if (empty($contentid)) {
     $contentid = null;
 }
 
+// Definir parametros 
 $values = [
     'id' => $contentid,
     'library' => $library,
@@ -536,30 +413,25 @@ $values = [
     'tipo' => $tipo,
 ];
 
-// Instantiate the myform form from within the plugin.
+// Instanciar el formulario H5P en el plugin.
 $mform = new test_editor_form($current_url, $values);
 
-// Form processing and displaying is done here.
+// Procesar y mostrar el formulario H5P.
 if ($mform->is_cancelled()) {
-    // If there is a cancel element on the form, and it was pressed,
-    // then the `is_cancelled()` function will return true.
-    // You can handle the cancel operation here.
+    // Si el recurso H5P se cancela, `is_cancelled()`retorna true.
     $contentid = null;
     $library = null;
     $_SESSION['dataArray']=$dataArray;
 } else if ($data = $mform->get_data()) {
 
     if (isset($data->deletebutton)) {
-        // Handle delete button submission here
-        // TODO For example: delete the relevant record, or perform any deletion action. 
+        // TODO Eliminar recurso H5P 
         echo "Delete button pressed";
-        redirect($current_url, 'Item deleted successfully', 2);
+        redirect($current_url, 'Se ha eliminado el recurso existosamente', 2);
     } else {
-
-        // Decode the JSON string inside h5pparams into an associative array
+        // Transformar JSON a un array
         $h5pparams = json_decode($data->h5pparams, true);
-        //TODO verificar si ya tiene el nombre del topico o no porque al editarlo intenta agregarlo nuevamente LISTO abajo
-        // Update the value of the "extraTitle" field
+        // Actualizar el valor de "extraTitle" 
         // Verificar si el tópico ya está en el extraTitle
         if (strpos($h5pparams['metadata']['extraTitle'], $data->topic) === false) {
             // Si el tópico no está en extraTitle, lo agregamos
@@ -572,77 +444,44 @@ if ($mform->is_cancelled()) {
             $h5pparams['metadata']['title'] = $data->topic . "-" . $h5pparams['metadata']['title'] . "-ID" . $oaid;
         }
 
-        // Encode the modified h5pparams array back into JSON format
+        // Transformar de nuevo el array en JSON
         $data->h5pparams = json_encode($h5pparams);
 
-        // When the form is submitted, and the data is successfully validated,
-        // the `get_data()` function will return the data posted in the form.
+        // Cuando se guarda el formulario H5P, y todo fue validado `get_data()` retorna la info
         $mform->save_h5p($data);
         $contentid = null;
         $library = null;
     }
 }
 else{
-    echo "I AM ON THE LAST ELSE";
+    echo "error";
 }
 
 echo $OUTPUT->header();
 
-//Create table
+//Crear tabla
 $table = new html_table();
 $table->width = '70%';
-
-// $table->head = array("firstname","count");
 $table->align = array( 'left','centre');
 $table->size = array( '55%','15%');
-
-// Sample data array of objects
-// $result = [
-//             (object) ['firstname' => 'John', 'lastname' => 'Doe', 'count' => 3],
-//             (object) ['firstname' => 'Jane', 'lastname' => 'Smith', 'count' => 5]
-// ];
-
-// foreach($result as $rec) {
-
-//     $table->data[] = new html_table_row(array( implode(array($rec->firstname," ",$rec->lastname)), $rec->count));
-
-// }
 
 echo html_writer::start_div();
 echo html_writer::table($table);
 echo html_writer::end_div();
 
-// $mform1 = new myform(null, $values);
-// // Form processing and displaying is done here.
-// if ($mform1->is_cancelled()) {
-//     // If there is a cancel element on the form, and it was pressed,
-//     // then the `is_cancelled()` function will return true.
-//     // You can handle the cancel operation here.
-// } else if ($fromform = $mform1->get_data()) {
-//     // When the form is submitted, and the data is successfully validated,
-//     // the `get_data()` function will return the data posted in the form.
-// } else {
-//     // This branch is executed if the form is submitted but the data doesn't
-//     // validate and the form should be redisplayed or on the first display of the form.
-
-//     // Set anydefault data (if any).
-//     $mform1->set_data($toform);
-
-//     // Display the form.
-//     $mform1->display();
-// }
-
+// Funcion para verificar como termina el titulo del recurso H5P
 function checkTitleEndsWith($title, $searchString) {
-    // Get the length of the search string
+    // Obtener el largo de la cadena searchString
     $searchStringLength = strlen($searchString);
-    // Get the ending part of the title that is the same length as the search string
+    // Obtener la ultima parte del title del mismo largo que searchString
     $ending = substr($title, -$searchStringLength);
-    // Compare the ending with the search string
+    // Comparar las cadenas
     return $ending === $searchString;
 }
 
+// Si se trata de un nuevo recurso H5P
 if ($contentid === null && empty($library)) {
-    // Create a form.
+    // Crear formulario
     echo html_writer::start_tag('form', array('method' => 'post', 'action' => ''));
     echo html_writer::start_div();
 
@@ -655,39 +494,17 @@ if ($contentid === null && empty($library)) {
             
             $filecontextid = $file->get_contextid();
             $options[] = [];
-            if($filecontextid == $contextid){//Filtar solo los correspondientes a este curso, mas abajo filtro por OA
+            //Filtar solo los correspondientes a este curso, mas abajo filtro por OA
+            if($filecontextid == $contextid){
                 list($filecontext, $course, $cm) = get_context_info_array($filecontextid);
                 $coursename = $course->fullname ?? $SITE->fullname;
-                // $modulename = ($course) ? ' - Module: ' . ($cm->name ?? 'ERROR: No module') : '';
                 $params = json_decode($h5pcontent->jsoncontent);
                 $h5pcontenttitle = ' - ' . ($params->metadata->title ?? 'ERROR: No title');
                 //Filtramos solo los h5p correspondientes a este OA 
                 // TODO filtrar los que corresponden a los topicos seleccionados
                 if(checkTitleEndsWith($h5pcontenttitle, "-ID".$oaid)){
                     $options[$h5pcontent->id] = $coursename .  $h5pcontenttitle;
-
                 }
-                
-                // if($h5pcontent->id==33){    
-                    // Send the file to the user for download
-                    // Get the URL of the file
-
-                    // $url = moodle_url::make_pluginfile_url(
-                    //     $file->get_contextid(),
-                    //     $file->get_component(),
-                    //     $file->get_filearea(),
-                    //     $file->get_itemid(),
-                    //     $file->get_filepath(),
-                    //     $file->get_filename(),
-                    //     false                     // Do not force download of the file.
-                    // );
-
-                    // echo $url;
-                    // echo $file->get_contextid().$file->get_component().$file->get_filearea().$file->get_itemid().$file->get_filepath().$file->get_filename();
-                    // // Echo the HTML button with the file URL
-                    // echo '<a href="' . $url . '" download>Download File</a>';
-
-                // }
             }
         }
     }
@@ -695,7 +512,7 @@ if ($contentid === null && empty($library)) {
     echo html_writer::label('Selecccionar un archivo para editar: ', 'id');
     echo html_writer::select($options, 'id');
 
-    // Button to submit form.
+    // Boton para editar H5P existente
     echo html_writer::start_div('', array('style' => 'margin-top: 20px'));
     echo html_writer::tag('button', 'Editar', array('id' => 'buttonEditarH5P', 'style' => 'background-color: #0073e6; color: white; border: none; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 5px; transition: background-color 0.3s ease;'));
     echo html_writer::end_div();
@@ -705,6 +522,7 @@ if ($contentid === null && empty($library)) {
     $editor_ajax = new editor_ajax();
     $libraries = $editor_ajax->getLatestLibraryVersions();
 
+    //Tipos de recurso H5P
     foreach ($libraries as $library) {
         $key = H5PCore::libraryToString(['name'=>$library->machine_name, 'majorVersion' => $library->major_version,
             'minorVersion' => $library->minor_version]);
@@ -712,6 +530,7 @@ if ($contentid === null && empty($library)) {
     }
 
     $topics = [];
+    // Tipos de componente
     $tipos = array(
         'contenido' => 'Contenido',
         'ejemplo' => 'Ejemplo',
@@ -723,21 +542,18 @@ if ($contentid === null && empty($library)) {
     echo html_writer::select($topics, 'topic');
     echo html_writer::select($options2, 'library');
 
-    // Button to submit form.
+    // Boton para crear un recurso H5P nuevo
     echo html_writer::start_div('', array('style' => 'margin-top: 20px'));
     echo html_writer::tag('button', 'Crear', array('id' => 'buttonCrearNuevoH5P', 'style' => 'background-color: #0073e6; color: white; border: none; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 5px; transition: background-color 0.3s ease;'));
     echo html_writer::end_div();
 
-    // Close form.
+    // Cerrar formulario
     echo html_writer::end_div();
     echo html_writer::end_tag('form');
 } else {
     $mform->display();
 }
 
-
-
-// echo $instanciasOAJSON;
-// $PAGE->requires->js_call_amd('local_yourplugin/main', 'init', array($instanciasOAJSON));
+// Incluir javascript
 $PAGE->requires->js_call_amd('local_yourplugin/h5pEditor', 'init', array($dataArrayJSON)); 
 echo $OUTPUT->footer();

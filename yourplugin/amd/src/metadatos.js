@@ -4,6 +4,30 @@ define(['jquery','core/log'], function($, log){
     return {
         init: function() {
             $(document).ready(function(){
+                // Obtener el URL
+                var queryString = window.location.search;
+
+                // Eliminar el '?' character.
+                queryString = queryString.substring(1);
+
+                // Dividir los parametros en un array
+                var params = queryString.split('&');
+
+                // Crear objeto para almacenar los parametros.
+                var paramsObject = {};
+
+                // Iterar y almacenar en paramsObject.
+                params.forEach(function(param) {
+                    var keyValue = param.split('=');
+                    var key = decodeURIComponent(keyValue[0]);
+                    var value = decodeURIComponent(keyValue[1]);
+                    paramsObject[key] = value;
+                });
+
+                // Obtener parametros
+                var paramCourseid = paramsObject['courseid'];
+                var paramOAID = paramsObject['oaid'];
+
                 // Estilos que se aplicarán a cada botón
                 const estilosBoton = {
                     backgroundColor: '#4CAF50', // Color verde del botón en la imagen
@@ -23,8 +47,6 @@ define(['jquery','core/log'], function($, log){
                     transform : 'translateX(-50%)'// Para centrar el botón
                 };
 
-                log.debug("CHECK METADATOS");
-                // Function to create and append elements dynamically
                 /**
                  * Crea un campo de entrada (input) y lo enlaza a la página.
                  * @param {string} labelText - El texto que se mostrará en la etiqueta del campo.
@@ -125,41 +147,22 @@ define(['jquery','core/log'], function($, log){
                     return container;
                 }
 
-                // Function to create the form
                 /**
                  * Crea y genera el formulario de ontología LOM dinámicamente y lo añade al documento.
                  */
                 function createLomForm() {
                     var mainDiv = document.querySelector('div[role="main"]');
                     const lomForm = document.createElement('div');
-                    // const lomForm = document.getElementById('lom-form');
 
-                    // General Section
                     lomForm.appendChild(createInput('Título:', 'title', 'text', 'Título del objeto de aprendizaje', true));
                     lomForm.appendChild(createInput('Conocimientos Previos:', 'prerequisitos', 'text',
                     'Conocimientos previos que el alumno debe tener para interactuar con el OA.'));
                     lomForm.appendChild(createInput('Idioma:', 'language', 'text', 'Idioma (ej: es)',true));
                     lomForm.appendChild(createInput('Palabras clave:', 'keywords', 'text', 'Palabras clave (separadas por comas)'));
-
-                    // Life Cycle Section
                     lomForm.appendChild(createInput('Autor:', 'author', 'text', 'Nombre del autor', true));
                     lomForm.appendChild(createInput('Tema:', 'tema', 'text', 'Tema/s separados por coma', true));
-
-                    // Meta-metadata Section
                     lomForm.appendChild(createInput('Asignatura:', 'asignatura', 'text',
                     'Nombre de la asignatura', true));
-                    // lomForm.appendChild(createInput('Fecha de creación de metadatos:', 'metadataDate', 'date'));
-
-                    // Technical Section
-                    // lomForm.appendChild(createInput('Formato:', 'format', 'text', 'Formato del recurso (ej: video/mp4)'));
-                    // lomForm.appendChild(createInput('Tamaño (en bytes):', 'size', 'number', 'Tamaño del recurso en bytes'));
-
-                    // Educational Section
-                    // lomForm.appendChild(createInput('Tipo de Interactividad:', 'interactivityType', 'text',
-                    // 'Tipo de interactividad (ej: activo)'));
-                    // lomForm.appendChild(createInput('Dificultad:', 'difficulty', 'text', 'Dificultad (ej: media)'));
-
-                    // Rights Section
                     lomForm.appendChild(createSelect('Nivel Educativo', 'nivel',
                         ['Seleccionar','Primario', 'Secundario', 'Universitario', 'Posgrado']));
                     lomForm.appendChild(createSelect('Público objetivo', 'anioing',
@@ -180,24 +183,25 @@ define(['jquery','core/log'], function($, log){
                     }
 
                     var contenedorMensajes = document.createElement("div");
-                    // Add event listener to button
+                    // Event listener to button
                     buttonGuardar.addEventListener('click', async function() {
-                        log.debug("CLICKED");
                         const titleInput = document.getElementById('title');
                         const asignaturaInput = document.getElementById('asignatura');
                         const languageInput = document.getElementById('language');
                         const authorInput = document.getElementById('author');
                         const temaInput = document.getElementById('tema');
+
+                        // Verificar que los metadatos minimos esten completos
                         if (titleInput.value.trim() != ''
                             && asignaturaInput.value.trim() != ''
                             && languageInput.value.trim() != ''
                             && authorInput.value.trim() != ''
                             && temaInput.value.trim() != '') {
-
+                            // Enviar metadatos a la ontologia
                             fetch("http://localhost:8080/ontology/insertMetadatos", {
                                     method: "POST",
                                     headers: {
-                                      "Content-Type": "application/x-www-form-urlencoded", // O "application/json" si es necesario
+                                      "Content-Type": "application/x-www-form-urlencoded",
                                     },
                                     body: new URLSearchParams({
                                         titulo: titleInput.value.trim(),
@@ -208,11 +212,11 @@ define(['jquery','core/log'], function($, log){
                                 if (!response.ok) {
                                 throw new Error("Error en la solicitud");
                                 }
-                                return response.text(); // O .json() si esperas una respuesta JSON
+                                return response.text();
                             })
                             .then(data => {
                                 log.debug("Respuesta del servidor insertMetadatos:", data);
-                                // Redirigir a la página de tu plugin local
+                                // Redirigir a la proxima pantalla 
                                 window.location.href = 'http://localhost/local/yourplugin/exportScorm.php?courseid='
                                 + paramCourseid + '&oaid=' + paramOAID;
                             })
@@ -221,6 +225,7 @@ define(['jquery','core/log'], function($, log){
                             });
 
                         } else {
+                            // Mostrar advertencia sobre metadatos minimos no completos.
                             contenedorMensajes.setAttribute("id","contenedorMensajes");
                             contenedorMensajes.style.marginTop="80px";
                             contenedorMensajes.style.textAlign="center";
@@ -248,60 +253,32 @@ define(['jquery','core/log'], function($, log){
                     lomForm.insertAdjacentElement('afterend', buttonGuardar);
                 }
 
-                // Get the query string portion of the URL.
-                var queryString = window.location.search;
-
-                // Remove the leading '?' character.
-                queryString = queryString.substring(1);
-
-                // Split the query string into an array of key-value pairs.
-                var params = queryString.split('&');
-
-                // Create an object to store the parameters and their values.
-                var paramsObject = {};
-
-                // Iterate over the key-value pairs and populate the paramsObject.
-                params.forEach(function(param) {
-                    var keyValue = param.split('=');
-                    var key = decodeURIComponent(keyValue[0]);
-                    var value = decodeURIComponent(keyValue[1]);
-                    paramsObject[key] = value;
-                });
-
-                // Now you can access the parameters and their values from the paramsObject.
-                var paramCourseid = paramsObject['courseid'];
-                var paramOAID = paramsObject['oaid'];
-
-
-                  //enviar a la ontologia en el momento
-                  fetch("http://localhost:8080/ontology/getInfoMetadatos", {
+                
+                // Obtener metadatos automaticos de la ontologia
+                fetch("http://localhost:8080/ontology/getInfoMetadatos", {
                     method: "GET",
                     headers: {
-                      "Content-Type": "application/x-www-form-urlencoded", // O "application/json" si es necesario
+                      "Content-Type": "application/x-www-form-urlencoded",
                     }
                   })
-                  .then(response => {
+                .then(response => {
                     if (!response.ok) {
                       throw new Error("Error en la solicitud");
                     }
-                    return response.text(); // O .json() si esperas una respuesta JSON
+                    return response.text();
                   })
-                  .then(data => {
+                .then(data => {
                     log.debug("Respuesta del servidor GetInfoMetadatos:", data);
                     const list = JSON.parse(data);
 
-                    // Acceder al primer elemento
-                    const firstElement = list[0];
-                    log.debug("firstElement:", firstElement);
-
-                    // Call the function to create the form
+                    // Llamar a funcion para crear el formulario.
                     createLomForm();
 
-
-                    const titleInput = document.getElementById('title'); // Nombre
+                    // Completar los metadatos automaticamente.
+                    const titleInput = document.getElementById('title');
                     titleInput.value = list[2];
 
-                    const asignaturaInput = document.getElementById('asignatura'); // Nombre
+                    const asignaturaInput = document.getElementById('asignatura');
                     asignaturaInput.value = list[0];
 
                     const selectElementNivel = document.getElementById('nivel');
@@ -329,10 +306,10 @@ define(['jquery','core/log'], function($, log){
                             break;
                     }
 
-                    const languageInput = document.getElementById('language'); // Nombre
+                    const languageInput = document.getElementById('language');
                     languageInput.value = "Español";
 
-                    const temaInput = document.getElementById('tema'); // Nombre
+                    const temaInput = document.getElementById('tema');
                     temaInput.value = "";
                     for (let i = 3; i < list.length; i++) {
                         if(i != 3){
@@ -343,9 +320,9 @@ define(['jquery','core/log'], function($, log){
 
 
                   })
-                  .catch(error => {
+                .catch(error => {
                     log.debug("Error:", error);
-                  });
+                });
 
             });
         }
