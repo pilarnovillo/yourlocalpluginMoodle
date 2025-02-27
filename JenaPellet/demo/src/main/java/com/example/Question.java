@@ -28,6 +28,4 @@ public class Question {
         return "Question: " + question + "\nAnswers: " + answers;
     }
 
-    
-
 }
