@@ -7,15 +7,7 @@ use core_external\external_function_parameters;
 use core_external\external_single_structure;
 use core_external\external_multiple_structure;
 use core_external\external_value;
-use core_external\external_warnings;
-use context_module;
 
-/**
- * This is the external method for getting access information for a h5p activity.
- *
- * @copyright  2020 Carlos Escobedo <carlos@moodle.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class guardar_topico_oa extends external_api {
     /**
      * Parameters.
@@ -37,90 +29,48 @@ class guardar_topico_oa extends external_api {
 
 
     public static function execute(string $idTopico, int $oaid, bool $selected ): array {
-        require(__DIR__ . '/../../lib/easyrdf/vendor/autoload.php');
-       // Configura el endpoint SPARQL
-       $record = new \stdClass();
+        $record = new \stdClass();
         try {
 
-            $record->message = "no entro al if";
-            // Configura el endpoint SPARQL
-            $endpoint1 = 'http://localhost:3030/OA'; // Cambia 'dataset' por el nombre de tu dataset
-        
-            $sparql1 = new \EasyRdf\Sparql\Client($endpoint1);
+            $record->message = "Existoso";
 
             if($selected){
-                $insertQuery = "PREFIX oaca: <http://www.semanticweb.org/valer/ontologies/OntoOA#>
-                INSERT DATA {
-            
-                    oaca:Contenido{$oaid} oaca:contenidoDesarrollaTopico  oaca:{$idTopico}.
-                    
-                }"; 
-
-                $resultInsert = $sparql1->update($insertQuery);
-
-                $record->message = "Result Status: ".$resultInsert->getStatus();
-
                 //OWLAPI Integration
-                // Define the URL of the Spring Boot endpoint
                 $url = "http://localhost:8080/ontology/linkTopicToOA?oaid=" . urlencode($oaid)."&idTopic=".urlencode($idTopico);
 
-                // Initialize cURL session
                 $ch = curl_init($url);
 
-                // Set the cURL options for a POST request
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_POST, true);
 
-                // Execute the POST request
                 $response = curl_exec($ch);
 
-                // Check for errors
                 if (curl_errno($ch)) {
                     echo 'Error:' . curl_error($ch);
                 }
 
-                // Close the cURL session
                 curl_close($ch);
             }
             else{
-                $deleteQuery = "PREFIX oaca: <http://www.semanticweb.org/valer/ontologies/OntoOA#>
-                DELETE DATA {
-            
-                    oaca:Contenido{$oaid} oaca:contenidoDesarrollaTopico  oaca:{$idTopico}.
-                    
-                }"; 
-
-                $resultInsert = $sparql1->update($deleteQuery);
-
-                $record->message = "Result Status: ".$resultInsert->getStatus();
-
                 //OWLAPI Integration
-                // Define the URL of the Spring Boot endpoint
                 $url = "http://localhost:8080/ontology/unlinkTopicToOA?oaid=" . urlencode($oaid)."&idTopic=".urlencode($idTopico);
 
-                // Initialize cURL session
                 $ch = curl_init($url);
 
-                // Set the cURL options for a POST request
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_POST, true);
 
-                // Execute the POST request
                 $response = curl_exec($ch);
 
-                // Check for errors
                 if (curl_errno($ch)) {
                     echo 'Error:' . curl_error($ch);
                 }
 
-                // Close the cURL session
                 curl_close($ch);
-
             }
             
 
         } catch (Exception $e) {
-            echo "Error: " . $e->getMessage();
             $record->message = $e->getMessage();
         }
 
@@ -131,7 +81,7 @@ class guardar_topico_oa extends external_api {
 
         return new external_multiple_structure(
             new external_single_structure([
-                'message' => new external_value(PARAM_TEXT, 'id', VALUE_OPTIONAL),
+                'message' => new external_value(PARAM_TEXT, 'message', VALUE_OPTIONAL),
             ])
         );
     }
