@@ -18,7 +18,6 @@ public class UnidadDto {
         return nombre;
     }
 
-    // Getter for id
     public String getId() {
         return id;
     }
@@ -31,6 +30,3 @@ public class UnidadDto {
         this.temas.add(tema);
     }
 }
-
-
-
