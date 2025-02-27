@@ -5,8 +5,6 @@ public class VerboDto {
     private String id;
     private String nivel;
     
-
-    // Getter and Setter for nombre
     public String getNombre() {
         return nombre;
     }
@@ -15,7 +13,6 @@ public class VerboDto {
         this.nombre = nombre;
     }
 
-    // Getter and Setter for id
     public String getId() {
         return id;
     }
