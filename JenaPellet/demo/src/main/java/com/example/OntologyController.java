@@ -1,6 +1,5 @@
 package com.example;
 
-import org.apache.jena.sparql.function.library.print;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -68,8 +67,6 @@ public class OntologyController {
     private String oaid = "";
     
     public OntologyController() {
-        
-        
     }
 
     // Método para iniciar la creacion de un nuevo OA
@@ -104,7 +101,6 @@ public class OntologyController {
         // Agrega el IRIMapper al gestor de ontologías.
         manager.getIRIMappers().add(iriMapperOntoLOM);
 
-
         IRI ontoMETIRI = IRI.create("http://www.semanticweb.org/valer/ontologies/OntoMET");
         // Mapea el IRI de la ontología importada a una ruta de archivo local.
         File ontoMET = new File("C:\\Users\\piluc\\Downloads\\OntoMET.owl");
@@ -112,14 +108,12 @@ public class OntologyController {
         // Agrega el IRIMapper al gestor de ontologías.
         manager.getIRIMappers().add(iriMapperOntoMET);
 
-
         IRI ontoOAIRI = IRI.create("http://www.semanticweb.org/valer/ontologies/OntoOA");
         // Mapea el IRI de la ontología importada a una ruta de archivo local.
         File ontoOA = new File("C:\\Users\\piluc\\Downloads\\Base 3 OntoOA y OntoT (2).owl");
         SimpleIRIMapper iriMapperOntoOA = new SimpleIRIMapper(ontoOAIRI, IRI.create(ontoOA));
         // Agrega el IRIMapper al gestor de ontologías.
         manager.getIRIMappers().add(iriMapperOntoOA);
-
 
         IRI ontoTIRI = IRI.create("http://www.semanticweb.org/valer/ontologies/OntoT");
         // Mapea el IRI de la ontología importada a una ruta de archivo local.
@@ -135,7 +129,6 @@ public class OntologyController {
         for (OWLOntology importedOntology : ontologyConocimiento.getImports()) {
             System.out.println("Imported ontology: " + importedOntology.getOntologyID());
         }
-
 
         return "Se recibieron los parámetros: " + oaid;
     }
