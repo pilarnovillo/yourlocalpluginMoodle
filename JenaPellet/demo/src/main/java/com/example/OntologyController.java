@@ -1,6 +1,5 @@
 package com.example;
 
-import org.apache.jena.sparql.function.library.print;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
